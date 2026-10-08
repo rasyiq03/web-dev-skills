@@ -128,16 +128,20 @@ def build_base_css(project_name, today_str):
     return header + "\n" + body
 
 
-def build_skeleton_html(page_id, site_type, chosen_layout, project_name, today_str, lang, fonts_links, has_data_sections):
+def build_skeleton_html(page_id, site_type, chosen_layout, project_name, today_str, lang, fonts_links, has_data_sections, file_rel=None):
     """
     Menyusun kerangka file HTML untuk satu halaman sesuai konvensi.
 
     I.S. : page_id ('index', 'tentang', dll.), konfigurasi layout dan font lengkap.
     F.S. : String HTML valid dikembalikan.
     """
+    if file_rel is None:
+        is_root = (page_id == "index")
+        file_rel = "index.html" if is_root else f"pages/{page_id}.html"
+
+    depth = len(file_rel.split("/")) - 1
+    prefix = "../" * depth
     is_root = (page_id == "index")
-    prefix = "" if is_root else "../"
-    file_rel = "index.html" if is_root else f"pages/{page_id}.html"
 
     # Cari section untuk halaman ini
     page_sections = [s for s in site_type.get("sections", []) if s.get("page") == page_id]
@@ -314,19 +318,24 @@ def scaffold(slug, force=False):
         if chart_vendor_src.is_file():
             shutil.copyfile(chart_vendor_src, site_dir / "js" / "vendor" / "chart.umd.js")
 
-    # 7. Skeleton HTML per halaman
+    # 7. Skeleton HTML per halaman untuk setiap bahasa
     fonts_links = io.read_text(proj_dir / "fonts.html")
     pages_list = project.site_pages(brief, site_type)
+    all_langs = brief.get("languages", ["id"])
 
-    for p in pages_list:
-        page_has_data = any(s.get("page") == p and s.get("data") is True for s in site_type.get("sections", []))
-        html_code = build_skeleton_html(
-            p, site_type, chosen_layout, project_name, today_str, first_lang, fonts_links, page_has_data
-        )
-        if p == "index":
-            io.write_text(site_dir / "index.html", html_code)
-        else:
-            io.write_text(site_dir / "pages" / f"{p}.html", html_code)
+    for l_idx, current_l in enumerate(all_langs):
+        for p in pages_list:
+            page_has_data = any(s.get("page") == p and s.get("data") is True for s in site_type.get("sections", []))
+            if l_idx == 0:
+                rel = "index.html" if p == "index" else f"pages/{p}.html"
+            else:
+                rel = f"{current_l}/index.html" if p == "index" else f"{current_l}/pages/{p}.html"
+            target_file = site_dir / rel
+            target_file.parent.mkdir(parents=True, exist_ok=True)
+            html_code = build_skeleton_html(
+                p, site_type, chosen_layout, project_name, today_str, current_l, fonts_links, page_has_data, file_rel=rel
+            )
+            io.write_text(target_file, html_code)
 
     # 8. Salin konfigurasi dari config/ ke projects/<slug>/ dan hash
     config_hashes = {}

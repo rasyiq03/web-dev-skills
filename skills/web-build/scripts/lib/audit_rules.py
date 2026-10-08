@@ -894,8 +894,8 @@ def check_bilingual_parity(proj_dir, brief):
     p1 = set(re.findall(r"\[\[ISI:\s*[^\]]+\]\]", c1_text))
     p2 = set(re.findall(r"\[\[ISI:\s*[^\]]+\]\]", c2_text))
 
-    n1 = set(re.findall(r"\b\d+([.,]\d+)?\b", c1_text))
-    n2 = set(re.findall(r"\b\d+([.,]\d+)?\b", c2_text))
+    n1 = set(re.findall(r"\b\d+(?:[.,]\d+)?\b", c1_text))
+    n2 = set(re.findall(r"\b\d+(?:[.,]\d+)?\b", c2_text))
 
     if n1 != n2:
         diff = (n1 - n2) | (n2 - n1)
