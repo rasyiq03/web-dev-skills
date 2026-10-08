@@ -21,6 +21,7 @@ GENERATOR = f"{TOOL_NAME} {VERSION}"
 REPO_ROOT = Path(__file__).resolve().parents[4]
 SKILLS_DIR = REPO_ROOT / "skills"
 BUILD_DIR = SKILLS_DIR / "web-build"
+SCRIPTS_DIR = BUILD_DIR / "scripts"
 DESIGN_DIR = SKILLS_DIR / "web-design"
 SCHEMAS_DIR = BUILD_DIR / "schemas"
 SITE_TYPES_DIR = BUILD_DIR / "site-types"
@@ -33,6 +34,16 @@ CONFIG_DIR = REPO_ROOT / "config"
 NODE_MODULES = REPO_ROOT / "node_modules"
 
 SLUG_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+
+
+def repo_root():
+    """Mengembalikan root repository."""
+    return REPO_ROOT
+
+
+def scripts_dir():
+    """Mengembalikan folder scripts skills/web-build/scripts."""
+    return SCRIPTS_DIR
 
 
 # ============================================================
