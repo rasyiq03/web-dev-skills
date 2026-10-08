@@ -215,12 +215,31 @@ def run_check(slug):
     findings += audit_rules.check_css_raw_color(site_dir)
     findings += audit_rules.check_js_conventions(site_dir)
 
-    # 5. Batasan keputusan (TFS)
+    # 5. Audit Anti-Slop (Langkah 5)
+    findings += audit_rules.audit_anti_slop(proj_dir, brief, decisions, site_type)
+
+    # 6. Batasan keputusan (TFS) (Langkah 6)
     c_findings, tfs_auto = audit_rules.evaluate_constraints(proj_dir, decisions)
     findings += c_findings
 
-    # 6. Lapisan data mock
+    # 7. Lapisan data mock (Langkah 7)
     findings += audit_rules.check_data_layer(proj_dir, site_type)
+
+    # 8. Paritas dwibahasa (Langkah 8)
+    findings += audit_rules.check_bilingual_parity(proj_dir, brief)
+
+    # Deduplikasi temuan
+    seen_keys = set()
+    unique_findings = []
+    for f in findings:
+        key = (f["rule"], f.get("file"), f.get("line"), f.get("message"))
+        if key not in seen_keys:
+            seen_keys.add(key)
+            unique_findings.append(f)
+    findings = unique_findings
+
+    # 9. Signature score (Langkah 9)
+    signature_score = audit_rules.compute_signature_score(site_dir, decisions, findings)
 
     # Ringkasan temuan
     errors_count = sum(1 for f in findings if f["level"] == "error")
@@ -229,8 +248,6 @@ def run_check(slug):
 
     lint_count = sum(1 for f in findings if f["category"] == "lint" and f["level"] in ("error", "warning"))
     design_count = sum(1 for f in findings if f["category"] == "design" and f["level"] in ("error", "warning"))
-
-    signature_score = 1.0 if not any(f["rule"].startswith("file-header") or f["rule"].startswith("banner") for f in findings) else 0.85
 
     report_data = {
         "round": current_round,
