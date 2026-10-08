@@ -199,20 +199,30 @@ def node_modules_complete(folder, packages):
     return all((folder / name / "package.json").is_file() for name in packages)
 
 
-def npm_ci(repo_root, npm, tmp):
+def npm_ci(repo_root, npm, packages, tmp):
     """
     Memasang alat Node persis sesuai package-lock.json ke folder tmp.
 
-    I.S. : npm adalah path perintah npm; tmp folder kosong.
+    I.S. : npm adalah path perintah npm; packages adalah paket yang wajib ada; tmp kosong.
     F.S. : package.json dan package-lock.json tersalin ke tmp; CompletedProcess npm ci
-           dikembalikan.
+           dikembalikan. Bila npm ci sukses tetapi ada paket yang tidak terpasang (misalnya
+           NODE_ENV=production melewati devDependencies), kode keluar diubah menjadi 1 dan
+           stderr menyebut paketnya, agar folder yang tidak lengkap tidak masuk cache.
     """
     for name in NODE_MANIFESTS:
         shutil.copyfile(Path(repo_root) / name, tmp / name)
 
-    command = [npm, "ci", "--no-audit", "--no-fund", "--loglevel=error"]
+    # --include=dev: alat pemeriksa ada di devDependencies, jangan ikut dilewati
+    command = [npm, "ci", "--include=dev", "--no-audit", "--no-fund", "--loglevel=error"]
+    result = subprocess.run(command, cwd=tmp, capture_output=True, text=True, encoding="utf-8")
 
-    return subprocess.run(command, cwd=tmp, capture_output=True, text=True, encoding="utf-8")
+    missing = [name for name in packages if not (tmp / "node_modules" / name / "package.json").is_file()]
+
+    if result.returncode == 0 and missing:
+        reason = f"npm ci selesai tetapi paket ini tidak terpasang: {', '.join(missing)}"
+        return subprocess.CompletedProcess(command, 1, result.stdout, reason)
+
+    return result
 
 
 def ensure_node_tools(repo_root, cache):
@@ -247,6 +257,6 @@ def ensure_node_tools(repo_root, cache):
                 "terminal, then run the same command again",
             )
 
-        install_into(final, "alat Node (npm ci)", functools.partial(npm_ci, repo_root, npm))
+        install_into(final, "alat Node (npm ci)", functools.partial(npm_ci, repo_root, npm, packages))
 
     return final / "node_modules"

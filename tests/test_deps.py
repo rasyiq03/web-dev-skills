@@ -88,6 +88,34 @@ def test_node_tools_without_node_fail_with_message(stand_in_repo, tmp_path, monk
     assert not cache.exists()
 
 
+def make_fake_npm(folder):
+    """
+    Membuat npm tiruan yang selesai dengan kode 0 tanpa memasang apa pun.
+
+    I.S. : folder ada.
+    F.S. : Path npm tiruan (npm.cmd di Windows, skrip sh di tempat lain) dikembalikan.
+    """
+    if os.name == "nt":
+        fake = folder / "npm.cmd"
+        fake.write_text("@exit /b 0\r\n", encoding="utf-8")
+    else:
+        fake = folder / "npm"
+        fake.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+        fake.chmod(0o755)
+
+    return fake
+
+
+def test_npm_ci_without_all_packages_counts_as_failure(stand_in_repo, tmp_path):
+    work = tmp_path / "work"
+    work.mkdir()
+
+    result = deps.npm_ci(stand_in_repo, str(make_fake_npm(tmp_path)), ["eslint"], work)
+
+    assert result.returncode != 0
+    assert "eslint" in result.stderr
+
+
 def test_failed_install_leaves_no_cache_folder(tmp_path):
     final = tmp_path / "cache" / "py-x"
     failing = [sys.executable, "-c", "import sys; sys.exit(3)"]
@@ -111,6 +139,17 @@ def test_node_tools_install_into_cache_once(stand_in_repo, tmp_path, monkeypatch
     # Panggilan kedua tanpa node/npm di PATH harus memakai cache tanpa memasang ulang
     monkeypatch.setenv("PATH", python_only_path())
     assert deps.ensure_node_tools(stand_in_repo, cache) == modules
+
+
+@pytest.mark.network
+def test_node_tools_include_dev_packages_under_production_env(stand_in_repo, tmp_path, monkeypatch):
+    # NODE_ENV=production membuat npm ci melewati devDependencies (eslint, stylelint, ...)
+    monkeypatch.setenv("NODE_ENV", "production")
+
+    modules = deps.ensure_node_tools(stand_in_repo, tmp_path / "cache")
+
+    assert (modules / "eslint" / "package.json").is_file()
+    assert (modules / "stylelint" / "package.json").is_file()
 
 
 @pytest.mark.network

@@ -16,8 +16,10 @@ and the fixes in step 7.
   testimonials, client logos, statistics) becomes a placeholder `[[ISI: <what>]]`.
 - Run every command from the folder Claude Code was opened in, exactly as written here.
   Every script prints what it wrote and exits non-zero on failure; read its output before
-  moving on. On a new machine the first command installs the Python packages and Node
-  tools once (about a minute, needs internet); let it finish.
+  moving on. On a new machine the first script after `path` (usually `validate_brief`)
+  installs the Python packages and Node tools once, which needs internet and can take
+  several minutes on a slow connection. Give that call a timeout of 10 minutes, and do not
+  interrupt or repeat it while it runs.
 - `<project>` below is the folder printed in step 1. Write every project file there.
 - Work without stopping to ask the user, unless they asked for interactive mode or a
   script tells you to ask.

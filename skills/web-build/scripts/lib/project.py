@@ -28,6 +28,13 @@ def open_project(slug, need=()):
     project = paths.project_dir(slug)
 
     if not project.is_dir():
+        # Agen yang pindah ke dalam proyek akan membuat proyek ganda bila disuruh menulis brief
+        home = paths.find_project_home(slug)
+
+        if home is not None:
+            fail(EXIT_INVALID, [f"Folder proyek tidak ada: {project}", f"Proyek {slug} ada di {home / slug}."],
+                 f"run the command from {home}, the folder that contains {slug}/")
+
         fail(EXIT_INVALID, f"Folder proyek tidak ada: {project}",
              f"write {project / 'brief.yaml'} first")
 

@@ -4,9 +4,14 @@
 #             ke skrip, kode keluar skrip, dan subperintah path.
 # ============================================================
 
+import os
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 
-from conftest import REPO, next_line, run_script
+import pytest
+from conftest import FIXTURES, REPO, SCRIPTS, next_line, run_script
 
 
 def printed_project(result):
@@ -83,3 +88,41 @@ def test_run_path_rejects_invalid_slug():
     result = run_script("run", "path", "Kopi Senja")
 
     assert result.returncode == 1
+
+
+def test_run_from_inside_project_points_to_its_parent(monkeypatch, tmp_path):
+    monkeypatch.delenv("PD_PROJECTS_DIR", raising=False)
+    project = tmp_path / "kopi-senja"
+    (project / "site").mkdir(parents=True)
+    shutil.copyfile(FIXTURES / "kopi-senja" / "brief.yaml", project / "brief.yaml")
+
+    result = run_script("run", "validate_brief", "kopi-senja", cwd=project / "site")
+
+    assert result.returncode == 1
+    assert next_line(result) == (
+        f"NEXT: run the command from {tmp_path.resolve()}, the folder that contains kopi-senja/"
+    )
+    assert not (project / "site" / "kopi-senja").exists()
+
+
+@pytest.mark.network
+def test_prepared_packages_reach_child_processes(tmp_path):
+    # serve.py menjalankan validate_brief.py sebagai proses anak; paket di cache harus ikut
+    probe = (
+        "import os, subprocess, sys; sys.path.insert(0, sys.argv[1]);"
+        "import run; run.prepare_dependencies();"
+        "child = subprocess.run([sys.executable, '-S', '-c', 'import yaml, jsonschema']);"
+        "sys.exit(child.returncode)"
+    )
+    env = dict(os.environ, PD_CACHE_DIR=str(tmp_path / "cache"))
+
+    result = subprocess.run(
+        [sys.executable, "-S", "-c", probe, str(SCRIPTS)],
+        env=env,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=600,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr

@@ -122,6 +122,23 @@ def projects_dir():
     return cwd
 
 
+def find_project_home(slug):
+    """
+    Mencari folder induk proyek dari folder kerja, untuk agen yang pindah ke dalam proyek.
+
+    I.S. : slug sudah sah; folder kerja boleh berada di dalam folder proyek (misalnya site/).
+    F.S. : Folder yang memuat <slug>/brief.yaml, bila <slug> adalah folder kerja atau salah
+           satu induknya, dikembalikan; None bila tidak ada.
+    """
+    cwd = Path.cwd().resolve()
+
+    for folder in (cwd, *cwd.parents):
+        if folder.name == slug and (folder / "brief.yaml").is_file():
+            return folder.parent
+
+    return None
+
+
 def is_valid_slug(slug):
     """
     Memeriksa apakah slug berbentuk kebab-case huruf kecil.

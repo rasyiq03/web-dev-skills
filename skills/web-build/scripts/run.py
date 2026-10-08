@@ -65,10 +65,17 @@ def prepare_dependencies():
     Memastikan paket Python dan alat Node siap sebelum skrip dijalankan.
 
     I.S. : paths.REPO_ROOT berisi requirements.txt, package.json, package-lock.json.
-    F.S. : Paket Python bisa diimpor; PD_NODE_MODULES menunjuk node_modules yang dipakai.
+    F.S. : Paket Python bisa diimpor, juga oleh proses anak lewat PYTHONPATH (serve.py
+           menjalankan validate_brief.py sebagai proses terpisah); PD_NODE_MODULES menunjuk
+           node_modules yang dipakai.
     """
     cache = deps.cache_root()
-    deps.ensure_python_packages(paths.REPO_ROOT, cache)
+    target = deps.ensure_python_packages(paths.REPO_ROOT, cache)
+
+    if target is not None:
+        existing = os.environ.get("PYTHONPATH")
+        os.environ["PYTHONPATH"] = os.pathsep.join([str(target), existing] if existing else [str(target)])
+
     node_modules = deps.ensure_node_tools(paths.REPO_ROOT, cache)
     os.environ["PD_NODE_MODULES"] = str(node_modules)
 
