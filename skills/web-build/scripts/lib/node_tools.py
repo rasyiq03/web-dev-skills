@@ -6,6 +6,7 @@
 # ============================================================
 
 import re
+import shutil
 import subprocess
 
 from lib import io, paths
@@ -69,6 +70,29 @@ def run_tool(package, args, cwd):
         )
     except FileNotFoundError:
         return subprocess.CompletedProcess(args, EXIT_NOT_RUN, "", "Perintah node tidak ditemukan di PATH.")
+
+
+def lint_config(name):
+    """
+    Menentukan file config linter yang impor plugin-nya bisa ditemukan.
+
+    I.S. : name adalah nama file di config/, misalnya eslint.config.js.
+    F.S. : config/<name> dikembalikan bila node_modules yang dipakai berada di salah satu
+           induknya (mode pengembangan). Selain itu config disalin ke
+           <node_modules>/../config/<name> dan path salinan itu dikembalikan, karena ESLint dan
+           stylelint mencari plugin dari lokasi file config.
+    """
+    source = paths.CONFIG_DIR / name
+    modules = paths.node_modules_dir().resolve()
+
+    if modules.parent in source.resolve().parents:
+        return source
+
+    target = modules.parent / "config" / name
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(source, target)
+
+    return target
 
 
 # ============================================================

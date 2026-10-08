@@ -55,16 +55,16 @@ def eslint_args():
     Menyusun argumen ESLint bersama untuk mode perbaikan dan mode laporan.
 
     I.S. : -
-    F.S. : List argumen dikembalikan. Config diambil dari config/ di repo karena impor
-           plugin di eslint.config.js hanya bisa ditemukan dari node_modules repo;
-           salinan di proyek tetap dijaga oleh pemeriksaan integritas konfigurasi.
+    F.S. : List argumen dikembalikan. Config diambil lewat node_tools.lint_config agar impor
+           plugin di eslint.config.js selalu ditemukan; salinan di proyek tetap dijaga oleh
+           pemeriksaan integritas konfigurasi.
     """
     return [
         JS_TARGET,
         "--ignore-pattern",
         "site/js/vendor/**",
         "--config",
-        str(paths.CONFIG_DIR / "eslint.config.js"),
+        str(node_tools.lint_config("eslint.config.js")),
     ]
 
 
@@ -73,10 +73,10 @@ def stylelint_args():
     Menyusun argumen stylelint bersama untuk mode perbaikan dan mode laporan.
 
     I.S. : -
-    F.S. : List argumen dikembalikan. Config diambil dari config/ di repo dengan alasan
-           yang sama seperti ESLint (plugin stylelint-order dicari dari lokasi config).
+    F.S. : List argumen dikembalikan. Config diambil lewat node_tools.lint_config dengan
+           alasan yang sama seperti ESLint (plugin stylelint-order dicari dari lokasi config).
     """
-    return ["--config", str(paths.CONFIG_DIR / ".stylelintrc.json"), CSS_TARGET]
+    return ["--config", str(node_tools.lint_config(".stylelintrc.json")), CSS_TARGET]
 
 
 def run_json_linter(proj_dir, package, args, ok_codes, target, report_file=None):
