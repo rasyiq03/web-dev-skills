@@ -11,16 +11,22 @@ different sites while each site stays internally consistent.
 
 ## Inputs
 
-- `projects/<slug>/brief.yaml` and `projects/<slug>/gaps.json` (it lists requirement ids
-  such as `req-audience` that your rationale must cite).
-- `styles/index.yaml`: one line per style. Read only this catalog first, then open the full
-  file of each style you actually use.
-- `layouts/patterns.yaml`: the layout patterns available for each section kind.
+- `<project>/brief.yaml` and `<project>/gaps.json` (it lists requirement ids such as
+  `req-audience` that your rationale must cite). `<project>` is the folder printed by
+  `python "${CLAUDE_PLUGIN_ROOT}/skills/web-build/scripts/run.py" path <slug>`; web-build
+  step 1 has already run it.
+- `${CLAUDE_PLUGIN_ROOT}/skills/web-design/styles/index.yaml`: one line per style. Read only
+  this catalog first, then open the full file of each style you actually use.
+- `${CLAUDE_PLUGIN_ROOT}/skills/web-design/layouts/patterns.yaml`: the layout patterns
+  available for each section kind.
+
+If `${CLAUDE_PLUGIN_ROOT}/skills` appears literally in this file (the skill was loaded
+without plugin support), it means the folder that contains this skill's folder.
 
 If the brief names a style (for example "neobrutalism") or a brand palette, every
 direction keeps it and varies only the other axes.
 
-## Write `projects/<slug>/directions.yaml`
+## Write `<project>/directions.yaml`
 
 Propose exactly 5 directions. Give each a `probability` between 0 and 1 that estimates how
 often a typical designer would produce this direction for this brief; the five values sum
@@ -55,7 +61,8 @@ directions:
 Each rationale line names something specific to this brief: the audience, the place, the
 product, or the business goal. A rationale that would fit any business needs rewriting.
 `based_on` lists requirement ids exactly as `gaps.json` prints them. The file must pass
-`skills/web-build/schemas/directions.schema.json`; `pick_direction.py` reports any mismatch.
+`${CLAUDE_PLUGIN_ROOT}/skills/web-build/schemas/directions.schema.json`; `pick_direction`
+reports any mismatch.
 
 ## Custom values
 
