@@ -96,6 +96,17 @@ and overwrites the pinned versions.
    run_name="__main__")` in the same process. `run.py` lives in `scripts/`, so
    `sys.path[0]` is already the scripts folder that `from lib import …` needs.
 
+### Lint configs next to the Node tools
+
+`config/eslint.config.js` imports its plugins, and `config/.stylelintrc.json` names
+`stylelint-order`; both resolve from the config file's own location. In an installed
+plugin, `config/` sits in the plugin folder and `node_modules` in the cache, so the
+imports would fail. `node_tools.lint_config(name)` returns the config to pass to the
+linter: `config/<name>` itself when the `node_modules` in use sits in one of its
+ancestors (development), otherwise a fresh copy at `<node_modules>/../config/<name>`, from
+where the plugins resolve. `check.py` uses it for ESLint and stylelint on every run, so a
+plugin update that changes a config takes effect even when the lock file did not change.
+
 Hashes are the first 12 hex characters of SHA-256. A plugin update that changes
 `requirements.txt` or `package-lock.json`, or a different Python version, gets a fresh
 cache folder automatically. Old folders are not removed automatically; the README says
@@ -139,6 +150,11 @@ user must install before running the same command again.
   `PD_NODE_MODULES` when set, else `REPO_ROOT/node_modules`. A function is needed because
   `run.py` imports `lib` before it knows which folder to export. `node_tools.py` and
   `scaffold.py` call the function.
+
+### Changes in `lib/node_tools.py` and `check.py`
+
+- New `lint_config(name)` as described above; `check.py` `eslint_args()` and
+  `stylelint_args()` pass its result to `--config`.
 
 ## 3. Project location and skill text
 
@@ -203,6 +219,13 @@ The same path changes for `styles/`, `layouts/`, `directions.schema.json`, and
     call reuses the folder without installing.
 - `paths.find_repo_root`: a copy of `skills/web-build/` under `<tmp>/.agents/skills/`
   inside a stand-in repository finds `<tmp>`.
+- `node_tools.lint_config`: with the repository's `node_modules` it returns
+  `config/<name>`; with `PD_NODE_MODULES` pointing elsewhere it returns an identical copy
+  next to that folder.
+- Marker `network`, end to end: copy only the files a plugin install contains (no
+  `node_modules`, no `.venv`) to a temporary plugin folder, then run every step through that
+  copy's `run.py` with `python -S` (no site-packages), a fresh `PD_CACHE_DIR`, and an empty
+  working folder; `check.py` reports zero errors.
 - Every `${CLAUDE_PLUGIN_ROOT}/<path>` written in either `SKILL.md` exists in the
   repository (placeholders such as `<site_type>` are matched against the folder listing).
 - `tests/test_sync_adapters.py` updated: only `.agents/skills/` is written; a stale
