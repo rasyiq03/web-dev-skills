@@ -40,6 +40,8 @@ def run_formatters(proj_dir):
         "--fix-type",
         "layout",
         "site/js/**/*.js",
+        "--ignore-pattern",
+        "site/js/vendor/**",
         "--config",
         "eslint.config.js",
     ]
@@ -54,12 +56,22 @@ def run_linters(proj_dir):
     Menjalankan linter dengan format output JSON dan mengumpulkan findings.
 
     I.S. : proj_dir siap.
-    F.S. : List finding dengan category='lint' dikembalikan.
+    F.S. : List finding dengan category='lint' dikembalikan (vendor dikecualikan).
     """
     findings = []
 
-    # 1. ESLint JSON
-    cmd_eslint = ["npx", "eslint", "-f", "json", "site/js/**/*.js", "--config", "eslint.config.js"]
+    # 1. ESLint JSON (kecualikan vendor)
+    cmd_eslint = [
+        "npx",
+        "eslint",
+        "-f",
+        "json",
+        "site/js/**/*.js",
+        "--ignore-pattern",
+        "site/js/vendor/**",
+        "--config",
+        "eslint.config.js",
+    ]
     res_es = subprocess.run(cmd_eslint, cwd=proj_dir, shell=True, capture_output=True, text=True, encoding="utf-8")
     if res_es.stdout.strip():
         try:
@@ -70,6 +82,8 @@ def run_linters(proj_dir):
                     rel_file = Path(file_path).relative_to(proj_dir).as_posix()
                 except ValueError:
                     rel_file = file_path
+                if "vendor" in rel_file:
+                    continue
                 for m in file_entry.get("messages", []):
                     level = "error" if m.get("severity") == 2 else "warning"
                     findings.append({
