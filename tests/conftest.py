@@ -6,6 +6,7 @@
 
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import uuid
@@ -46,6 +47,11 @@ def projects_dir(monkeypatch):
     monkeypatch.setenv("PD_PROJECTS_DIR", str(base))
     monkeypatch.setenv("PD_DATE", TEST_DATE)
     yield base
+
+    # File read-only (misalnya objek git tiruan) tidak bisa dihapus rmtree di Windows
+    for path in base.rglob("*"):
+        if path.is_file():
+            path.chmod(stat.S_IREAD | stat.S_IWRITE)
     shutil.rmtree(base, ignore_errors=True)
 
 
@@ -79,6 +85,21 @@ def copy_fixture(projects_dir, name, files):
         shutil.copyfile(FIXTURES / name / file, target / file)
 
     return target
+
+
+def add_git_folder(site_dir):
+    """
+    Membuat folder .git tiruan di site/, seperti saat pengguna menjadikan site/ repo untuk deploy.
+
+    I.S. : site_dir sudah di-scaffold dan belum punya .git.
+    F.S. : site_dir/.git/HEAD ada, dan satu file objek read-only seperti milik git asli.
+    """
+    git_dir = site_dir / ".git"
+    obj = git_dir / "objects" / "ab" / "cdef0123"
+    obj.parent.mkdir(parents=True)
+    obj.write_text("blob", encoding="utf-8")
+    obj.chmod(stat.S_IREAD)
+    (git_dir / "HEAD").write_text("ref: refs/heads/main\n", encoding="utf-8")
 
 
 def run_script(name, *args, script_dir=SCRIPTS):

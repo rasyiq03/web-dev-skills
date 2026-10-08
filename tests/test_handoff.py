@@ -3,8 +3,24 @@
 # Deskripsi : Pengujian unit dan CLI untuk handoff.py.
 # ============================================================
 
-from conftest import copy_fixture, next_line, run_script
+from conftest import add_git_folder, copy_fixture, next_line, run_script
 from lib import io
+
+
+def test_handoff_provenance_skips_git_folder(projects_dir):
+    proj = copy_fixture(projects_dir, "kopi-senja", ["brief.yaml", "directions.yaml"])
+    run_script("gaps", "kopi-senja")
+    run_script("pick_direction", "kopi-senja", "--pick", "dir-2")
+    run_script("compile_tokens", "kopi-senja")
+    run_script("scaffold", "kopi-senja")
+    add_git_folder(proj / "site")
+
+    result = run_script("handoff", "kopi-senja")
+
+    assert result.returncode == 0, result.stderr
+    files = io.read_json(proj / "provenance.json")["files"]
+    assert "index.html" in files
+    assert not [name for name in files if name.startswith(".git/")]
 
 
 def test_handoff_acceptance(projects_dir):

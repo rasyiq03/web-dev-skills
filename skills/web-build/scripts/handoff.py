@@ -232,9 +232,9 @@ def handoff(slug, no_provenance=False):
     else:
         site_hashes = {}
         for f in site_dir.rglob("*"):
-            if f.is_file():
-                rel = f.relative_to(site_dir).as_posix()
-                site_hashes[rel] = io.sha256_file(f)
+            rel_parts = f.relative_to(site_dir).parts
+            if f.is_file() and not set(rel_parts) & set(paths.SITE_IGNORED_DIRS):
+                site_hashes["/".join(rel_parts)] = io.sha256_file(f)
 
         decisions_hash = io.sha256_file(proj_dir / "decisions.yaml")
         prov_data = {

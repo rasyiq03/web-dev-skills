@@ -14,7 +14,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import io, paths, project, report
+from lib import io, node_tools, paths, project, report
 from lib.report import EXIT_INVALID, fail
 
 
@@ -348,17 +348,8 @@ def scaffold(slug, force=False):
             config_hashes[cfg_file.name] = io.sha256_file(dest)
 
     # 9. Format awal dengan Prettier agar skeleton langsung lolos prettier --check
-    try:
-        import subprocess
-
-        subprocess.run(
-            ["npx", "prettier", "--write", "site/**/*.{html,css}"],
-            cwd=proj_dir,
-            shell=True,
-            capture_output=True,
-        )
-    except Exception:
-        pass
+    #    (kegagalan Prettier dilaporkan check.py sebagai tool-failed)
+    node_tools.run_tool("prettier", ["--write", "site/**/*.{html,css}"], proj_dir)
 
     io.save_state(
         proj_dir,

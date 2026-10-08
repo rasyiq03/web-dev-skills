@@ -4,15 +4,20 @@
 #             perekaman ronde, perbaikan bertahap, dan pemilihan ronde terbaik.
 # ============================================================
 
+import sys
+from pathlib import Path
+
 import pytest
-from conftest import copy_fixture, next_line, run_script
+from conftest import REPO, add_git_folder, copy_fixture, next_line, run_script
 from lib import io
 
 
-@pytest.fixture
-def kopi_scaffolded_check(projects_dir):
+def scaffold_kopi(projects_dir):
     """
-    Menyiapkan proyek kopi-senja hingga selesai di-scaffold.
+    Menyiapkan proyek kopi-senja di projects_dir hingga selesai di-scaffold.
+
+    I.S. : PD_PROJECTS_DIR sudah menunjuk projects_dir.
+    F.S. : projects_dir/kopi-senja/site/ berisi skeleton; path folder proyek dikembalikan.
     """
     proj = copy_fixture(projects_dir, "kopi-senja", ["brief.yaml", "directions.yaml"])
     run_script("gaps", "kopi-senja")
@@ -20,6 +25,100 @@ def kopi_scaffolded_check(projects_dir):
     run_script("compile_tokens", "kopi-senja")
     run_script("scaffold", "kopi-senja")
     return proj
+
+
+def seed_lint_violations(proj):
+    """
+    Menanam satu pelanggaran ESLint dan satu pelanggaran stylelint yang tidak bisa di-fix otomatis.
+
+    I.S. : proj sudah di-scaffold.
+    F.S. : main.js memuat if tanpa kurung kurawal; components.css memuat kelas non-BEM.
+    """
+    main_file = proj / "site" / "js" / "main.js"
+    io.write_text(main_file, io.read_text(main_file) + "\nif (true) alert(1);\n")
+    comp_file = proj / "site" / "css" / "components.css"
+    io.write_text(comp_file, io.read_text(comp_file) + "\n.Bad {\n\tmargin: 0;\n}\n")
+
+
+def lint_rules(proj):
+    """
+    Mengambil id aturan dari semua temuan report.json.
+
+    I.S. : check.py sudah dijalankan untuk proj.
+    F.S. : Set id aturan dikembalikan.
+    """
+    return {f["rule"] for f in io.read_json(proj / "report.json")["findings"]}
+
+
+@pytest.fixture
+def kopi_scaffolded_check(projects_dir):
+    """
+    Menyiapkan proyek kopi-senja di dalam repo hingga selesai di-scaffold.
+    """
+    return scaffold_kopi(projects_dir)
+
+
+@pytest.fixture
+def kopi_outside_repo(tmp_path, monkeypatch):
+    """
+    Menyiapkan proyek kopi-senja di folder di luar repo hingga selesai di-scaffold.
+
+    I.S. : tmp_path pytest berada di luar repo (folder temp sistem).
+    F.S. : PD_PROJECTS_DIR menunjuk tmp_path; path folder proyek dikembalikan.
+    """
+    assert not tmp_path.resolve().is_relative_to(REPO)
+    monkeypatch.setenv("PD_PROJECTS_DIR", str(tmp_path))
+    monkeypatch.setenv("PD_DATE", "2026-10-08")
+    return scaffold_kopi(tmp_path)
+
+
+@pytest.mark.node
+def test_check_reports_stylelint_findings(kopi_scaffolded_check):
+    seed_lint_violations(kopi_scaffolded_check)
+
+    run_script("check", "kopi-senja")
+
+    assert "selector-class-pattern" in lint_rules(kopi_scaffolded_check)
+
+
+@pytest.mark.node
+def test_check_runs_linters_for_project_outside_repo(kopi_outside_repo):
+    seed_lint_violations(kopi_outside_repo)
+
+    run_script("check", "kopi-senja")
+
+    rules = lint_rules(kopi_outside_repo)
+    assert "curly" in rules
+    assert "selector-class-pattern" in rules
+    assert "tool-failed" not in rules
+
+
+@pytest.mark.node
+def test_check_ignores_git_folder_in_site(kopi_scaffolded_check):
+    add_git_folder(kopi_scaffolded_check / "site")
+
+    result = run_script("check", "kopi-senja")
+
+    assert result.returncode == 0, result.stderr
+    assert next_line(result) == "NEXT: run handoff.py"
+    assert not (kopi_scaffolded_check / "rounds" / "1" / "site" / ".git").exists()
+
+
+@pytest.mark.node
+def test_check_reports_failed_tools_as_errors(kopi_scaffolded_check, monkeypatch):
+    # PATH hanya berisi folder Python: node tidak bisa ditemukan sama sekali
+    monkeypatch.setenv("PATH", str(Path(sys.executable).parent))
+
+    result = run_script("check", "kopi-senja")
+
+    assert next_line(result) == "NEXT: fix the findings in report.json, then run check.py again"
+    data = io.read_json(kopi_scaffolded_check / "report.json")
+    failed = [f for f in data["findings"] if f["rule"] == "tool-failed"]
+    assert {f["level"] for f in failed} == {"error"}
+    messages = " ".join(f["message"] for f in failed)
+    for tool in ("prettier", "eslint", "stylelint", "html-validate"):
+        assert tool in messages
+    assert data["summary"]["errors"] >= 4
 
 
 @pytest.mark.node

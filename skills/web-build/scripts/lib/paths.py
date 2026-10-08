@@ -35,6 +35,10 @@ NODE_MODULES = REPO_ROOT / "node_modules"
 
 SLUG_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
+# Folder di dalam site/ yang bukan bagian situs (misalnya repo git untuk deploy);
+# tidak ikut disalin ke rounds/ dan tidak ikut di-hash di provenance.json
+SITE_IGNORED_DIRS = (".git",)
+
 
 def repo_root():
     """
@@ -65,7 +69,8 @@ def projects_dir():
     """
     Menentukan folder induk semua proyek.
 
-    I.S. : PD_PROJECTS_DIR boleh diatur (dipakai tes); bila tidak, pakai projects/ di root.
+    I.S. : PD_PROJECTS_DIR boleh diatur (folder proyek di luar repo, atau folder tes);
+           bila tidak, pakai projects/ di root.
     F.S. : Path folder induk proyek dikembalikan (belum tentu sudah ada).
     """
     override = os.environ.get("PD_PROJECTS_DIR")

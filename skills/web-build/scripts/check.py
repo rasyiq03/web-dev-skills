@@ -7,14 +7,13 @@
 
 import json
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import audit_rules, io, paths, project, report
+from lib import audit_rules, io, node_tools, paths, project, report
 from lib.report import EXIT_CHECK_FAILED, EXIT_INVALID, fail
 
 
@@ -22,33 +21,103 @@ from lib.report import EXIT_CHECK_FAILED, EXIT_INVALID, fail
 # ====================== FORMAT & LINT =======================
 # ============================================================
 
+PRETTIER_TARGET = "site/**/*.{html,css}"
+JS_TARGET = "site/js/**/*.js"
+CSS_TARGET = "site/css/**/*.css"
+HTML_TARGET = "site/**/*.html"
+
+# File sementara untuk laporan JSON stylelint (dihapus setelah dibaca)
+STYLELINT_REPORT = ".stylelint-report.json"
+
 
 def run_formatters(proj_dir):
     """
     Menjalankan Prettier, ESLint, dan stylelint dengan opsi perbaikan otomatis (--fix/--write).
 
     I.S. : proj_dir memiliki file konfigurasi dan folder site/.
-    F.S. : Kode terformat otomatis.
+    F.S. : Kode terformat otomatis. List temuan dikembalikan: satu temuan tool-failed bila
+           Prettier gagal (kegagalan ESLint dan stylelint dilaporkan oleh run_linters).
     """
-    cmd_prettier = ["npx", "prettier", "--write", "site/**/*.{html,css}"]
-    subprocess.run(cmd_prettier, cwd=proj_dir, shell=True, capture_output=True)
+    findings = []
 
-    cmd_eslint = [
-        "npx",
-        "eslint",
-        "--fix",
-        "--fix-type",
-        "layout",
-        "site/js/**/*.js",
+    res_pr = node_tools.run_tool("prettier", ["--write", PRETTIER_TARGET], proj_dir)
+    if res_pr.returncode != 0:
+        findings.append(node_tools.failure_finding("prettier", res_pr, PRETTIER_TARGET))
+
+    node_tools.run_tool("eslint", ["--fix", "--fix-type", "layout", *eslint_args()], proj_dir)
+    node_tools.run_tool("stylelint", ["--fix", *stylelint_args()], proj_dir)
+
+    return findings
+
+
+def eslint_args():
+    """
+    Menyusun argumen ESLint bersama untuk mode perbaikan dan mode laporan.
+
+    I.S. : -
+    F.S. : List argumen dikembalikan. Config diambil dari config/ di repo karena impor
+           plugin di eslint.config.js hanya bisa ditemukan dari node_modules repo;
+           salinan di proyek tetap dijaga oleh pemeriksaan integritas konfigurasi.
+    """
+    return [
+        JS_TARGET,
         "--ignore-pattern",
         "site/js/vendor/**",
         "--config",
-        "eslint.config.js",
+        str(paths.CONFIG_DIR / "eslint.config.js"),
     ]
-    subprocess.run(cmd_eslint, cwd=proj_dir, shell=True, capture_output=True)
 
-    cmd_stylelint = ["npx", "stylelint", "--fix", "--config", ".stylelintrc.json", "site/css/**/*.css"]
-    subprocess.run(cmd_stylelint, cwd=proj_dir, shell=True, capture_output=True)
+
+def stylelint_args():
+    """
+    Menyusun argumen stylelint bersama untuk mode perbaikan dan mode laporan.
+
+    I.S. : -
+    F.S. : List argumen dikembalikan. Config diambil dari config/ di repo dengan alasan
+           yang sama seperti ESLint (plugin stylelint-order dicari dari lokasi config).
+    """
+    return ["--config", str(paths.CONFIG_DIR / ".stylelintrc.json"), CSS_TARGET]
+
+
+def run_json_linter(proj_dir, package, args, ok_codes, target, report_file=None):
+    """
+    Menjalankan satu linter berformat JSON dan membaca hasilnya.
+
+    I.S. : args sudah memuat opsi format JSON; report_file diisi bila alat menulis JSON ke
+           file, bukan ke stdout.
+    F.S. : (data, None) bila alat berjalan normal; (None, temuan tool-failed) bila alat
+           crash, keluar dengan kode di luar ok_codes, atau keluarannya bukan JSON.
+    """
+    if report_file is not None:
+        report_file.unlink(missing_ok=True)
+
+    result = node_tools.run_tool(package, args, proj_dir)
+    raw = result.stdout
+
+    if report_file is not None:
+        raw = io.read_text(report_file) if report_file.is_file() else ""
+        report_file.unlink(missing_ok=True)
+
+    if result.returncode in ok_codes:
+        try:
+            return json.loads(raw), None
+        except ValueError:
+            pass
+
+    return None, node_tools.failure_finding(package, result, target)
+
+
+def relative_to_project(file_path, proj_dir):
+    """
+    Mengubah path file dari laporan linter menjadi path relatif ke folder proyek.
+
+    I.S. : file_path adalah path absolut dari laporan linter.
+    F.S. : Path POSIX relatif dikembalikan, atau file_path apa adanya bila di luar proyek.
+    """
+    try:
+        return Path(file_path).resolve().relative_to(proj_dir.resolve()).as_posix()
+    except ValueError:
+        return file_path
 
 
 def run_linters(proj_dir):
@@ -56,99 +125,82 @@ def run_linters(proj_dir):
     Menjalankan linter dengan format output JSON dan mengumpulkan findings.
 
     I.S. : proj_dir siap.
-    F.S. : List finding dengan category='lint' dikembalikan (vendor dikecualikan).
+    F.S. : List finding dengan category='lint' dikembalikan (vendor dikecualikan). Linter yang
+           gagal berjalan menghasilkan temuan tool-failed berlevel error.
     """
     findings = []
 
-    # 1. ESLint JSON (kecualikan vendor)
-    cmd_eslint = [
-        "npx",
-        "eslint",
-        "-f",
-        "json",
-        "site/js/**/*.js",
-        "--ignore-pattern",
-        "site/js/vendor/**",
-        "--config",
-        "eslint.config.js",
-    ]
-    res_es = subprocess.run(cmd_eslint, cwd=proj_dir, shell=True, capture_output=True, text=True, encoding="utf-8")
-    if res_es.stdout.strip():
-        try:
-            es_data = json.loads(res_es.stdout)
-            for file_entry in es_data:
-                file_path = file_entry.get("filePath", "")
-                try:
-                    rel_file = Path(file_path).relative_to(proj_dir).as_posix()
-                except ValueError:
-                    rel_file = file_path
-                if "vendor" in rel_file:
-                    continue
-                for m in file_entry.get("messages", []):
-                    level = "error" if m.get("severity") == 2 else "warning"
-                    findings.append({
-                        "rule": m.get("ruleId") or "eslint",
-                        "category": "lint",
-                        "level": level,
-                        "file": rel_file,
-                        "line": m.get("line", 1),
-                        "message": m.get("message", ""),
-                        "fix": "Perbaiki kode JS sesuai aturan ESLint.",
-                    })
-        except Exception:
-            pass
+    # 1. ESLint JSON (kecualikan vendor); kode keluar 1 = ada pelanggaran
+    es_data, failure = run_json_linter(
+        proj_dir, "eslint", ["-f", "json", *eslint_args()], (0, 1), JS_TARGET
+    )
+    if failure:
+        findings.append(failure)
+    for file_entry in es_data or []:
+        rel_file = relative_to_project(file_entry.get("filePath", ""), proj_dir)
+        if "vendor" in rel_file:
+            continue
+        for m in file_entry.get("messages", []):
+            level = "error" if m.get("severity") == 2 else "warning"
+            findings.append({
+                "rule": m.get("ruleId") or "eslint",
+                "category": "lint",
+                "level": level,
+                "file": rel_file,
+                "line": m.get("line", 1),
+                "message": m.get("message", ""),
+                "fix": "Perbaiki kode JS sesuai aturan ESLint.",
+            })
 
-    # 2. stylelint JSON
-    cmd_stylelint = ["npx", "stylelint", "-f", "json", "--config", ".stylelintrc.json", "site/css/**/*.css"]
-    res_st = subprocess.run(cmd_stylelint, cwd=proj_dir, shell=True, capture_output=True, text=True, encoding="utf-8")
-    if res_st.stdout.strip():
-        try:
-            st_data = json.loads(res_st.stdout)
-            for file_entry in st_data:
-                source = file_entry.get("source", "")
-                try:
-                    rel_file = Path(source).relative_to(proj_dir).as_posix()
-                except ValueError:
-                    rel_file = source
-                for w in file_entry.get("warnings", []):
-                    level = "error" if w.get("severity") == "error" else "warning"
-                    findings.append({
-                        "rule": w.get("rule", "stylelint"),
-                        "category": "lint",
-                        "level": level,
-                        "file": rel_file,
-                        "line": w.get("line", 1),
-                        "message": w.get("text", ""),
-                        "fix": "Perbaiki gaya CSS sesuai aturan stylelint.",
-                    })
-        except Exception:
-            pass
+    # 2. stylelint JSON; stylelint 17 menulis laporan ke stderr, jadi dibaca lewat -o.
+    #    Kode keluar 2 = ada pelanggaran
+    st_data, failure = run_json_linter(
+        proj_dir,
+        "stylelint",
+        ["-f", "json", "-o", STYLELINT_REPORT, *stylelint_args()],
+        (0, 2),
+        CSS_TARGET,
+        report_file=proj_dir / STYLELINT_REPORT,
+    )
+    if failure:
+        findings.append(failure)
+    for file_entry in st_data or []:
+        rel_file = relative_to_project(file_entry.get("source", ""), proj_dir)
+        for w in file_entry.get("warnings", []):
+            level = "error" if w.get("severity") == "error" else "warning"
+            findings.append({
+                "rule": w.get("rule", "stylelint"),
+                "category": "lint",
+                "level": level,
+                "file": rel_file,
+                "line": w.get("line", 1),
+                "message": w.get("text", ""),
+                "fix": "Perbaiki gaya CSS sesuai aturan stylelint.",
+            })
 
-    # 3. html-validate JSON
-    cmd_htmlval = ["npx", "html-validate", "-f", "json", "--config", ".htmlvalidate.json", "site/**/*.html"]
-    res_hv = subprocess.run(cmd_htmlval, cwd=proj_dir, shell=True, capture_output=True, text=True, encoding="utf-8")
-    if res_hv.stdout.strip():
-        try:
-            hv_data = json.loads(res_hv.stdout)
-            for file_entry in hv_data:
-                file_path = file_entry.get("filePath", "")
-                try:
-                    rel_file = Path(file_path).relative_to(proj_dir).as_posix()
-                except ValueError:
-                    rel_file = file_path
-                for m in file_entry.get("messages", []):
-                    level = "error" if m.get("severity") == 2 else "warning"
-                    findings.append({
-                        "rule": m.get("ruleId", "html-validate"),
-                        "category": "lint",
-                        "level": level,
-                        "file": rel_file,
-                        "line": m.get("line", 1),
-                        "message": m.get("message", ""),
-                        "fix": "Perbaiki struktur HTML sesuai spesifikasi.",
-                    })
-        except Exception:
-            pass
+    # 3. html-validate JSON; kode keluar 1 = ada pelanggaran
+    hv_data, failure = run_json_linter(
+        proj_dir,
+        "html-validate",
+        ["-f", "json", "--config", ".htmlvalidate.json", HTML_TARGET],
+        (0, 1),
+        HTML_TARGET,
+    )
+    if failure:
+        findings.append(failure)
+    for file_entry in hv_data or []:
+        rel_file = relative_to_project(file_entry.get("filePath", ""), proj_dir)
+        for m in file_entry.get("messages", []):
+            level = "error" if m.get("severity") == 2 else "warning"
+            findings.append({
+                "rule": m.get("ruleId", "html-validate"),
+                "category": "lint",
+                "level": level,
+                "file": rel_file,
+                "line": m.get("line", 1),
+                "message": m.get("message", ""),
+                "fix": "Perbaiki struktur HTML sesuai spesifikasi.",
+            })
 
     return findings
 
@@ -156,6 +208,8 @@ def run_linters(proj_dir):
 # ============================================================
 # ========================= CHECK RUN ========================
 # ============================================================
+
+SITE_IGNORE = shutil.ignore_patterns(*paths.SITE_IGNORED_DIRS)
 
 
 def run_check(slug):
@@ -183,13 +237,13 @@ def run_check(slug):
     round_dir.mkdir(parents=True, exist_ok=True)
 
     # Buat snapshot site/ ke rounds/<round>/ SEBELUM menulis laporan
-    shutil.copytree(site_dir, round_dir / "site", dirs_exist_ok=True)
+    shutil.copytree(site_dir, round_dir / "site", dirs_exist_ok=True, ignore=SITE_IGNORE)
 
     # 1. Format (auto-fix)
-    run_formatters(proj_dir)
+    findings = run_formatters(proj_dir)
 
     # 2. Lint (report)
-    findings = run_linters(proj_dir)
+    findings += run_linters(proj_dir)
 
     # 3. Integritas konfigurasi
     stored_cfg_hashes = state.get("config_hashes", {})
@@ -307,7 +361,7 @@ def run_check(slug):
 
         best_site = proj_dir / "rounds" / str(best_round) / "site"
         if best_site.is_dir():
-            shutil.copytree(best_site, site_dir, dirs_exist_ok=True)
+            shutil.copytree(best_site, site_dir, dirs_exist_ok=True, ignore=SITE_IGNORE)
 
         lines.append(f"Pemeriksaan selesai. Ronde terbaik yang dipulihkan: Ronde {best_round}.")
         return lines, "run handoff.py"
