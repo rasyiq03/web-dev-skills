@@ -14,9 +14,11 @@ gate tests at the end and show me the results."*
 
 - **Python 3.11+**, dependencies only from `requirements.txt`. `serve.py` uses the standard
   library only. Node tools come from `npm run setup`.
-- Every script: `python skills/web-build/scripts/<name>.py <slug> [options]`, run from the
-  repository root, reads and writes only inside `projects/<slug>/` (plus reading `skills/`,
-  `audit/`, `config/`).
+- Every script: `python skills/web-build/scripts/<name>.py <slug> [options]`, or through
+  the launcher `python skills/web-build/scripts/run.py <name> <slug> [options]`, which
+  installs the dependencies on first use (see
+  `docs/superpowers/specs/2026-10-08-plugin-packaging-design.md`). A script reads and
+  writes only inside its project folder (§2), plus reading `skills/`, `audit/`, `config/`.
 - Exit codes: `0` success · `1` invalid input (message says what to fix) · `2` a check
   failed · `3` the agent must ask the user (message contains the question) · `4` timeout.
 - Every script prints a short human-readable summary ending with one line that starts with
@@ -33,6 +35,8 @@ gate tests at the end and show me the results."*
 
 ```
 AGENTS.md  IMPLEMENTATION.md  requirements.txt  package.json
+.claude-plugin/  plugin.json marketplace.json (Claude Code plugin and marketplace)
+LICENSE  README.md  docs/superpowers/ (specs and plans)
 config/          .prettierrc.json .prettierignore eslint.config.js .stylelintrc.json
                  .htmlvalidate.json .editorconfig
 audit/           anti-slop.yaml cliches-id.txt cliches-en.txt
@@ -43,8 +47,8 @@ skills/
 		schemas/     brief.schema.json directions.schema.json decisions.schema.json mock.schema.json
 		templates/   js/api/ config.js client.js endpoints.js mock-label.js
 		site-types/  company-profile.yaml dashboard.yaml landing.yaml portfolio.yaml umkm-catalog.yaml
-		scripts/     validate_brief.py gaps.py serve.py pick_direction.py compile_tokens.py
-		             scaffold.py context.py check.py handoff.py lib/
+		scripts/     run.py validate_brief.py gaps.py serve.py pick_direction.py compile_tokens.py
+		             scaffold.py context.py check.py handoff.py lib/ (deps.py node_tools.py …)
 	web-design/
 		SKILL.md
 		styles/      index.yaml neobrutalism.yaml editorial.yaml _template.yaml
@@ -53,7 +57,7 @@ tools/           sync_adapters.py (v0.1) · render_check.py, build_cliches.py, e
                  export_rdf.py, shapes.ttl (v0.4)
 examples/kopi-senja/   brief.yaml directions.yaml decisions.yaml
 tests/
-projects/<slug>/       created at run time (see section 2)
+<project>/             created at run time (see section 2)
 ```
 
 Do not create a `CLAUDE.md`. Claude Code (2.1.277+) reads `AGENTS.md` when no `CLAUDE.md`
@@ -61,6 +65,10 @@ exists; if both exist Claude Code follows `CLAUDE.md` and Codex follows `AGENTS.
 two drift apart. `sync_adapters.py` warns when it finds one.
 
 ## 2. Files inside `projects/<slug>/`
+
+The project folder is `$PD_PROJECTS_DIR/<slug>/` when that variable is set,
+`projects/<slug>/` when the scripts run from the repository root, and otherwise
+`<current folder>/<slug>/`. `run.py path <slug>` prints it.
 
 | File | Written by | Purpose |
 | --- | --- | --- |
@@ -352,9 +360,10 @@ round reports zero errors; the restore picks the best round.
 
 - For each `skills/<name>/`, checks that `SKILL.md` frontmatter `name` equals `<name>` and
   the description is under 1,024 characters.
-- Creates relative symlinks `.claude/skills/<name>` (Claude Code) and
-  `.agents/skills/<name>` (Codex) pointing to `skills/<name>`. `--copy` copies instead
-  (Windows without symlink rights). Warns when a `CLAUDE.md` exists.
+- Creates relative symlinks `.agents/skills/<name>` (Codex) pointing to `skills/<name>`.
+  `--copy` copies instead (Windows without symlink rights). Claude Code loads the skills
+  through the plugin, so `.claude/skills/` is not written; a leftover copy there produces a
+  warning, because the skill would be listed twice. Warns when a `CLAUDE.md` exists.
 
 ### 3.11 v0.3: `tools/render_check.py`, `tools/build_cliches.py`, `tools/eval/`
 
