@@ -29,3 +29,4 @@ def test_projects_dir_fixture(projects_dir, monkeypatch):
 
     assert os.environ["PD_PROJECTS_DIR"] == str(projects_dir)
     assert projects_dir.is_relative_to(REPO)
+

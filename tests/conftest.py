@@ -122,3 +122,4 @@ def next_line(result):
     lines = [line for line in result.stdout.splitlines() if line.startswith("NEXT:")]
 
     return lines[-1] if lines else ""
+
