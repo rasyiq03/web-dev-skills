@@ -316,7 +316,7 @@ def scaffold(slug, force=False):
             h = file_header(js_name, project_name, desc, today_str, "css")
             io.write_text(site_dir / "js" / js_name, h)
 
-        chart_vendor_src = paths.NODE_MODULES / "chart.js" / "dist" / "chart.umd.js"
+        chart_vendor_src = paths.node_modules_dir() / "chart.js" / "dist" / "chart.umd.js"
         if chart_vendor_src.is_file():
             shutil.copyfile(chart_vendor_src, site_dir / "js" / "vendor" / "chart.umd.js")
 

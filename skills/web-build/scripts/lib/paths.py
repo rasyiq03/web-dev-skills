@@ -17,8 +17,37 @@ VERSION = "0.1"
 TOOL_NAME = "pd-web-skills"
 GENERATOR = f"{TOOL_NAME} {VERSION}"
 
-# scripts/lib/paths.py -> scripts -> web-build -> skills -> root repo
-REPO_ROOT = Path(__file__).resolve().parents[4]
+SLUG_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+
+# Folder di dalam site/ yang bukan bagian situs (misalnya repo git untuk deploy);
+# tidak ikut disalin ke rounds/ dan tidak ikut di-hash di provenance.json
+SITE_IGNORED_DIRS = (".git",)
+
+
+# ============================================================
+# ========================= AKAR REPO ========================
+# ============================================================
+
+
+def find_repo_root(start):
+    """
+    Mencari akar repo atau plugin dengan naik dari folder start.
+
+    I.S. : start adalah folder di dalam repo, folder plugin terpasang, atau salinan skill
+           (misalnya .agents/skills/web-build/scripts/lib untuk Codex).
+    F.S. : Folder induk pertama yang berisi audit/anti-slop.yaml dan config/eslint.config.js
+           dikembalikan; RuntimeError bila tidak ada.
+    """
+    start = Path(start).resolve()
+
+    for folder in (start, *start.parents):
+        if (folder / "audit" / "anti-slop.yaml").is_file() and (folder / "config" / "eslint.config.js").is_file():
+            return folder
+
+    raise RuntimeError(f"Akar web-skills (audit/ dan config/) tidak ditemukan di atas {start}")
+
+
+REPO_ROOT = find_repo_root(Path(__file__).parent)
 SKILLS_DIR = REPO_ROOT / "skills"
 BUILD_DIR = SKILLS_DIR / "web-build"
 SCRIPTS_DIR = BUILD_DIR / "scripts"
@@ -31,13 +60,6 @@ STYLES_DIR = DESIGN_DIR / "styles"
 PATTERNS_FILE = DESIGN_DIR / "layouts" / "patterns.yaml"
 AUDIT_DIR = REPO_ROOT / "audit"
 CONFIG_DIR = REPO_ROOT / "config"
-NODE_MODULES = REPO_ROOT / "node_modules"
-
-SLUG_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
-
-# Folder di dalam site/ yang bukan bagian situs (misalnya repo git untuk deploy);
-# tidak ikut disalin ke rounds/ dan tidak ikut di-hash di provenance.json
-SITE_IGNORED_DIRS = (".git",)
 
 
 def repo_root():
@@ -60,6 +82,19 @@ def scripts_dir():
     return SCRIPTS_DIR
 
 
+def node_modules_dir():
+    """
+    Menentukan folder node_modules yang dipakai alat Node.
+
+    I.S. : PD_NODE_MODULES boleh diatur (run.py mengisinya dengan folder cache).
+    F.S. : Path PD_NODE_MODULES dikembalikan bila diatur, selain itu node_modules di akar repo.
+           Dibaca setiap dipanggil karena run.py mengaturnya setelah modul ini diimpor.
+    """
+    override = os.environ.get("PD_NODE_MODULES")
+
+    return Path(override) if override else REPO_ROOT / "node_modules"
+
+
 # ============================================================
 # ====================== FOLDER PROYEK =======================
 # ============================================================
@@ -69,13 +104,22 @@ def projects_dir():
     """
     Menentukan folder induk semua proyek.
 
-    I.S. : PD_PROJECTS_DIR boleh diatur (folder proyek di luar repo, atau folder tes);
-           bila tidak, pakai projects/ di root.
-    F.S. : Path folder induk proyek dikembalikan (belum tentu sudah ada).
+    I.S. : PD_PROJECTS_DIR boleh diatur; folder kerja saat ini menentukan sisanya.
+    F.S. : Urutan: PD_PROJECTS_DIR; projects/ di akar repo bila folder kerja adalah akar repo
+           (mode pengembangan); selain itu folder kerja itu sendiri, sehingga proyek ada di
+           <folder>/<slug>/. Path belum tentu sudah ada.
     """
     override = os.environ.get("PD_PROJECTS_DIR")
 
-    return Path(override) if override else REPO_ROOT / "projects"
+    if override:
+        return Path(override)
+
+    cwd = Path.cwd().resolve()
+
+    if cwd == REPO_ROOT:
+        return REPO_ROOT / "projects"
+
+    return cwd
 
 
 def is_valid_slug(slug):
@@ -93,7 +137,7 @@ def project_dir(slug):
     Mengembalikan folder satu proyek.
 
     I.S. : slug sudah diperiksa dengan is_valid_slug.
-    F.S. : Path projects/<slug>/ dikembalikan.
+    F.S. : Path <folder induk proyek>/<slug>/ dikembalikan (lihat projects_dir).
     """
     return projects_dir() / slug
 

@@ -29,7 +29,7 @@ def open_project(slug, need=()):
 
     if not project.is_dir():
         fail(EXIT_INVALID, f"Folder proyek tidak ada: {project}",
-             f"write projects/{slug}/brief.yaml first")
+             f"write {project / 'brief.yaml'} first")
 
     missing = [name for name in need if not (project / name).is_file()]
 

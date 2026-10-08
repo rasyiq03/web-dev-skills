@@ -28,7 +28,7 @@ def tool_command(package):
     I.S. : package adalah nama paket di node_modules repo, misalnya eslint.
     F.S. : List ['node', <path bin absolut>] dikembalikan, atau None bila paket tidak terpasang.
     """
-    pkg_dir = paths.NODE_MODULES / package
+    pkg_dir = paths.node_modules_dir() / package
     manifest = pkg_dir / "package.json"
 
     if not manifest.is_file():
@@ -56,7 +56,7 @@ def run_tool(package, args, cwd):
     command = tool_command(package)
 
     if command is None:
-        reason = f"Paket {package} tidak ditemukan di {paths.NODE_MODULES}."
+        reason = f"Paket {package} tidak ditemukan di {paths.node_modules_dir()}."
         return subprocess.CompletedProcess(args, EXIT_NOT_RUN, "", reason)
 
     try:
