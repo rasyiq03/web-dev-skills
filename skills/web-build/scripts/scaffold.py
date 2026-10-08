@@ -243,13 +243,15 @@ def scaffold(slug, force=False):
     site_type = project.load_site_type(site_type_id)
 
     # Petakan layout per section dari decisions.yaml
-    layout_decision = next((d for d in decisions.get("decisions", []) if d.get("axis") == "layout"), {})
-    # choice string misal: "hero=split-offset, services=list-with-prices, ..."
     chosen_layout = {}
-    for pair in layout_decision.get("choice", "").split(","):
-        if "=" in pair:
-            sec_k, pat_v = pair.strip().split("=", 1)
-            chosen_layout[sec_k.strip()] = pat_v.strip()
+    if isinstance(decisions.get("chosen", {}).get("layout"), dict):
+        chosen_layout = dict(decisions["chosen"]["layout"])
+    else:
+        layout_decision = next((d for d in decisions.get("decisions", []) if d.get("axis") == "layout"), {})
+        for pair in layout_decision.get("choice", "").split(","):
+            if "=" in pair:
+                sec_k, pat_v = pair.strip().split("=", 1)
+                chosen_layout[sec_k.strip()] = pat_v.strip()
 
     # 1. Buat folder-folder site/
     dirs_to_create = [
