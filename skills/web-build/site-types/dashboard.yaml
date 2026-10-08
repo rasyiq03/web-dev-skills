@@ -1,0 +1,62 @@
+id: dashboard
+summary: An internal or client-facing view of metrics, charts, and records, with filters.
+default_pages: [index, data]
+
+required_fields: [business.name, business.kind, audience]
+
+# Sections marked data: true get their numbers and records through js/api/
+# (see "Data and the mock API" in references/conventions.md): the client's API when
+# facts.data_source is stated, otherwise mock files labeled as sample data.
+facts:
+  - data_source
+  - metrics
+  - entities
+  - time_range
+  - user_roles
+
+sections:
+  - id: shell
+    page: index
+    purpose: Navigation between pages, the product name, and the current user or role.
+    pattern_kind: app-shell
+  - id: filters
+    page: index
+    purpose: Time range and the one or two filters every view shares.
+    pattern_kind: filters
+    facts: [time_range]
+  - id: kpis
+    page: index
+    purpose: The three to five numbers the audience checks first, each with unit and period.
+    pattern_kind: kpi
+    data: true
+    facts: [metrics]
+  - id: charts
+    page: index
+    purpose: How the key metrics change over time or compare across groups.
+    pattern_kind: chart-panel
+    data: true
+    facts: [metrics]
+  - id: records
+    page: data
+    purpose: The underlying records in a sortable table.
+    pattern_kind: table
+    data: true
+    facts: [entities]
+
+questions:
+  - field: facts.metrics
+    ask:
+      id: Angka apa yang paling sering dilihat pengguna dashboard ini?
+      en: Which numbers do the dashboard's users check most often?
+  - field: audience
+    ask:
+      id: Siapa yang memakai dashboard ini, dan untuk keputusan apa?
+      en: Who uses this dashboard, and to decide what?
+  - field: facts.data_source
+    ask:
+      id: Dari mana datanya (file, API, atau belum ada)?
+      en: Where does the data come from (file, API, or not yet available)?
+  - field: facts.time_range
+    ask:
+      id: Rentang waktu bawaan yang ditampilkan?
+      en: What time range should it show by default?

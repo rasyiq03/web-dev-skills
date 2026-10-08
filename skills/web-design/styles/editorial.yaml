@@ -1,0 +1,50 @@
+id: editorial
+name: Editorial
+summary: Magazine-like serif display type, generous margins, rules and columns, quiet color.
+suits: Professional services, architects, consultants, writers, heritage brands, NGOs, and report-style dashboards.
+
+base:
+  type_scale: { base: 1.125rem, ratio: 1.414 }
+  space: { xs: 0.25rem, sm: 0.75rem, md: 1.25rem, lg: 2.5rem, xl: 5rem, section: 8rem }
+  radius: { none: 0, sm: 0.125rem }
+  border: { width: 1px, strong: "1px solid var(--pd-color-ink)" }
+  shadow: { hard: "none", hard-sm: "none" }
+  motion: { fast: 150ms, base: 300ms, easing: "cubic-bezier(0.3, 0, 0.2, 1)" }
+
+palettes:
+  - id: ink-on-cream
+    mood: Uncoated paper and black ink with a brick-red accent.
+    colors: { ink: "#1F1D1A", paper: "#FBF7F0", accent: "#8C2F1B", muted: "#625B52", accent-ink: "#FFFFFF" }
+  - id: night-print
+    mood: Dark print with brass; evening and formal.
+    colors: { ink: "#EDE8DF", paper: "#161513", accent: "#D9A441", muted: "#A39B8E", accent-ink: "#161513" }
+  - id: forest-ledger
+    mood: Ledger green on warm grey; calm and established.
+    colors: { ink: "#1E2A22", paper: "#F2F0E8", accent: "#2F6B4F", muted: "#56605A", accent-ink: "#FFFFFF" }
+
+pairings:
+  - id: fraunces-plex
+    display: Fraunces
+    body: IBM Plex Sans
+    mono: IBM Plex Mono
+  - id: newsreader-public
+    display: Newsreader
+    body: Public Sans
+    mono: DM Mono
+  - id: instrument-familjen
+    display: Instrument Serif
+    body: Familjen Grotesk
+    mono: JetBrains Mono
+
+components:
+  button: Text in body font with a strong underline or a thin ink border; accent fill only for
+    the single primary action on a page.
+  card: No box; a thin rule above, a small mono label, a display-font heading, body text.
+  section: Wide outer margins; content set on an asymmetric 12-column grid (for example 2 + 7 + 3).
+  label: Small caps or mono, muted color, used for dates, categories, and figure captions.
+  image: Full-bleed or column-aligned photos with a caption under each.
+
+signature_moves:
+  - A large display heading that spans columns, with the body text in a narrow measure (60-70ch).
+  - Numbered sections (01, 02, 03) set in the mono font.
+  - Pull quotes only from real quotes in the brief.

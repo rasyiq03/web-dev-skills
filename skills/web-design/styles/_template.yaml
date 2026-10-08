@@ -1,0 +1,36 @@
+# Copy this file to <your-style>.yaml, fill it in, and add one line to index.yaml.
+# Every value here becomes a design token; compile_tokens.py rejects missing keys
+# and palettes whose text/background pairs fall below WCAG AA (4.5:1).
+id: your-style
+name: Your style
+summary: One sentence a model can use to decide whether this style fits a brief.
+suits: Kinds of business and audiences this style serves well.
+
+base:
+  type_scale: { base: 1rem, ratio: 1.25 }
+  space: { xs: 0.25rem, sm: 0.5rem, md: 1rem, lg: 2rem, xl: 4rem, section: 6rem }
+  radius: { none: 0, sm: 0.25rem }
+  border: { width: 1px, strong: "1px solid var(--pd-color-ink)" }
+  shadow: { hard: "none", hard-sm: "none" }
+  motion: { fast: 120ms, base: 200ms, easing: "ease-out" }
+
+palettes:
+  - id: palette-one
+    mood: What this palette feels like, in a few words.
+    colors: { ink: "#000000", paper: "#FFFFFF", accent: "#0000EE", muted: "#555555", accent-ink: "#FFFFFF" }
+
+pairings:
+  - id: pairing-one
+    display: A Google Fonts family name
+    body: A Google Fonts family name
+    mono: A Google Fonts family name
+
+components:
+  button: How the primary button looks and behaves.
+  card: How a card looks.
+  section: How sections are separated and laid out.
+  label: How small labels, prices, and tags look.
+  image: How photos are framed.
+
+signature_moves:
+  - Two or three recognizable moves that make a page clearly this style.

@@ -1,0 +1,54 @@
+id: umkm-catalog
+summary: A small business's product list with ordering through WhatsApp or a marketplace.
+default_pages: [index, produk, cara-pesan]
+
+required_fields: [business.name, business.kind, business.location]
+
+facts:
+  - products
+  - prices
+  - whatsapp
+  - marketplace_links
+  - shipping_area
+  - hours
+
+sections:
+  - id: hero
+    page: index
+    purpose: What the business sells and where, with the order button.
+    pattern_kind: hero
+  - id: featured
+    page: index
+    purpose: Best-selling or signature products.
+    pattern_kind: offering
+    data: true
+    facts: [products, prices]
+  - id: catalog
+    page: produk
+    purpose: Every product with name, price, and an order link per item.
+    pattern_kind: catalog
+    data: true
+    facts: [products, prices]
+  - id: how-to-order
+    page: cara-pesan
+    purpose: Ordering steps, payment, shipping area, and hours.
+    pattern_kind: process
+    facts: [whatsapp, marketplace_links, shipping_area, hours]
+
+questions:
+  - field: facts.products
+    ask:
+      id: Produk apa saja yang dijual, beserta harganya?
+      en: Which products do you sell, and at what price?
+  - field: facts.whatsapp
+    ask:
+      id: Nomor WhatsApp atau tautan toko untuk pemesanan?
+      en: WhatsApp number or shop link for orders?
+  - field: audience
+    ask:
+      id: Siapa pembeli utamanya?
+      en: Who are the main buyers?
+  - field: facts.shipping_area
+    ask:
+      id: Melayani pengiriman ke mana saja?
+      en: Where do you deliver?

@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "directions.schema.json",
+  "title": "Five candidate design directions with verbalized probabilities",
+  "type": "object",
+  "required": ["directions"],
+  "additionalProperties": false,
+  "properties": {
+    "directions": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "probability", "style", "palette", "type_pairing", "layout",
+          "motion", "tone", "register", "summary", "rationale", "based_on"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^dir-[0-9]+$" },
+          "probability": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+          "style": { "type": "string" },
+          "palette": { "type": "string" },
+          "colors": {
+            "type": "object",
+            "required": ["ink", "paper", "accent", "muted", "accent-ink"],
+            "additionalProperties": false,
+            "patternProperties": { ".*": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" } }
+          },
+          "type_pairing": { "type": "string" },
+          "fonts": {
+            "type": "object",
+            "required": ["display", "body", "mono"],
+            "additionalProperties": false,
+            "patternProperties": { ".*": { "type": "string" } }
+          },
+          "layout": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": { "type": "string" }
+          },
+          "motion": { "enum": ["none", "low", "medium"] },
+          "tone": { "type": "string" },
+          "register": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": false,
+            "properties": {
+              "id": { "enum": ["kamu", "Anda"] },
+              "en": { "const": "you" }
+            }
+          },
+          "summary": { "type": "string", "minLength": 10 },
+          "rationale": {
+            "type": "object",
+            "required": ["style", "color", "typography", "layout", "motion", "tone"],
+            "additionalProperties": false,
+            "patternProperties": { ".*": { "type": "string", "minLength": 10 } }
+          },
+          "based_on": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^req-[a-z0-9_.-]+$" }
+          }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "palette": { "const": "custom" } } },
+            "then": { "required": ["colors"] }
+          },
+          {
+            "if": { "properties": { "type_pairing": { "const": "custom" } } },
+            "then": { "required": ["fonts"] }
+          }
+        ]
+      }
+    }
+  }
+}

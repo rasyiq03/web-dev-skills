@@ -1,0 +1,129 @@
+# Read only by check.py. This file is never loaded into a model's context: telling a model
+# what to avoid tends to make the avoided pattern more likely. check.py reports each hit
+# with the `fix` text, which names the replacement rather than the problem.
+#
+# level: error   -> must be fixed before handoff
+#        warning -> fix unless the brief explicitly asks for it
+#        info    -> reported in the handoff summary only
+
+rules:
+  # ---------- facts and content ----------
+  - id: unsourced-number
+    level: error
+    check: Every number in visible text appears in brief.yaml, or is a year, a phone
+      number, a postal code, or part of an address.
+    fix: 'Replace the number with [[ISI: <what it measures>]] or use the value from the brief.'
+  - id: placeholder-person
+    level: error
+    pattern: '(?i)\b(john|jane) doe\b|lorem ipsum|\bnama pelanggan\b'
+    fix: 'Use a real name from the brief or [[ISI: nama dan peran]].'
+  - id: unsourced-quote
+    level: error
+    check: Every <blockquote> and testimonial block contains text found in brief.yaml facts.
+    fix: 'Use a quote from the brief or [[ISI: testimoni pelanggan]].'
+  - id: placeholder-left
+    level: info
+    pattern: '\[\[ISI: [^\]]+\]\]'
+    fix: 'Listed in the handoff summary for the client to fill.'
+
+  # ---------- links and interaction ----------
+  - id: empty-link
+    level: error
+    pattern: 'href=""|href="#"(?!\w)|href="javascript:'
+    fix: 'Point the link at a real page, a section anchor, a tel:/mailto:/wa.me URL, or use a button.'
+  - id: animate-everything
+    level: warning
+    check: More than 30% of elements inside <main> have an animation or a reveal-on-scroll class.
+    fix: 'Keep motion for the hero entrance and direct feedback (hover, focus, open/close).'
+
+  # ---------- color, type, tokens ----------
+  - id: raw-color
+    level: error
+    check: Any hex, rgb(), hsl(), or named color outside css/tokens.css.
+    fix: 'Use the matching var(--pd-color-*) from tokens.css.'
+  - id: raw-font
+    level: error
+    check: Any font-family value outside css/tokens.css that is not var(--pd-font-*).
+    fix: 'Use var(--pd-font-display), var(--pd-font-body), or var(--pd-font-mono).'
+  - id: default-font
+    level: warning
+    pattern: '(?i)font-family:[^;]*\b(inter|roboto|open sans|lato|arial|poppins|montserrat)\b'
+    fix: 'Use the pairing chosen in decisions.yaml.'
+  - id: purple-blue-gradient
+    level: warning
+    check: A linear-gradient or radial-gradient whose color stops have hues between 220 and 290
+      degrees.
+    fix: 'Use flat colors from the palette; a gradient only when the style file lists one.'
+  - id: glass-and-glow
+    level: warning
+    pattern: 'backdrop-filter:\s*blur|filter:\s*blur\(\s*[4-9]\d|box-shadow:[^;]*0 0 \d{2,}px'
+    fix: 'Use the style''s shadow tokens.'
+  - id: low-contrast
+    level: error
+    check: Each text color and background color pair used together has a contrast ratio of
+      at least 4.5:1 (3:1 for text 24px and larger).
+    fix: 'Use ink on paper, or accent-ink on accent.'
+
+  # ---------- structure ----------
+  - id: emoji-in-heading
+    level: warning
+    check: An emoji code point inside h1-h6, a button, or a nav link.
+    fix: 'Use words, or an SVG icon with an accessible name.'
+  - id: centered-everything
+    level: warning
+    check: More than 60% of sections have text-align center on their main text.
+    fix: 'Follow the layout pattern recorded in decisions.yaml.'
+  - id: pattern-missing
+    level: error
+    check: A section listed in decisions.yaml layout lacks data-pd-pattern with the chosen id.
+    fix: 'Build that section with the recorded pattern and add data-pd-pattern="<id>".'
+
+  # ---------- copy ----------
+  - id: cliche-phrase
+    level: warning
+    source: [cliches-id.txt, cliches-en.txt]
+    fix: 'Replace with a sentence that states a fact from the brief.'
+
+  # ---------- data and mock API ----------
+  - id: hardcoded-data
+    level: error
+    check: Data written into the page instead of fetched - in HTML, a number in visible text
+      of a dashboard page (footer years excepted); in JS outside js/api/ and js/vendor/, an
+      array literal holding more than three objects or numbers.
+    fix: 'Add an endpoint in js/api/endpoints.js, put the values in data/mock/<name>.mock.json, and render them from request().'
+  - id: direct-fetch
+    level: error
+    pattern: '\bfetch\(|XMLHttpRequest|\$\.ajax|axios\.'
+    scope: 'site/js/**/*.js, excluding site/js/api/client.js and site/js/vendor/'
+    fix: 'Call request(<endpoint>, params) from js/api/client.js.'
+  - id: mock-file-invalid
+    level: error
+    check: A file in site/data/mock/ fails schemas/mock.schema.json, or is not referenced by
+      endpoints.js, or an endpoint in endpoints.js has no mock file.
+    fix: 'Keep exactly one <name>.mock.json per endpoint, with "_mock": true and the endpoint line.'
+  - id: mock-label-missing
+    level: error
+    check: API_MODE is mock and a page that loads a script calling request() has no
+      [data-pd-mock-label] element, or main.js does not call watchMockData().
+    fix: 'Keep the scaffolded mock label near the page title and call watchMockData() in main.js.'
+  - id: mock-people-quotes
+    level: error
+    check: A mock file contains keys named quote, testimonial, review, testimoni, or ulasan.
+    fix: 'Remove the quotes from the mock data and use [[ISI: testimoni pelanggan]] in the page.'
+  - id: api-template-modified
+    level: error
+    check: site/js/api/client.js or mock-label.js differs from the scaffold template, or
+      config.js differs in anything other than the values of API_MODE, API_BASE_URL, and
+      MOCK_DELAY_MS.
+    fix: 'Restore the template file; put endpoint changes in endpoints.js only.'
+
+  # ---------- dashboards ----------
+  - id: raw-color-in-js
+    level: error
+    pattern: '#[0-9A-Fa-f]{3,8}\b|rgba?\(|hsla?\('
+    scope: 'site/js/**/*.js, excluding site/js/vendor/'
+    fix: 'Read the color from a --pd-color-chart-* or state token with getComputedStyle.'
+  - id: chart-without-text
+    level: error
+    check: A chart canvas or svg without an aria-label and without a hidden data table next to it.
+    fix: 'Add an aria-label summary and the same data in a visually hidden <table>.'

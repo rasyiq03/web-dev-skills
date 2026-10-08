@@ -1,0 +1,67 @@
+# Expected output of: python skills/web-build/scripts/pick_direction.py kopi-senja --pick dir-2
+# (with --pick the source is client-picked; with sampling it is sampled and seed is the drawn seed)
+project: kopi-senja
+direction: dir-2
+seed: 4182
+decisions:
+  - id: d-style-1
+    axis: style
+    choice: neobrutalism
+    based_on: [req-audience, req-business.location]
+    rationale: A hand-stamped look feels made by the owner, not by a franchise.
+    source: client-picked
+    realized_by: [border.strong, shadow.hard]
+    verified_by: [c-style-border]
+  - id: d-palette-1
+    axis: palette
+    choice: warm-paper
+    based_on: [req-audience, req-business.location]
+    rationale: Kraft paper and orange stamp ink set it apart from chain cafes in Bandung.
+    source: client-picked
+    realized_by: [color.ink, color.paper, color.accent, color.muted, color.accent-ink]
+    verified_by: [c-palette-paper, c-contrast-body, c-contrast-accent]
+  - id: d-typo-1
+    axis: typography
+    choice: "grotesk-mono: Archivo Black / Archivo / JetBrains Mono"
+    based_on: [req-audience, req-business.location]
+    rationale: Mono prices read like the receipts students compare when budgeting.
+    source: client-picked
+    realized_by: [font.display, font.body, font.mono]
+    verified_by: [c-type-heading, c-type-body]
+  - id: d-layout-1
+    axis: layout
+    choice: "hero=split-offset, services=list-with-prices, proof=facts-ledger, story=portrait-and-text, contact=contact-card"
+    based_on: [req-audience, req-business.location]
+    rationale: A ruled price list answers the first question a student asks, the price.
+    source: client-picked
+    realized_by: [split-offset, list-with-prices, facts-ledger, portrait-and-text, contact-card]
+    verified_by: [c-layout-hero, c-layout-services, c-layout-proof, c-layout-story, c-layout-contact]
+  - id: d-motion-1
+    axis: motion
+    choice: low
+    based_on: [req-audience, req-business.location]
+    rationale: Hover feedback only, so the menu loads fast on phone data.
+    source: client-picked
+    realized_by: [motion.fast, motion.base]
+    verified_by: [c-motion]
+  - id: d-tone-1
+    axis: tone
+    choice: "santai-lugas (id: kamu)"
+    based_on: [req-audience, req-business.location]
+    rationale: Students expect a casual register and the pronoun "kamu".
+    source: client-picked
+    verified_by: [c-register-id]
+constraints:
+  - { id: c-style-border, kind: token-equals, token: border.strong, value: "3px solid var(--pd-color-ink)" }
+  - { id: c-palette-paper, kind: token-equals, token: color.paper, value: "#F4EBDD" }
+  - { id: c-contrast-body, kind: contrast-min, fg: color.ink, bg: color.paper, ratio: 4.5 }
+  - { id: c-contrast-accent, kind: contrast-min, fg: color.accent-ink, bg: color.accent, ratio: 4.5 }
+  - { id: c-type-heading, kind: var-used, selector: h1, property: font-family, var: --pd-font-display }
+  - { id: c-type-body, kind: var-used, selector: body, property: font-family, var: --pd-font-body }
+  - { id: c-layout-hero, kind: pattern-present, pattern: split-offset, page: index.html }
+  - { id: c-layout-services, kind: pattern-present, pattern: list-with-prices, page: index.html }
+  - { id: c-layout-proof, kind: pattern-present, pattern: facts-ledger, page: index.html }
+  - { id: c-layout-story, kind: pattern-present, pattern: portrait-and-text, page: pages/tentang.html }
+  - { id: c-layout-contact, kind: pattern-present, pattern: contact-card, page: pages/kontak.html }
+  - { id: c-motion, kind: motion-max, level: low }
+  - { id: c-register-id, kind: register, lang: id, pronoun: kamu }

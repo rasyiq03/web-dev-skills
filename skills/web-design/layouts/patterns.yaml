@@ -1,0 +1,110 @@
+# Layout patterns per section kind. Each section in the built HTML carries
+# data-pd-pattern="<id>" so check.py can verify the chosen pattern was used.
+hero:
+  - id: split-offset
+    layout: Text column and image column of unequal width (5/7), image overlapping the next section.
+  - id: full-bleed-type
+    layout: One oversized display line across the full width, the offer and action below it.
+  - id: stacked-statement
+    layout: Left-aligned heading, a short paragraph, and the action, with a narrow image strip at the side.
+  - id: photo-caption
+    layout: Full-width photo with the heading set as a caption block in one corner.
+
+offering:
+  - id: grid-staggered
+    layout: Cards on a grid whose rows are offset by half a card height.
+  - id: list-with-prices
+    layout: A ruled list like a menu board, name left and price right in the mono font.
+  - id: feature-rows
+    layout: Alternating rows of image and text, each row a different width ratio.
+  - id: tabs-by-category
+    layout: Category tabs above a list; works without JavaScript as anchored sections.
+
+proof:
+  - id: logo-strip-plain
+    layout: Client names set as text in one row, no boxes.
+    note: Only with client names stated in the brief.
+  - id: single-quote
+    layout: One real quote set large with the person's name and role.
+    note: Only with a quote stated in the brief.
+  - id: facts-ledger
+    layout: Two or three stated facts (year founded, projects done) in a ruled table.
+
+story:
+  - id: two-column-narrative
+    layout: Heading in a narrow left column, text in a wider right column.
+  - id: timeline-ruled
+    layout: Dated milestones on a vertical rule.
+  - id: portrait-and-text
+    layout: Photo of the owner or team beside a short first-person paragraph.
+
+contact:
+  - id: map-band
+    layout: Full-width band with address, hours, and actions on one side and a map link on the other.
+  - id: contact-card
+    layout: One bordered card with every contact method as a large tappable link.
+  - id: split-form
+    layout: Contact details on the left, a short form on the right.
+
+action:
+  - id: band-with-button
+    layout: Full-width accent band with one sentence and one button.
+  - id: closing-statement
+    layout: Large closing line and the action, left-aligned, followed by the footer.
+
+work:
+  - id: case-list
+    layout: Projects as rows with title, role, year, and a thumbnail that grows on hover.
+  - id: masonry-plain
+    layout: Images in columns of uneven heights with captions under each.
+  - id: index-table
+    layout: A sortable-looking table of projects with a preview image on the side.
+
+catalog:
+  - id: product-grid-dense
+    layout: Small product cards, four per row on desktop, each with an order link.
+  - id: price-list
+    layout: Grouped ruled lists of products and prices, an order button per group.
+
+process:
+  - id: numbered-steps
+    layout: Numbered steps in a row on desktop and a column on mobile.
+  - id: checklist-card
+    layout: One card listing what the buyer needs to do, in order.
+
+# ---------- dashboard ----------
+app-shell:
+  - id: sidebar-left
+    layout: Fixed navigation column on the left, page title and filters across the top of the content.
+  - id: topbar-tabs
+    layout: Navigation as tabs in a top bar, content full width below; suits two or three pages.
+  - id: icon-rail
+    layout: Narrow icon rail with labels on hover and focus, widest possible content area.
+
+filters:
+  - id: filter-bar
+    layout: One row of compact controls under the page title, applied immediately.
+  - id: filter-drawer
+    layout: A button opens a side drawer with all filters and an apply action.
+
+kpi:
+  - id: kpi-row
+    layout: Three to five figures in one row, label above, value large, period and change below.
+  - id: kpi-ledger
+    layout: Figures in a ruled two-column list like a ledger, label left and value right.
+  - id: kpi-lead
+    layout: One lead figure at large size, the others smaller beside it.
+
+chart-panel:
+  - id: chart-grid-2
+    layout: Charts in a two-column grid of equal panels, each with title, unit, and source line.
+  - id: chart-lead-side
+    layout: One wide time-series chart with a narrow column of smaller breakdowns beside it.
+  - id: chart-stack
+    layout: Full-width charts stacked vertically, sharing one x-axis range.
+
+table:
+  - id: table-plain
+    layout: Ruled rows, sticky header, right-aligned numbers, sortable columns.
+  - id: table-dense
+    layout: Compact rows with zebra striping from tokens, column toggles, pagination.

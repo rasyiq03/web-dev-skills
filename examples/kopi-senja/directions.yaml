@@ -1,0 +1,131 @@
+# Example web-design output for examples/kopi-senja/brief.yaml
+directions:
+- id: dir-1
+  probability: 0.34
+  style: editorial
+  palette: ink-on-cream
+  type_pairing: fraunces-plex
+  layout:
+    hero: stacked-statement
+    services: feature-rows
+    proof: facts-ledger
+    story: two-column-narrative
+    contact: map-band
+  motion: low
+  tone: tenang-akrab
+  register:
+    id: kamu
+  summary: Cafe as a reading room; serif headings and cream paper.
+  rationale:
+    style: A quiet reading-room look suits students who stay for hours.
+    color: Cream and brick feel warm without the dark-brown look of chain coffee shops.
+    typography: A serif display suits students who come to read and work for hours.
+    layout: A stacked statement keeps the hero readable before photos exist.
+    motion: Little motion keeps attention on reading and the menu.
+    tone: A calm, friendly register with "kamu" fits students without sounding loud.
+  based_on:
+  - req-audience
+  - req-business.kind
+- id: dir-2
+  probability: 0.24
+  style: neobrutalism
+  palette: warm-paper
+  type_pairing: grotesk-mono
+  layout:
+    hero: split-offset
+    services: list-with-prices
+    proof: facts-ledger
+    story: portrait-and-text
+    contact: contact-card
+  motion: low
+  tone: santai-lugas
+  register:
+    id: kamu
+  summary: Hand-stamped menu board; thick borders, receipt-style prices.
+  rationale:
+    style: A hand-stamped look feels made by the owner, not by a franchise.
+    color: Kraft paper and orange stamp ink set it apart from chain cafes in Bandung.
+    typography: Mono prices read like the receipts students compare when budgeting.
+    layout: A ruled price list answers the first question a student asks, the price.
+    motion: Hover feedback only, so the menu loads fast on phone data.
+    tone: Students expect a casual register and the pronoun "kamu".
+  based_on:
+  - req-audience
+  - req-business.location
+- id: dir-3
+  probability: 0.18
+  style: neobrutalism
+  palette: sun-block
+  type_pairing: wide-display
+  layout:
+    hero: full-bleed-type
+    services: grid-staggered
+    proof: facts-ledger
+    story: timeline-ruled
+    contact: map-band
+  motion: medium
+  tone: ramai-ceria
+  register:
+    id: kamu
+  summary: Campus event poster; loud yellow and one huge word.
+  rationale:
+    style: Poster energy matches the campus events students already follow.
+    color: Poster yellow stands out among student hangouts that use muted tones.
+    typography: A wide display word works like a poster on a campus notice board.
+    layout: Staggered cards give the menu the rhythm of a flyer wall.
+    motion: A short entrance on the hero word echoes a poster being pasted up.
+    tone: A cheerful, loud register with "kamu" matches campus event posters.
+  based_on:
+  - req-audience
+- id: dir-4
+  probability: 0.14
+  style: editorial
+  palette: forest-ledger
+  type_pairing: newsreader-public
+  layout:
+    hero: photo-caption
+    services: list-with-prices
+    proof: single-quote
+    story: timeline-ruled
+    contact: split-form
+  motion: none
+  tone: hangat-sunda
+  register:
+    id: kamu
+  summary: Highland ledger; green tones referencing the tea and coffee hills south of Bandung.
+  rationale:
+    style: A printed-ledger look ties the cafe to the highland coffee around Bandung.
+    color: Ledger green references the highland plantations around Bandung.
+    typography: Newsreader gives a printed, local-newspaper feel.
+    layout: A photo with a caption block lets the place carry the hero.
+    motion: No motion; the photo and the text carry the page.
+    tone: Warm Sundanese-flavored phrasing with "kamu" for local students.
+  based_on:
+  - req-business.location
+  - req-business.cultural_context
+- id: dir-5
+  probability: 0.1
+  style: editorial
+  palette: night-print
+  type_pairing: instrument-familjen
+  layout:
+    hero: full-bleed-type
+    services: feature-rows
+    proof: facts-ledger
+    story: two-column-narrative
+    contact: contact-card
+  motion: low
+  tone: malam-tenang
+  register:
+    id: kamu
+  summary: The name taken literally; a dusk-to-night site in dark print and brass.
+  rationale:
+    style: A dusk palette and tall serif take the name Senja literally.
+    color: Dark print and brass follow the name Senja (dusk).
+    typography: A tall serif heading echoes the quiet of late evening.
+    layout: Full-width type puts the name itself in front.
+    motion: Slow, low motion fits an evening mood without distracting.
+    tone: A quiet evening register with "kamu" for students who study late.
+  based_on:
+  - req-business.name
+  - req-audience

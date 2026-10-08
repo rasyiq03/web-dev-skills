@@ -1,0 +1,52 @@
+id: neobrutalism
+name: Neobrutalism
+summary: Thick ink borders, hard offset shadows, flat bold color blocks, blunt type.
+suits: Cafes, street food, creative studios, student and youth products, events, and playful internal dashboards.
+
+# Values shared by every palette and pairing of this style.
+base:
+  type_scale: { base: 1.0625rem, ratio: 1.333 }
+  space: { xs: 0.25rem, sm: 0.5rem, md: 1rem, lg: 2rem, xl: 4rem, section: 6rem }
+  radius: { none: 0, sm: 0.25rem }
+  border: { width: 3px, strong: "3px solid var(--pd-color-ink)" }
+  shadow: { hard: "6px 6px 0 var(--pd-color-ink)", hard-sm: "3px 3px 0 var(--pd-color-ink)" }
+  motion: { fast: 120ms, base: 200ms, easing: "cubic-bezier(0.2, 0, 0, 1)" }
+
+palettes:
+  - id: warm-paper
+    mood: Kraft paper and stamp ink; warm and homemade.
+    colors: { ink: "#1B1A17", paper: "#F4EBDD", accent: "#F26B3A", muted: "#5E574D", accent-ink: "#1B1A17" }
+  - id: mint-signal
+    mood: Pharmacy-mint background with cobalt; clean and alert.
+    colors: { ink: "#111111", paper: "#E4F3DC", accent: "#2B59C3", muted: "#46523F", accent-ink: "#FFFFFF" }
+  - id: sun-block
+    mood: Poster yellow and signal red; loud and festive.
+    colors: { ink: "#14110F", paper: "#FFF1A8", accent: "#D7263D", muted: "#574E36", accent-ink: "#FFFFFF" }
+
+pairings:
+  - id: grotesk-mono
+    display: Archivo Black
+    body: Archivo
+    mono: JetBrains Mono
+  - id: wide-display
+    display: Unbounded
+    body: Public Sans
+    mono: DM Mono
+  - id: bricolage-plex
+    display: Bricolage Grotesque
+    body: IBM Plex Sans
+    mono: IBM Plex Mono
+
+# How the style's signature components are built. Use the tokens above.
+components:
+  button: Solid accent fill, ink text in accent-ink, strong border, hard-sm shadow; on hover
+    the button moves 3px down-right and the shadow shrinks to zero.
+  card: Paper background, strong border, hard shadow, square corners, heading in display font.
+  section: Alternate paper and accent backgrounds between sections; a strong border separates them.
+  label: Mono font, uppercase, small size, letter-spacing 0.08em, used for prices and tags.
+  image: Strong border around photos; slight rotation (-1deg to 1deg) only on decorative images.
+
+signature_moves:
+  - Prices and tags set in the mono font like a printed receipt.
+  - One oversized display word per page, cropped by the viewport edge.
+  - Grids with deliberately uneven column widths (for example 5/7 or 2/3).

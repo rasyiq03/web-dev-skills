@@ -1,0 +1,9 @@
+# One line per style. Read this first; open a style file only when you use it.
+styles:
+  - id: neobrutalism
+    file: neobrutalism.yaml
+    summary: Thick ink borders, hard offset shadows, flat bold color blocks, blunt type.
+  - id: editorial
+    file: editorial.yaml
+    summary: Magazine-like serif display type, generous margins, rules and columns, quiet color.
+  # Add your own style by copying _template.yaml and listing it here.

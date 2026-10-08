@@ -1,0 +1,58 @@
+id: portfolio
+summary: Show a person's or studio's work and make it easy to hire them.
+default_pages: [index, karya, tentang, kontak]
+
+required_fields: [business.name, business.kind, audience]
+
+facts:
+  - projects
+  - skills
+  - email
+  - social_links
+  - cv_url
+
+sections:
+  - id: hero
+    page: index
+    purpose: Who they are and what they make, in one line.
+    pattern_kind: hero
+  - id: selected-work
+    page: index
+    purpose: Three to six projects, each with role, outcome, and image.
+    pattern_kind: work
+    data: true
+    facts: [projects]
+  - id: work-index
+    page: karya
+    purpose: Every project with filters by type when there are more than six.
+    pattern_kind: work
+    data: true
+    facts: [projects]
+  - id: about
+    page: tentang
+    purpose: Background, skills, and how they work.
+    pattern_kind: story
+    facts: [skills, cv_url]
+  - id: contact
+    page: kontak
+    purpose: How to start a project together.
+    pattern_kind: contact
+    facts: [email, social_links]
+
+questions:
+  - field: audience
+    ask:
+      id: Siapa yang ingin kamu yakinkan (klien, perekrut, kurator)?
+      en: Who do you want to convince (clients, recruiters, curators)?
+  - field: facts.projects
+    ask:
+      id: Proyek mana yang paling ingin ditonjolkan, dan apa peranmu?
+      en: Which projects should lead, and what was your role?
+  - field: tone
+    ask:
+      id: Kesan apa yang ingin ditinggalkan?
+      en: What impression should the site leave?
+  - field: style_request
+    ask:
+      id: Referensi gaya (opsional)
+      en: Style references (optional)

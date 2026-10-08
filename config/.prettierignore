@@ -1,0 +1,3 @@
+# JavaScript is formatted by ESLint (Allman braces); Prettier has no Allman option.
+**/*.js
+**/*.mjs

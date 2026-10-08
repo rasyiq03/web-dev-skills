@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mock.schema.json",
+  "title": "Mock API response file (site/data/mock/<name>.mock.json)",
+  "type": "object",
+  "required": ["_mock", "endpoint", "generated_by", "data"],
+  "additionalProperties": false,
+  "properties": {
+    "_mock": { "const": true },
+    "endpoint": {
+      "description": "Method and path of the real endpoint this file imitates, e.g. GET /metrics.",
+      "type": "string",
+      "pattern": "^(GET|POST|PUT|PATCH|DELETE) /[A-Za-z0-9/_{}:-]*$"
+    },
+    "generated_by": { "type": "string" },
+    "note": { "type": "string" },
+    "data": {}
+  }
+}

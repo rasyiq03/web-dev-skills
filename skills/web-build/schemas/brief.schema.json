@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "brief.schema.json",
+  "title": "Project brief",
+  "type": "object",
+  "required": [
+    "slug",
+    "site_type",
+    "languages",
+    "business",
+    "audience",
+    "goal",
+    "tone",
+    "facts"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "site_type": {
+      "enum": [
+        "company-profile",
+        "landing",
+        "portfolio",
+        "umkm-catalog",
+        "dashboard"
+      ]
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "id",
+          "en"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "interactive": {
+      "type": "boolean",
+      "default": false
+    },
+    "business": {
+      "type": "object",
+      "required": [
+        "name",
+        "kind",
+        "location"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/field"
+        },
+        "kind": {
+          "$ref": "#/$defs/field"
+        },
+        "location": {
+          "$ref": "#/$defs/field"
+        },
+        "cultural_context": {
+          "$ref": "#/$defs/field"
+        },
+        "differentiator": {
+          "$ref": "#/$defs/field"
+        }
+      }
+    },
+    "audience": {
+      "$ref": "#/$defs/field"
+    },
+    "goal": {
+      "$ref": "#/$defs/field"
+    },
+    "tone": {
+      "$ref": "#/$defs/field"
+    },
+    "style_request": {
+      "$ref": "#/$defs/field"
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "colors": {
+          "$ref": "#/$defs/field"
+        },
+        "fonts": {
+          "$ref": "#/$defs/field"
+        },
+        "logo": {
+          "$ref": "#/$defs/field"
+        }
+      }
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      }
+    },
+    "facts": {
+      "description": "Every fact the site may show. Keys are free-form snake_case names.",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/field"
+      }
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "photos": {
+          "$ref": "#/$defs/field"
+        },
+        "illustrations": {
+          "$ref": "#/$defs/field"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "field": {
+      "type": "object",
+      "required": [
+        "value",
+        "source"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {},
+        "source": {
+          "enum": [
+            "stated",
+            "inferred",
+            "unknown"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "const": "unknown"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "enum": [
+                  "stated",
+                  "inferred"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "not": {
+                  "const": "unknown"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

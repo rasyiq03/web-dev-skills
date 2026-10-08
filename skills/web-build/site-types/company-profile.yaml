@@ -1,0 +1,63 @@
+id: company-profile
+summary: Who the business is, what it offers, and how to reach it.
+default_pages: [index, tentang, kontak]
+
+required_fields: [business.name, business.kind, business.location, audience]
+
+facts:
+  - address
+  - whatsapp
+  - email
+  - hours
+  - services
+  - founded_year
+  - client_names
+  - team_members
+
+sections:
+  - id: hero
+    page: index
+    purpose: Name the business and its single clearest offer in one view.
+    pattern_kind: hero
+  - id: services
+    page: index
+    purpose: The main services or products, each with one concrete line.
+    pattern_kind: offering
+    facts: [services]
+  - id: proof
+    page: index
+    purpose: Evidence the client can stand behind; placeholders when none is stated.
+    pattern_kind: proof
+    facts: [client_names, founded_year]
+  - id: story
+    page: tentang
+    purpose: Why the business exists and who runs it.
+    pattern_kind: story
+    facts: [founded_year, team_members]
+  - id: contact
+    page: kontak
+    purpose: Every way to reach the business, the address, and the hours.
+    pattern_kind: contact
+    facts: [address, whatsapp, email, hours]
+
+questions:
+  - field: audience
+    ask:
+      id: Siapa pelanggan utama yang ingin dijangkau?
+      en: Who are the main customers you want to reach?
+  - field: business.differentiator
+    ask:
+      id: Apa yang membedakan usaha ini dari pesaing terdekat?
+      en: What sets the business apart from its nearest competitor?
+  - field: goal
+    ask:
+      id: Setelah membuka situs, apa yang paling ingin pengunjung lakukan?
+      en: After opening the site, what should visitors do first?
+  - field: brand.colors
+    ask:
+      id: Ada warna atau logo yang wajib dipakai?
+      en: Are there brand colors or a logo that must be used?
+  - field: style_request
+    ask:
+      id: Situs atau gaya yang disukai sebagai referensi (opsional)
+      en: Sites or styles you like as a reference (optional)

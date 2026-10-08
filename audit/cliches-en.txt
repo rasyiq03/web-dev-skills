@@ -1,0 +1,17 @@
+# Seed list. Replace with the corpus-derived list from tools/build_cliches.py (see IMPLEMENTATION.md).
+# One phrase per line, lowercase; check.py matches them case-insensitively in visible text.
+revolutionize your business
+take your business to the next level
+unlock the power of
+unleash your potential
+seamless experience
+cutting-edge solutions
+in today's fast-paced world
+elevate your
+empower your
+your trusted partner
+we are passionate about
+look no further
+transform the way you
+game-changer
+state-of-the-art

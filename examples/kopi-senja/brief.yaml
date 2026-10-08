@@ -1,0 +1,26 @@
+# Prompt: "buat company profile Kopi Senja, kedai kopi di Bandung, target mahasiswa"
+slug: kopi-senja
+site_type: company-profile
+languages: [id]
+interactive: false
+business:
+  name: { value: Kopi Senja, source: stated }
+  kind: { value: kedai kopi, source: stated }
+  location: { value: Bandung, source: stated }
+  cultural_context: { value: Sunda, source: inferred, note: dari lokasi Bandung }
+  differentiator: { value: unknown, source: unknown }
+audience: { value: mahasiswa, source: stated }
+goal: { value: unknown, source: unknown }
+tone: { value: unknown, source: unknown }
+style_request: { value: unknown, source: unknown }
+brand:
+  colors: { value: unknown, source: unknown }
+  fonts: { value: unknown, source: unknown }
+  logo: { value: unknown, source: unknown }
+facts:
+  address: { value: unknown, source: unknown }
+  whatsapp: { value: unknown, source: unknown }
+  hours: { value: unknown, source: unknown }
+  services: { value: unknown, source: unknown }
+assets:
+  photos: { value: unknown, source: unknown }

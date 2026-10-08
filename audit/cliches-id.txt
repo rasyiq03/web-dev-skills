@@ -1,0 +1,19 @@
+# Seed list. Replace with the corpus-derived list from tools/build_cliches.py (see IMPLEMENTATION.md).
+# One phrase per line, lowercase; check.py matches them case-insensitively in visible text.
+solusi terpercaya
+solusi terbaik untuk
+wujudkan impian anda
+wujudkan impianmu
+revolusikan bisnis anda
+tingkatkan bisnis anda ke level berikutnya
+kualitas terbaik dengan harga terjangkau
+kami hadir untuk anda
+melayani dengan sepenuh hati
+mitra terpercaya
+pengalaman tak terlupakan
+didukung oleh tim profesional
+inovasi tanpa batas
+selangkah lebih maju
+satu langkah lebih dekat
+era digital
+di era modern ini

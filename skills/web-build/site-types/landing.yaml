@@ -1,0 +1,55 @@
+id: landing
+summary: One page that leads a visitor to one action.
+default_pages: [index]
+
+required_fields: [business.name, business.kind, goal]
+
+facts:
+  - product_name
+  - price
+  - features
+  - whatsapp
+  - signup_url
+  - deadline
+
+sections:
+  - id: hero
+    page: index
+    purpose: The offer and the one action, both visible without scrolling.
+    pattern_kind: hero
+  - id: problem
+    page: index
+    purpose: The situation the audience is in, in their own words.
+    pattern_kind: story
+  - id: offer
+    page: index
+    purpose: What they get, with price or terms when stated.
+    pattern_kind: offering
+    facts: [product_name, price, features]
+  - id: proof
+    page: index
+    purpose: Evidence; placeholders when none is stated.
+    pattern_kind: proof
+  - id: action
+    page: index
+    purpose: Repeat the action with any deadline or condition.
+    pattern_kind: action
+    facts: [signup_url, whatsapp, deadline]
+
+questions:
+  - field: goal
+    ask:
+      id: Satu tindakan apa yang harus dilakukan pengunjung?
+      en: What single action should a visitor take?
+  - field: audience
+    ask:
+      id: Siapa yang paling membutuhkan penawaran ini?
+      en: Who needs this offer most?
+  - field: facts.price
+    ask:
+      id: Berapa harga atau syaratnya?
+      en: What is the price or the terms?
+  - field: business.differentiator
+    ask:
+      id: Mengapa memilih ini, bukan alternatifnya?
+      en: Why choose this over the alternatives?
