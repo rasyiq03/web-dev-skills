@@ -265,9 +265,14 @@ End with the approximate size (`characters / 4` tokens). Target: under 1,500 tok
 One run = one round. Order of work:
 
 1. **Format** (auto-fix): Prettier `--write` on HTML and CSS, ESLint `--fix` on JS,
-   stylelint `--fix` on CSS, all with the project's copied configs.
+   stylelint `--fix` on CSS. Prettier and html-validate use the project's copied configs;
+   ESLint and stylelint use the originals in `config/`, because their plugins resolve from
+   the config file's location and a project outside the repo cannot reach the repo's
+   `node_modules` (see §5). Every tool runs as `node <repo>/node_modules/<pkg>/<bin>`, not
+   through `npx`, so the pinned versions are used from any folder.
 2. **Lint** (report): html-validate, ESLint, stylelint with JSON formatters → findings with
-   `category: lint`.
+   `category: lint`. A tool that cannot run, exits with an unexpected code, or prints
+   output that is not JSON becomes an `error` finding `tool-failed`, never a silent pass.
 3. **Config integrity**: config hashes equal `state.yaml`; mismatch = error
    `config-modified` (restore the original and report).
 4. **Conventions** (`category: lint`, own checks): file header in the first 10 lines of every
@@ -407,6 +412,22 @@ stylelint 17.16.0 (+ stylelint-order), and html-validate, using the configs in `
   rule is turned off. The scaffold skeleton passes Prettier and html-validate.
 
 Pin these versions in `package.json` once v0.1 passes, so behaviour does not drift.
+
+**Verified on 2026-10-08 while making projects work outside the repo:**
+
+- stylelint 17 writes its `-f json` report to **stderr**, not stdout, and has no `--stdout`
+  option. `check.py` reads the report with `-o <file>`.
+- Normal exit codes: Prettier `--write` 0 (2 = a file failed to parse or the tool failed);
+  ESLint 0/1 (2 = crash or bad config); stylelint 0/2 (78 = bad config, 64 = bad option);
+  html-validate 0/1.
+- From a project folder outside the repo, the copied `eslint.config.js` fails with
+  `ERR_MODULE_NOT_FOUND` for `@stylistic/eslint-plugin`, and the copied `.stylelintrc.json`
+  fails with "Could not find stylelint-order". With `--config` pointing at `config/` in the
+  repo, both work, and ESLint still lints the files under the current directory.
+- `npx` run outside the repo falls back to its own cache or downloads the latest versions,
+  so the pinned versions are not guaranteed.
+- A `site/` that the user turns into a git repo (for deployment) holds read-only object
+  files on Windows; `check.py` and `handoff.py` skip `site/.git/`.
 
 **Still to verify:**
 

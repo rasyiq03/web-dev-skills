@@ -16,6 +16,9 @@ and the fixes in step 7.
   testimonials, client logos, statistics) becomes a placeholder `[[ISI: <what>]]`.
 - Run commands from the repository root. Every script prints what it wrote and exits
   non-zero on failure; read its output before moving on.
+- The project folder is `projects/<slug>/`. When the environment variable
+  `PD_PROJECTS_DIR` is set, it is `$PD_PROJECTS_DIR/<slug>/` instead: write every project
+  file there, and still run the scripts from the repository root.
 - Work without stopping to ask the user, unless they asked for interactive mode or a
   script tells you to ask.
 
