@@ -4,7 +4,7 @@
 	"type": "module",
 	"description": "Formatter and linters used by skills/web-build/scripts/check.py",
 	"scripts": {
-		"setup": "npm install -D prettier eslint @stylistic/eslint-plugin eslint-plugin-jsdoc globals stylelint stylelint-order html-validate && npm install chart.js"
+		"setup": "npm ci"
 	},
 	"devDependencies": {
 		"@stylistic/eslint-plugin": "5.10.0",

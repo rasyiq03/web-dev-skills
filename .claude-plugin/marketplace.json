@@ -1,0 +1,14 @@
+{
+  "name": "web-dev-skills",
+  "description": "Marketplace for web-skills: prompt-to-website skills for Claude Code.",
+  "owner": {
+    "name": "Rasyiq03"
+  },
+  "plugins": [
+    {
+      "name": "web-skills",
+      "source": "./",
+      "description": "Build a complete website from a short prompt, with recorded design decisions and checked pages."
+    }
+  ]
+}
