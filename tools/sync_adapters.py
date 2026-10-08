@@ -1,8 +1,8 @@
 # ============================================================
 # File      : sync_adapters.py
 # Proyek    : web-skills
-# Deskripsi : Sinkronisasi adapter skills ke folder .claude/skills/
-#             (Claude Code) dan .agents/skills/ (Codex).
+# Deskripsi : Sinkronisasi skill ke .agents/skills/ untuk Codex. Claude Code
+#             memuat skill lewat plugin, jadi .claude/skills/ tidak ditulis lagi.
 # ============================================================
 
 import argparse
@@ -38,10 +38,12 @@ def parse_frontmatter(skill_md_path):
 
 def sync_adapters(copy_mode=False):
     """
-    Memeriksa validitas SKILL.md dan membuat tautan/salinan ke .claude dan .agents.
+    Memeriksa validitas SKILL.md dan membuat tautan/salinan skill di .agents/skills/ (Codex).
 
     I.S. : Folder skills/ ada di root repo.
-    F.S. : Folder .claude/skills/ dan .agents/skills/ tersinkronisasi.
+    F.S. : .agents/skills/ tersinkronisasi. Peringatan dicetak bila CLAUDE.md ada, dan untuk
+           setiap salinan lama di .claude/skills/ yang akan membuat skill muncul dua kali di
+           samping plugin.
     """
     skills_dir = REPO_ROOT / "skills"
     if not skills_dir.is_dir():
@@ -54,10 +56,8 @@ def sync_adapters(copy_mode=False):
     if claude_md.is_file():
         lines.append("PERINGATAN: CLAUDE.md ditemukan! Claude Code akan mengabaikan AGENTS.md bila file ini ada.")
 
-    claude_skills_dir = REPO_ROOT / ".claude" / "skills"
     agents_skills_dir = REPO_ROOT / ".agents" / "skills"
 
-    claude_skills_dir.mkdir(parents=True, exist_ok=True)
     agents_skills_dir.mkdir(parents=True, exist_ok=True)
 
     skill_folders = [d for d in skills_dir.iterdir() if d.is_dir()]
@@ -86,30 +86,35 @@ def sync_adapters(copy_mode=False):
                 f"shorten description in skills/{s_name}/SKILL.md to under 1024 chars",
             )
 
-        # Buat adapter di .claude dan .agents
-        for target_parent, adapter_label in [
-            (claude_skills_dir, "Claude Code (.claude/skills)"),
-            (agents_skills_dir, "Codex (.agents/skills)"),
-        ]:
-            target_link = target_parent / s_name
-            if target_link.is_symlink() or target_link.is_file():
-                target_link.unlink()
-            elif target_link.is_dir():
-                shutil.rmtree(target_link)
+        # Salinan lama untuk Claude Code bentrok dengan skill dari plugin
+        stale = REPO_ROOT / ".claude" / "skills" / s_name
+        if stale.exists() or stale.is_symlink():
+            lines.append(
+                f"PERINGATAN: .claude/skills/{s_name} masih ada; hapus folder itu, karena Claude "
+                "Code kini memuat skill lewat plugin dan skill akan muncul dua kali."
+            )
 
-            if copy_mode:
+        # Buat adapter untuk Codex
+        adapter_label = "Codex (.agents/skills)"
+        target_link = agents_skills_dir / s_name
+        if target_link.is_symlink() or target_link.is_file():
+            target_link.unlink()
+        elif target_link.is_dir():
+            shutil.rmtree(target_link)
+
+        if copy_mode:
+            shutil.copytree(s_dir, target_link)
+            lines.append(f"  - [{s_name}] Disalin ke {adapter_label}")
+        else:
+            try:
+                # Buat relative symlink: ../../skills/<s_name>
+                rel_src = os.path.relpath(s_dir, agents_skills_dir)
+                target_link.symlink_to(rel_src, target_is_directory=True)
+                lines.append(f"  - [{s_name}] Symlink dibuat untuk {adapter_label}")
+            except OSError:
+                # Fallback ke copy jika izin symlink Windows tidak tersedia
                 shutil.copytree(s_dir, target_link)
-                lines.append(f"  - [{s_name}] Disalin ke {adapter_label}")
-            else:
-                try:
-                    # Buat relative symlink: ../../skills/<s_name>
-                    rel_src = os.path.relpath(s_dir, target_parent)
-                    target_link.symlink_to(rel_src, target_is_directory=True)
-                    lines.append(f"  - [{s_name}] Symlink dibuat untuk {adapter_label}")
-                except OSError:
-                    # Fallback ke copy jika izin symlink Windows tidak tersedia
-                    shutil.copytree(s_dir, target_link)
-                    lines.append(f"  - [{s_name}] Disalin (fallback tanpa hak symlink) ke {adapter_label}")
+                lines.append(f"  - [{s_name}] Disalin (fallback tanpa hak symlink) ke {adapter_label}")
 
     summary_lines = [
         "Sinkronisasi adapter selesai:",
@@ -126,7 +131,7 @@ def main():
     I.S. : sys.argv berisi opsi baris perintah.
     F.S. : Hasil sync_adapters() dikembalikan.
     """
-    parser = argparse.ArgumentParser(description="Sinkronisasi adapter skills ke Claude Code dan Codex.")
+    parser = argparse.ArgumentParser(description="Sinkronisasi skill ke .agents/skills/ untuk Codex.")
     parser.add_argument("--copy", action="store_true", help="Salin folder sebagai ganti relative symlink")
 
     args = parser.parse_args()
