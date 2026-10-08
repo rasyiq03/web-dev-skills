@@ -204,12 +204,21 @@ class QuestionnaireHandler(http.server.BaseHTTPRequestHandler):
     """
 
     def log_message(self, format, *args):
+        """
+        Membungkam log akses bawaan agar stdout hanya berisi URL dan baris NEXT:.
+
+        I.S. : Server menerima sebuah request.
+        F.S. : Tidak ada yang dicetak.
+        """
         # Mencegah polusi stdout dengan log server standar
         pass
 
     def validate_host(self):
         """
-        Memastikan host header hanya 127.0.0.1:<port> atau localhost:<port>.
+        Memastikan header Host hanya 127.0.0.1:<port> atau localhost:<port>.
+
+        I.S. : Request sudah diterima; self.server.port terisi.
+        F.S. : True dikembalikan bila Host diizinkan, False bila tidak.
         """
         host = self.headers.get("Host", "")
         allowed = [
@@ -219,6 +228,12 @@ class QuestionnaireHandler(http.server.BaseHTTPRequestHandler):
         return host in allowed
 
     def do_GET(self):
+        """
+        Menyajikan form kuesioner pada /<token>/.
+
+        I.S. : Request GET diterima.
+        F.S. : Respons 403 bila Host salah, 404 bila token salah, atau 200 berisi HTML form.
+        """
         # 1. Validasi Host
         if not self.validate_host():
             self.send_response(403)
@@ -245,6 +260,14 @@ class QuestionnaireHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(html_bytes)
 
     def do_POST(self):
+        """
+        Menerima jawaban form pada /<token>/submit.
+
+        I.S. : Request POST diterima.
+        F.S. : Respons 403 bila Host salah, 404 bila path salah, 400 bila Content-Type bukan JSON
+               atau body tidak valid, 409 bila sudah pernah dikirim; bila sah, jawaban disimpan
+               di self.server dan respons 200 dikirim.
+        """
         # 1. Validasi Host
         if not self.validate_host():
             self.send_response(403)
@@ -397,6 +420,12 @@ def run_server(slug, timeout_seconds=1800):
 
 
 def main():
+    """
+    Titik masuk CLI: membaca slug dan opsi --timeout dari argumen lalu menjalankan run_server().
+
+    I.S. : sys.argv berisi slug proyek dan opsi.
+    F.S. : Server berjalan sampai jawaban tersimpan atau batas waktu habis.
+    """
     parser = argparse.ArgumentParser(description="Jalankan server kuesioner brief interaktif.")
     parser.add_argument("slug", help="Slug proyek")
     parser.add_argument("--timeout", type=int, default=1800, help="Batas waktu server (detik)")

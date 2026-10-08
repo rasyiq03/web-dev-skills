@@ -402,6 +402,12 @@ def pick(slug, pick_id=None, seed_arg=None):
 
 
 def main():
+    """
+    Titik masuk CLI: membaca slug serta opsi --pick dan --seed dari argumen lalu menjalankan pick().
+
+    I.S. : sys.argv berisi slug proyek dan opsi.
+    F.S. : Hasil pick() dikembalikan; argparse keluar dengan kode 2 bila argumen salah.
+    """
     parser = argparse.ArgumentParser(description="Pilih arah visual dan susun decisions.yaml.")
     parser.add_argument("slug", help="Slug proyek")
     parser.add_argument("--pick", help="Pilih arah tertentu (dir-1 .. dir-5)", default=None)

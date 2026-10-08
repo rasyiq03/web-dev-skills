@@ -266,6 +266,12 @@ def handoff(slug, no_provenance=False):
 
 
 def main():
+    """
+    Titik masuk CLI: membaca slug dan opsi --no-provenance dari argumen lalu menjalankan handoff().
+
+    I.S. : sys.argv berisi slug proyek dan opsi.
+    F.S. : Hasil handoff() dikembalikan; argparse keluar dengan kode 2 bila argumen salah.
+    """
     parser = argparse.ArgumentParser(description="Susun paket serah terima proyek.")
     parser.add_argument("slug", help="Slug proyek")
     parser.add_argument("--no-provenance", action="store_true", help="Lewati pembuatan provenance.json")

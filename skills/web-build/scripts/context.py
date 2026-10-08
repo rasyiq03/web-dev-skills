@@ -137,6 +137,12 @@ def get_page_context(slug, page):
 
 
 def main():
+    """
+    Titik masuk CLI: membaca slug dan halaman dari argumen lalu menjalankan get_page_context().
+
+    I.S. : sys.argv berisi slug dan id halaman, atau kurang dari itu.
+    F.S. : Hasil get_page_context() dikembalikan; keluar dengan kode 1 bila argumen kurang.
+    """
     if len(sys.argv) < 3:
         fail(
             EXIT_INVALID,

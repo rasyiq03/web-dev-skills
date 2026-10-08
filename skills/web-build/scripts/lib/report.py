@@ -26,6 +26,13 @@ class ScriptExit(Exception):
     """
 
     def __init__(self, code, lines, next_step):
+        """
+        Menyimpan kode keluar, baris pesan, dan langkah berikutnya.
+
+        I.S. : code adalah kode keluar; lines berupa string atau list string; next_step adalah teks
+               untuk baris NEXT:.
+        F.S. : Atribut code, lines (selalu list), dan next_step terisi.
+        """
         super().__init__("\n".join(lines) if isinstance(lines, list) else lines)
         self.code = code
         self.lines = lines if isinstance(lines, list) else [lines]

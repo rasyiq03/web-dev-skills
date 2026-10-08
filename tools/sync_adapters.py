@@ -120,6 +120,12 @@ def sync_adapters(copy_mode=False):
 
 
 def main():
+    """
+    Titik masuk CLI: membaca opsi --copy dari argumen lalu menjalankan sync_adapters().
+
+    I.S. : sys.argv berisi opsi baris perintah.
+    F.S. : Hasil sync_adapters() dikembalikan.
+    """
     parser = argparse.ArgumentParser(description="Sinkronisasi adapter skills ke Claude Code dan Codex.")
     parser.add_argument("--copy", action="store_true", help="Salin folder sebagai ganti relative symlink")
 

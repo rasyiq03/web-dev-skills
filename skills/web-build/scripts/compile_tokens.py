@@ -180,6 +180,12 @@ def compile_tokens(slug):
 
     # Susun tokens.json (DTCG)
     def dtcg_group(token_dict, token_type):
+        """
+        Membungkus pasangan nama-nilai token menjadi satu grup DTCG.
+
+        I.S. : token_dict berisi nama token -> nilai string; token_type adalah $type DTCG.
+        F.S. : Dict {nama: {$value, $type, value}} dikembalikan.
+        """
         return {
             k: {"$value": v, "$type": token_type, "value": v}
             for k, v in token_dict.items()
@@ -325,6 +331,12 @@ def compile_tokens(slug):
 
 
 def main():
+    """
+    Titik masuk CLI: membaca slug dari argumen lalu menjalankan compile_tokens().
+
+    I.S. : sys.argv berisi slug proyek, atau kosong.
+    F.S. : Hasil compile_tokens() dikembalikan; keluar dengan kode 1 bila slug tidak diberikan.
+    """
     if len(sys.argv) < 2:
         fail(EXIT_INVALID, "Penggunaan: python compile_tokens.py <slug>", "specify a project slug")
     return compile_tokens(sys.argv[1])

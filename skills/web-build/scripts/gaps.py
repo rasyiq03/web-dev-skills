@@ -98,6 +98,12 @@ def build_gaps(slug):
 
 
 def main():
+    """
+    Titik masuk CLI: membaca slug dari argumen lalu menjalankan build_gaps().
+
+    I.S. : sys.argv berisi slug proyek, atau kosong.
+    F.S. : Hasil build_gaps() dikembalikan; keluar dengan kode 1 bila slug tidak diberikan.
+    """
     if len(sys.argv) < 2:
         fail(EXIT_INVALID, "Penggunaan: python gaps.py <slug>", "specify a project slug")
     return build_gaps(sys.argv[1])

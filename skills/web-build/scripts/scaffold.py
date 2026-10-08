@@ -381,6 +381,12 @@ def scaffold(slug, force=False):
 
 
 def main():
+    """
+    Titik masuk CLI: membaca slug dan opsi --force dari argumen lalu menjalankan scaffold().
+
+    I.S. : sys.argv berisi slug proyek dan opsi.
+    F.S. : Hasil scaffold() dikembalikan; argparse keluar dengan kode 2 bila argumen salah.
+    """
     parser = argparse.ArgumentParser(description="Buat kerangka proyek web-build.")
     parser.add_argument("slug", help="Slug proyek")
     parser.add_argument("--force", action="store_true", help="Timpa isi site/ jika sudah ada")

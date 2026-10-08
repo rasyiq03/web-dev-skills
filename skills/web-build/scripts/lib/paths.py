@@ -37,12 +37,22 @@ SLUG_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 
 def repo_root():
-    """Mengembalikan root repository."""
+    """
+    Mengembalikan root repository.
+
+    I.S. : -
+    F.S. : Path REPO_ROOT dikembalikan.
+    """
     return REPO_ROOT
 
 
 def scripts_dir():
-    """Mengembalikan folder scripts skills/web-build/scripts."""
+    """
+    Mengembalikan folder skills/web-build/scripts.
+
+    I.S. : -
+    F.S. : Path SCRIPTS_DIR dikembalikan.
+    """
     return SCRIPTS_DIR
 
 

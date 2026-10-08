@@ -94,6 +94,12 @@ def validate(slug):
 
 
 def main():
+    """
+    Titik masuk CLI: membaca slug dari argumen lalu menjalankan validate().
+
+    I.S. : sys.argv berisi slug proyek, atau kosong.
+    F.S. : Hasil validate() dikembalikan; keluar dengan kode 1 bila slug tidak diberikan.
+    """
     if len(sys.argv) < 2:
         fail(EXIT_INVALID, "Penggunaan: python validate_brief.py <slug>", "specify a project slug")
     return validate(sys.argv[1])

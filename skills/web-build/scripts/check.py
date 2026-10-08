@@ -316,6 +316,12 @@ def run_check(slug):
 
 
 def main():
+    """
+    Titik masuk CLI: membaca slug dari argumen lalu menjalankan run_check().
+
+    I.S. : sys.argv berisi slug proyek, atau kosong.
+    F.S. : Hasil run_check() dikembalikan; keluar dengan kode 1 bila slug tidak diberikan.
+    """
     if len(sys.argv) < 2:
         fail(EXIT_INVALID, "Penggunaan: python check.py <slug>", "specify a project slug")
     return run_check(sys.argv[1])

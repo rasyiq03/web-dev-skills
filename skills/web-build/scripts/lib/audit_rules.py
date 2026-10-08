@@ -316,7 +316,12 @@ def evaluate_constraints(proj_dir, decisions_data):
 
 
 def _extract_all_numbers(data):
-    """Mengekstrak semua angka dari struktur dict/list brief."""
+    """
+    Mengekstrak semua angka dari struktur dict/list brief.
+
+    I.S. : data adalah nilai YAML dari brief (dict, list, angka, atau string).
+    F.S. : Set string angka yang muncul di data dikembalikan.
+    """
     nums = set()
     if isinstance(data, dict):
         for v in data.values():
@@ -334,7 +339,11 @@ def _extract_all_numbers(data):
 
 def check_unsourced_number(proj_dir, rule, brief, decisions, site_type):
     """
-    Memeriksa bahwa setiap angka pada teks tampak ada di brief.yaml atau berupa tahun/nomor telp.
+    Memeriksa bahwa setiap angka pada teks tampak ada di brief.yaml, berupa tahun,
+    atau berada di dekat placeholder [[ISI: ...]].
+
+    I.S. : site/ berisi halaman HTML; brief adalah isi brief.yaml.
+    F.S. : Satu temuan per angka yang tidak bersumber dikembalikan.
     """
     findings = []
     site_dir = proj_dir / "site"
@@ -378,7 +387,10 @@ def check_unsourced_number(proj_dir, rule, brief, decisions, site_type):
 
 def check_unsourced_quote(proj_dir, rule, brief, decisions, site_type):
     """
-    Setiap <blockquote> atau blok testimonial memuat kutipan dari brief.yaml facts.
+    Memeriksa bahwa setiap <blockquote> memuat kutipan dari facts brief.yaml atau placeholder.
+
+    I.S. : site/ berisi halaman HTML; brief adalah isi brief.yaml.
+    F.S. : Satu temuan per <blockquote> yang teksnya tidak ada di facts dikembalikan.
     """
     findings = []
     site_dir = proj_dir / "site"
@@ -406,7 +418,11 @@ def check_unsourced_quote(proj_dir, rule, brief, decisions, site_type):
 
 def check_animate_everything(proj_dir, rule, brief, decisions, site_type):
     """
-    Lebih dari 30% elemen di dalam <main> memiliki animasi / reveal.
+    Memeriksa apakah lebih dari 30% elemen di dalam <main> memakai kelas animasi
+    (nama kelas memuat anim, reveal, atau fade).
+
+    I.S. : site/ berisi halaman HTML.
+    F.S. : Satu temuan per halaman yang melewati ambang 30% dikembalikan.
     """
     findings = []
     site_dir = proj_dir / "site"
@@ -435,10 +451,23 @@ def check_animate_everything(proj_dir, rule, brief, decisions, site_type):
 
 
 def check_raw_color(proj_dir, rule, brief, decisions, site_type):
+    """
+    Meneruskan aturan raw-color ke check_css_raw_color().
+
+    I.S. : site/css/ berisi file CSS.
+    F.S. : List temuan warna mentah di luar tokens.css dikembalikan.
+    """
     return check_css_raw_color(proj_dir / "site")
 
 
 def check_raw_font(proj_dir, rule, brief, decisions, site_type):
+    """
+    Memeriksa bahwa font-family di CSS selain tokens.css hanya memakai var(--pd-font-*)
+    atau kata kunci generik.
+
+    I.S. : site/css/ berisi file CSS.
+    F.S. : Satu temuan per deklarasi font-family mentah, lengkap dengan nomor baris, dikembalikan.
+    """
     findings = []
     site_dir = proj_dir / "site"
     for css_file in (site_dir / "css").rglob("*.css"):
@@ -464,6 +493,12 @@ def check_raw_font(proj_dir, rule, brief, decisions, site_type):
 
 
 def check_purple_blue_gradient(proj_dir, rule, brief, decisions, site_type):
+    """
+    Mencari baris gradien yang memuat hue HSL 220-290 atau hex bernuansa biru-ungu.
+
+    I.S. : site/css/ berisi file CSS.
+    F.S. : Satu temuan per baris gradien yang cocok dikembalikan.
+    """
     findings = []
     site_dir = proj_dir / "site"
     for css_file in (site_dir / "css").rglob("*.css"):
@@ -485,10 +520,24 @@ def check_purple_blue_gradient(proj_dir, rule, brief, decisions, site_type):
 
 
 def check_low_contrast(proj_dir, rule, brief, decisions, site_type):
+    """
+    Belum diimplementasikan. Kontras pasangan token ink/paper dan accent-ink/accent sudah
+    dicek constraint c-contrast-* (langkah 6) dan muted/paper oleh compile_tokens.py, tetapi
+    pasangan warna teks dan latar yang benar-benar dipakai di CSS belum diperiksa.
+
+    I.S. : -
+    F.S. : List kosong dikembalikan.
+    """
     return []
 
 
 def check_emoji_in_heading(proj_dir, rule, brief, decisions, site_type):
+    """
+    Mencari emoji di dalam h1-h6 dan button (tautan nav belum diperiksa).
+
+    I.S. : site/ berisi halaman HTML.
+    F.S. : Satu temuan per elemen yang memuat emoji dikembalikan.
+    """
     findings = []
     site_dir = proj_dir / "site"
     emoji_pattern = re.compile(r"[\U0001F300-\U0001FAFF\u2600-\u26FF\u2700-\u27BF]")
@@ -511,6 +560,13 @@ def check_emoji_in_heading(proj_dir, rule, brief, decisions, site_type):
 
 
 def check_centered_everything(proj_dir, rule, brief, decisions, site_type):
+    """
+    Memeriksa apakah lebih dari 60% <section> sebuah halaman rata tengah (style inline
+    text-align: center atau nama kelas yang memuat center).
+
+    I.S. : site/ berisi halaman HTML.
+    F.S. : Satu temuan per halaman yang melewati ambang 60% dikembalikan.
+    """
     findings = []
     site_dir = proj_dir / "site"
     for html_file in site_dir.rglob("*.html"):
@@ -540,10 +596,25 @@ def check_centered_everything(proj_dir, rule, brief, decisions, site_type):
 
 
 def check_pattern_missing(proj_dir, rule, brief, decisions, site_type):
+    """
+    Sengaja kosong: pattern tiap seksi sudah diperiksa constraint c-layout-<section>
+    (pattern-present) pada langkah 6, sehingga temuan tidak tercatat ganda.
+
+    I.S. : -
+    F.S. : List kosong dikembalikan.
+    """
     return []
 
 
 def check_hardcoded_data(proj_dir, rule, brief, decisions, site_type):
+    """
+    Mencari angka dua digit atau lebih (selain tahun) pada teks <main> halaman dashboard;
+    hanya angka pertama per halaman yang dilaporkan. Bagian JS dari aturan ini (array
+    literal di luar js/api/ dan js/vendor/) belum diperiksa.
+
+    I.S. : brief memuat site_type; site/ berisi halaman HTML.
+    F.S. : List temuan dikembalikan; kosong untuk tipe situs selain dashboard.
+    """
     findings = []
     site_dir = proj_dir / "site"
     if brief.get("site_type") != "dashboard":
@@ -573,14 +644,34 @@ def check_hardcoded_data(proj_dir, rule, brief, decisions, site_type):
 
 
 def check_mock_file_invalid(proj_dir, rule, brief, decisions, site_type):
+    """
+    Sengaja kosong: skema file mock dan pemetaan endpoint-file mock diperiksa
+    check_data_layer() pada langkah 7, sehingga temuan tidak tercatat ganda.
+
+    I.S. : -
+    F.S. : List kosong dikembalikan.
+    """
     return []
 
 
 def check_mock_label_missing(proj_dir, rule, brief, decisions, site_type):
+    """
+    Sengaja kosong: keberadaan [data-pd-mock-label] diperiksa check_data_layer() pada
+    langkah 7, sehingga temuan tidak tercatat ganda.
+
+    I.S. : -
+    F.S. : List kosong dikembalikan.
+    """
     return []
 
 
 def check_mock_people_quotes(proj_dir, rule, brief, decisions, site_type):
+    """
+    Mencari kunci quote, testimonial, review, testimoni, atau ulasan di file mock.
+
+    I.S. : site/data/mock/ mungkin ada dan berisi *.mock.json.
+    F.S. : Satu temuan per file mock yang memuat kunci terlarang dikembalikan.
+    """
     findings = []
     mock_dir = proj_dir / "site" / "data" / "mock"
     forbidden_keys = {"quote", "testimonial", "review", "testimoni", "ulasan"}
@@ -602,10 +693,23 @@ def check_mock_people_quotes(proj_dir, rule, brief, decisions, site_type):
 
 
 def check_api_template_modified(proj_dir, rule, brief, decisions, site_type):
+    """
+    Sengaja kosong: hash client.js dan mock-label.js serta nilai config.js diperiksa
+    check_data_layer() pada langkah 7, sehingga temuan tidak tercatat ganda.
+
+    I.S. : -
+    F.S. : List kosong dikembalikan.
+    """
     return []
 
 
 def check_chart_without_text(proj_dir, rule, brief, decisions, site_type):
+    """
+    Memastikan setiap <canvas> grafik punya aria-label atau tabel data pendamping.
+
+    I.S. : site/ berisi halaman HTML.
+    F.S. : Satu temuan per canvas tanpa alternatif teks dikembalikan.
+    """
     findings = []
     site_dir = proj_dir / "site"
     for html_file in site_dir.rglob("*.html"):
