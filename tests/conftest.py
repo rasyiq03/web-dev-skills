@@ -134,11 +134,12 @@ def add_git_folder(site_dir):
     (git_dir / "HEAD").write_text("ref: refs/heads/main\n", encoding="utf-8")
 
 
-def run_script(name, *args, script_dir=SCRIPTS):
+def run_script(name, *args, script_dir=SCRIPTS, cwd=REPO):
     """
-    Menjalankan satu skrip sebagai proses terpisah dari root repo, seperti agen memanggilnya.
+    Menjalankan satu skrip sebagai proses terpisah, seperti agen memanggilnya.
 
-    I.S. : Variabel lingkungan tes sudah diatur oleh fixture.
+    I.S. : Variabel lingkungan tes sudah diatur oleh fixture; cwd adalah folder kerja
+           (bawaan: root repo).
     F.S. : CompletedProcess dikembalikan; stdout dan stderr berupa teks UTF-8.
     """
     env = dict(os.environ, PYTHONIOENCODING="utf-8")
@@ -146,7 +147,7 @@ def run_script(name, *args, script_dir=SCRIPTS):
 
     return subprocess.run(
         command,
-        cwd=REPO,
+        cwd=cwd,
         env=env,
         capture_output=True,
         text=True,
