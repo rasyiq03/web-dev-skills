@@ -29,6 +29,38 @@ sys.path.insert(0, str(SCRIPTS))
 
 
 # ============================================================
+# ======================== OPSI PYTEST =======================
+# ============================================================
+
+
+def pytest_addoption(parser):
+    """
+    Menambah opsi --network untuk tes yang memasang dependensi dari internet.
+
+    I.S. : parser adalah parser opsi pytest.
+    F.S. : Opsi --network tersedia.
+    """
+    parser.addoption("--network", action="store_true", help="jalankan tes bertanda network")
+
+
+def pytest_collection_modifyitems(config, items):
+    """
+    Melewati tes bertanda network kecuali pytest dijalankan dengan --network.
+
+    I.S. : items adalah tes yang terkumpul.
+    F.S. : Tes network diberi tanda skip bila --network tidak diberikan.
+    """
+    if config.getoption("--network"):
+        return
+
+    skip = pytest.mark.skip(reason="butuh internet; jalankan dengan --network")
+
+    for item in items:
+        if "network" in item.keywords:
+            item.add_marker(skip)
+
+
+# ============================================================
 # ========================= FIXTURE ==========================
 # ============================================================
 
