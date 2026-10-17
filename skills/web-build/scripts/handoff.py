@@ -14,7 +14,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import explain, guided, io, paths, project, report, trace
+from lib import council, explain, guided, io, paths, project, report, trace
 from lib.report import EXIT_INVALID, fail
 
 
@@ -202,6 +202,38 @@ def finish_guided(proj_dir, brief):
     ]
 
 
+def finish_deep(proj_dir, brief, report_summary):
+    """
+    Meringkas sidang dewan dan menyatakan apakah situs siap pakai, khusus mode deep work.
+
+    I.S. : trace.jsonl berisi peristiwa council untuk sidang yang notulennya lolos.
+    F.S. : Baris ringkasan dikembalikan; daftar kosong untuk mode lain. "Siap pakai" hanya
+           bila keempat sidang tercatat dan check melaporkan nol error dan nol peringatan.
+    """
+    if brief.get("mode") != "deep":
+        return []
+
+    held = {e["sitting"]: e for e in trace.read(proj_dir) if e.get("event") == "council"}
+    done = [f"{s} ({held[s]['method']})" for s in council.SITTINGS if s in held]
+    missing = [s for s in council.SITTINGS if s not in held]
+    simulated = any(e.get("simulated") for e in held.values())
+    errors, warnings = report_summary.get("errors", 0), report_summary.get("warnings", 0)
+    lines = [f"  - Mode deep work: sidang tercatat {', '.join(done) or 'tidak ada'}"]
+
+    if simulated:
+        lines.append("  - Sebagian sidang disimulasikan oleh satu agen (tanpa subagent)")
+
+    if missing or errors or warnings or not report_summary:
+        reasons = ([f"sidang belum diadakan: {', '.join(missing)}"] if missing else []) + \
+                  ([f"check: {errors} error, {warnings} peringatan"] if (errors or warnings) else []) + \
+                  (["check belum dijalankan"] if not report_summary else [])
+        lines.append(f"  - Belum siap pakai: {'; '.join(reasons)}")
+    else:
+        lines.append("  - Siap pakai: keempat sidang mufakat atau voting, check nol error dan nol peringatan; isi placeholder sebelum dipublikasikan")
+
+    return lines
+
+
 def handoff(slug, no_provenance=False):
     """
     Eksekusi serah terima proyek: tulis HANDOFF.md, API_CONTRACT.md, provenance.json.
@@ -278,7 +310,7 @@ def handoff(slug, no_provenance=False):
 
     io.save_state(proj_dir, step="handoff")
     trace.append(proj_dir, "step", script="handoff")
-    guided_lines = finish_guided(proj_dir, brief)
+    guided_lines = finish_guided(proj_dir, brief) + finish_deep(proj_dir, brief, report_summary)
     explain.write(proj_dir)
 
     lines = [

@@ -20,7 +20,7 @@ from lib import graph, guided, io, project, trace
 EXPLAIN_FILE = "EXPLAIN.html"
 
 # Kolom graf: jenis simpul per kolom, dari masukan (kiri) sampai temuan (kanan)
-COLUMNS = (("requirement", "placeholder"), ("decision",), ("style", "token", "section"), ("check", "file"), ("finding",))
+COLUMNS = (("requirement", "placeholder", "minutes"), ("decision",), ("style", "token", "section"), ("check", "file"), ("finding",))
 COLUMN_WIDTH = 250
 NODE_WIDTH = 210
 ROW_HEIGHT = 28
@@ -74,16 +74,25 @@ TEXT = {
         "quiz_why": "Kenapa {axis} ini dipilih untuk situs ini?",
         "quiz_impact": "Kalau warna utama ({label}) diganti, bagian mana saja yang ikut berubah, dan aturan mana yang perlu diperiksa ulang?",
         "choice": "Pilihannya",
-        "columns": ["Kebutuhan / isian", "Keputusan", "Gaya / token / seksi", "Check / file", "Temuan"],
+        "columns": ["Kebutuhan / isian / sidang", "Keputusan", "Gaya / token / seksi", "Check / file", "Temuan"],
         "answer": "Lihat jawaban",
         "owners": {"developer": "Anda", "ai": "AI", "script": "Skrip", "council": "Dewan AI"},
-        "sources": {"client-picked": "dipilih klien", "sampled": "diundi skrip dari lima arah", "stated": "disebut di brief", "inferred": "ditebak AI dari brief", "overridden": "diubah setelah arah dipilih"},
+        "sources": {"client-picked": "dipilih klien", "sampled": "diundi skrip dari lima arah", "stated": "disebut di brief", "inferred": "ditebak AI dari brief", "overridden": "diubah setelah arah dipilih", "council": "diputuskan dewan AI lewat musyawarah"},
         "accepted": "Diterima oleh",
         "moves": {"pick": "memilih sendiri", "compare": "membandingkan pilihan", "justify": "memberi alasan", "predict": "menebak dulu sebelum melihat", "none": "tanpa pemeriksaan"},
         "not_in_directions": "tidak ada di kelima arah",
         "support": "Tingkat dukungan",
         "support_note": "Mode terpandu: bantuan AI dikurangi sedikit demi sedikit seiring Anda makin mandiri. Tiap checkpoint adalah saat Anda memeriksa dan memutuskan sendiri.",
         "next_level": "Proyek berikutnya",
+        "council": "Musyawarah dewan AI",
+        "council_note": "Mode deep work: lima peran AI (Perancang, Penulis, Arsitek front-end, Penguji mutu, Wakil klien) bermusyawarah di tiap titik keputusan. Notulen lengkapnya ada di folder deliberation/.",
+        "sittings": {"direction": "Arah desain", "copy": "Isi teks", "first-page": "Halaman pertama", "site": "Seluruh situs"},
+        "methods": {"mufakat": "mufakat", "vote": "voting berbobot"},
+        "not_held": "belum diadakan",
+        "simulated": "disimulasikan satu agen",
+        "dissent": "beda pendapat",
+        "vetoes": "veto fakta",
+        "minutes": "notulen",
         "axes": {"style": "Gaya", "palette": "Palet warna", "typography": "Huruf", "layout": "Tata letak", "motion": "Gerak", "tone": "Nada bahasa"},
         "step_names": ["Brief", "Celah fakta", "Arah desain", "Token dan kerangka", "Isi teks", "Membangun halaman", "Pemeriksaan", "Serah terima"],
         "done": "selesai",
@@ -126,16 +135,25 @@ TEXT = {
         "quiz_why": "Why was this {axis} chosen for this site?",
         "quiz_impact": "If the main colour ({label}) changes, which parts change with it, and which rules need checking again?",
         "choice": "The choice",
-        "columns": ["Requirements / gaps", "Decisions", "Style / tokens / sections", "Checks / files", "Findings"],
+        "columns": ["Requirements / gaps / sittings", "Decisions", "Style / tokens / sections", "Checks / files", "Findings"],
         "answer": "Show answer",
         "owners": {"developer": "You", "ai": "AI", "script": "Script", "council": "AI council"},
-        "sources": {"client-picked": "picked by the client", "sampled": "drawn by the script from five directions", "stated": "stated in the brief", "inferred": "inferred by the AI", "overridden": "changed after the direction was picked"},
+        "sources": {"client-picked": "picked by the client", "sampled": "drawn by the script from five directions", "stated": "stated in the brief", "inferred": "inferred by the AI", "overridden": "changed after the direction was picked", "council": "decided by the AI council"},
         "accepted": "Accepted by",
         "moves": {"pick": "picked it", "compare": "compared the options", "justify": "gave a reason", "predict": "predicted before looking", "none": "no check"},
         "not_in_directions": "not in the five directions",
         "support": "Support level",
         "support_note": "Guided mode: the AI's help shrinks step by step as you grow more independent. Each checkpoint is where you check and decide yourself.",
         "next_level": "Next project",
+        "council": "AI council deliberation",
+        "council_note": "Deep work mode: five AI roles (designer, copywriter, front-end architect, QA, client advocate) deliberate at each decision point. The full minutes are in the deliberation/ folder.",
+        "sittings": {"direction": "Direction", "copy": "Copy", "first-page": "First page", "site": "Whole site"},
+        "methods": {"mufakat": "consensus", "vote": "weighted vote"},
+        "not_held": "not held yet",
+        "simulated": "simulated by one agent",
+        "dissent": "dissent",
+        "vetoes": "fact vetoes",
+        "minutes": "minutes",
         "axes": {"style": "Style", "palette": "Palette", "typography": "Type", "layout": "Layout", "motion": "Motion", "tone": "Tone"},
         "step_names": ["Brief", "Missing facts", "Direction", "Tokens and scaffold", "Copy", "Build", "Check", "Handoff"],
         "done": "done",
@@ -248,6 +266,7 @@ button:hover, button:focus-visible { background: var(--accent); color: var(--acc
 #pd-graph path.is-on { stroke: var(--accent); stroke-width: 2.4; }
 #pd-graph [data-id].is-on rect.box { stroke: var(--accent); stroke-width: 2; }
 table { border-collapse: collapse; width: 100%; } td, th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+a { color: inherit; text-decoration-color: var(--accent); text-underline-offset: 2px; }
 code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
 details { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; background: var(--soft); }
 summary { cursor: pointer; font-weight: 700; }
@@ -322,7 +341,7 @@ def _style(proj_dir):
 # ============================================================
 
 
-def _steps_section(proj_dir, decisions, text):
+def _steps_section(proj_dir, decisions, text, deep=False):
     """
     Menyusun peta delapan langkah, diwarnai menurut pelakunya.
 
@@ -334,6 +353,10 @@ def _steps_section(proj_dir, decisions, text):
 
     for number, (name, owner, marker) in enumerate(zip(text["step_names"], STEP_OWNERS, STEP_MARKERS), start=1):
         owner = owner or ("developer" if picked else "script")
+
+        # Di mode deep, arah dan isi teks diputuskan dewan
+        if deep and number in (3, 5):
+            owner = "council"
         done = (proj_dir / marker).exists()
         state = text["done"] if done else text["pending"]
         css = "" if done else ' class="is-pending"'
@@ -387,6 +410,38 @@ def _field_text(value):
         return ", ".join(f"{k}={v}" for k, v in value.items())
 
     return value
+
+
+def _council_section(context_graph, brief, text):
+    """
+    Menyusun bagian musyawarah dewan AI, khusus mode deep work.
+
+    I.S. : context_graph berisi simpul minutes untuk sidang yang sudah dicatat.
+    F.S. : HTML bagian dikembalikan; kosong bila mode bukan deep.
+    """
+    if brief.get("mode") != "deep":
+        return ""
+
+    held = {n["label"]: n for n in context_graph["nodes"] if n["type"] == "minutes"}
+    rows = []
+
+    for sitting, name in text["sittings"].items():
+        node = held.get(sitting)
+
+        if node is None:
+            rows.append(f"<tr><td>{esc(name)}</td><td colspan=\"2\">{esc(text['not_held'])}</td></tr>")
+            continue
+
+        how = text["methods"].get(node.get("method"), node.get("method"))
+        how += f" · {text['simulated']}" if node.get("simulated") else ""
+        link = f'<a href="{esc(node["file"])}">{esc(text["minutes"])}</a>'
+        rows.append(f"<tr><td>{esc(name)}</td><td>{esc(how)} → <b>{esc(node.get('outcome'))}</b></td>"
+                    f"<td>{esc(node.get('why'))} ({link})</td></tr>")
+
+    return (
+        f'<h2>{esc(text["council"])}</h2><p class="note">{esc(text["council_note"])}</p>'
+        f'<table>{"".join(rows)}</table>'
+    )
 
 
 def _support_section(proj_dir, brief, text):
@@ -762,9 +817,10 @@ def build_html(proj_dir):
 
     body = "".join([
         f'<h1>{esc(text["title"])}: {esc(name)}</h1><p class="note">{esc(text["intro"])}</p>',
-        _steps_section(proj_dir, decisions, text),
+        _steps_section(proj_dir, decisions, text, brief.get("mode") == "deep"),
         _agency_section(context_graph, text),
         _support_section(proj_dir, brief, text),
+        _council_section(context_graph, brief, text),
         _decisions_section(proj_dir, context_graph, text),
         _graph_section(context_graph, text),
         _todo_section(context_graph, text),

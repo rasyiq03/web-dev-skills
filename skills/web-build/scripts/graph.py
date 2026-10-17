@@ -26,6 +26,7 @@ RELATION_WORDS = {
     "fills": "mengisi",
     "about": "memeriksa",
     "violates": "melanggar",
+    "decided_in": "diputuskan di",
 }
 
 # Kata kerja yang sama bila edge ditelusuri mundur (ujung -> pangkal)
@@ -38,6 +39,7 @@ INVERSE_WORDS = {
     "fills": "diisi oleh",
     "about": "diperiksa oleh",
     "violates": "dilanggar oleh",
+    "decided_in": "memutuskan",
 }
 
 

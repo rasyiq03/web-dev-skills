@@ -28,6 +28,10 @@ second, checks last. Scripts do every deterministic step; you write only the fil
 - **guided**: the user wants to learn or be guided ("mode terpandu", "ajari aku"). Read
   `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/mode-guided.md` and follow it in every
   step.
+- **deep**: the user wants one prompt in and a ready site out ("deep work", "mode
+  musyawarah", "langsung jadi"). Read
+  `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/mode-deep.md`: a council of AI roles
+  decides at four sittings. It costs more, so use it only when asked.
 
 ## Running scripts
 

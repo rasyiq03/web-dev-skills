@@ -57,6 +57,12 @@ frame the problem, choose the direction, and explain the result back. The help f
 you pass the checkpoints over several projects (Demonstrasi → Terbimbing → Petunjuk →
 Mandiri); your level is kept in `profile.yaml` next to the dependency cache.
 
+Add "mode deep work" (or "mode musyawarah", "langsung jadi") for one prompt in and a ready
+site out: five AI roles (Perancang, Penulis, Arsitek front-end, Penguji mutu, Wakil klien)
+deliberate at four sittings until they agree (*musyawarah untuk mufakat*), the Wakil klien
+vetoes any invented fact, and the minutes land in `deliberation/`. It uses several times
+more tokens than the default mode.
+
 Changed your mind about one decision? Ask for it ("ganti paletnya jadi sun-block, karena
 pelanggan suka warna cerah"). Only what depends on that decision is redone, and the reason
 is recorded. Ask "kenapa pakai font ini?" to get the chain of reasons.

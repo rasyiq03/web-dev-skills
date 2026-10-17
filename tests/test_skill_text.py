@@ -13,6 +13,8 @@ SKILL_FILES = [
     REPO / "skills" / "web-build" / "SKILL.md",
     REPO / "skills" / "web-design" / "SKILL.md",
     REPO / "skills" / "web-build" / "references" / "mode-guided.md",
+    REPO / "skills" / "web-build" / "references" / "mode-deep.md",
+    *sorted((REPO / "skills" / "web-build" / "references" / "council").glob("*.md")),
 ]
 ROOT_REF = re.compile(r"\$\{CLAUDE_PLUGIN_ROOT\}/([^\s`\"')]+)")
 COMMAND = re.compile(r"`python ([^`]+)`")

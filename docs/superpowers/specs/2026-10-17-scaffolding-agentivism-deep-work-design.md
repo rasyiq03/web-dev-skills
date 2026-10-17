@@ -1,6 +1,6 @@
 # Scaffolding, Agentivism, and Deep Work — architecture design
 
-Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide and phases 1–4 (context graph, EXPLAIN.html, trace and decide, guided mode) shipped
+Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide and phases 1–5 (context graph, EXPLAIN.html, trace and decide, guided mode, deep mode) shipped
 
 ## Goal
 
@@ -276,8 +276,9 @@ perspective, what to check, what evidence counts, and what the role must never d
 
 ### Protocol per decision point
 
-Sittings happen at three points: **direction** (step 3), **copy** (step 5), and **build
-review** (after the first page in step 6, then once for the whole site before step 7).
+Sittings happen at four points: **direction** (step 3, choosing among the five directions
+the chair wrote), **copy** (step 5), **first-page** (after the first page in step 6), and
+**site** (the whole site before step 7's last check).
 
 ```mermaid
 sequenceDiagram
@@ -306,8 +307,9 @@ sequenceDiagram
   recorded, never dropped.
 - **Facts are not negotiable.** The Wakil klien can veto any invented fact. That veto is
   final, so deep mode stays honest.
-- **Budget.** At most 2 rounds plus a vote per sitting, 4 sittings, so at most about 30
-  subagent calls per site. Packets come from the graph, so each call stays small.
+- **Budget.** Round 1 and round 2 are five calls each, and a revision only calls the
+  members who still block: usually about 11 subagent calls per sitting, never more than
+  15, so roughly 45 per site. Packets come from the graph, so each call stays small.
 - **Fallback.** Without a subagent tool the chair plays the roles one after another and
   the minutes say "simulated council". Independence is weaker, but the protocol is the same.
 

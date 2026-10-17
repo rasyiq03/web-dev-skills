@@ -341,11 +341,12 @@ def format_decisions_yaml(data):
 # ============================================================
 
 
-def pick(slug, pick_id=None, seed_arg=None):
+def pick(slug, pick_id=None, seed_arg=None, source_override=None):
     """
     Eksekusi alur pemilihan arah desain.
 
-    I.S. : Proyek memiliki brief.yaml, gaps.json, dan directions.yaml.
+    I.S. : Proyek memiliki brief.yaml, gaps.json, dan directions.yaml; source_override
+           ('council') dipakai council.py saat dewan yang memilih arah.
     F.S. : decisions.yaml ditulis, state.yaml diperbarui, mencetak ringkasan
            dan 'NEXT: run compile_tokens.py'.
     """
@@ -376,7 +377,7 @@ def pick(slug, pick_id=None, seed_arg=None):
         if not chosen:
             fail(EXIT_INVALID, f"Arah {pick_id!r} tidak ditemukan di directions.yaml.",
                  "choose an existing direction id (dir-1 to dir-5)")
-        source = "client-picked"
+        source = source_override or "client-picked"
     else:
         weights = [d["probability"] for d in dirs]
         rng = random.Random(seed)

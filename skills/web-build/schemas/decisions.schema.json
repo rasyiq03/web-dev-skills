@@ -40,7 +40,7 @@
             "items": { "type": "string", "pattern": "^req-[a-z0-9_.-]+$" }
           },
           "rationale": { "type": "string", "minLength": 10 },
-          "source": { "enum": ["stated", "sampled", "client-picked", "overridden"] },
+          "source": { "enum": ["stated", "sampled", "client-picked", "overridden", "council"] },
           "realized_by": {
             "description": "Token paths in tokens.json, or layout pattern ids.",
             "type": "array",

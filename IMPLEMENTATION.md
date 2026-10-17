@@ -43,13 +43,15 @@ audit/           anti-slop.yaml cliches-id.txt cliches-en.txt
 skills/
 	web-build/
 		SKILL.md
-		references/  conventions.md copy-id.md copy-en.md indonesia.md mode-guided.md a11y-judge.md
+		references/  conventions.md copy-id.md copy-en.md indonesia.md mode-guided.md mode-deep.md
+		             a11y-judge.md council/ (one card per role)
 		schemas/     brief.schema.json directions.schema.json decisions.schema.json mock.schema.json
+		             deliberation.schema.json
 		templates/   js/api/ config.js client.js endpoints.js mock-label.js
 		site-types/  company-profile.yaml dashboard.yaml landing.yaml portfolio.yaml umkm-catalog.yaml
 		scripts/     run.py validate_brief.py gaps.py serve.py pick_direction.py compile_tokens.py
-		             scaffold.py context.py graph.py explain.py decide.py checkpoint.py check.py
-		             handoff.py lib/ (graph.py explain.py trace.py guided.py …)
+		             scaffold.py context.py graph.py explain.py decide.py checkpoint.py council.py
+		             check.py handoff.py lib/ (graph.py explain.py trace.py guided.py council.py …)
 	web-design/
 		SKILL.md
 		styles/      index.yaml neobrutalism.yaml editorial.yaml _template.yaml
@@ -86,6 +88,7 @@ The project folder is `$PD_PROJECTS_DIR/<slug>/` when that variable is set,
 | `state.yaml` | every script | Current step, round counters, seed, config hashes |
 | `graph.json` | every script, through `lib/graph.py` | Context graph of the files above; see §3.13 |
 | `EXPLAIN.html` | `explain.py`, `handoff.py` | Visual explanation for the developer; see §3.14 |
+| `deliberation/<sitting>.packet.md`, `deliberation/<sitting>.yaml` | `council.py`, agent (chair) | Deep mode: packet for the members, and the minutes; see §3.17 |
 | `trace.jsonl` | every script, `decide.py`, `checkpoint.py` | One JSON line per event: step finished, decision changed or accepted, checkpoint result; see §3.15 |
 
 ### Requirement ids
@@ -487,6 +490,36 @@ Agent instructions: `skills/web-build/references/mode-guided.md`.
   (min 0); otherwise it stays. Auto mode never reads or writes the profile.
 - `EXPLAIN.html` shows the level, the checkpoint results, and the next level once handoff
   has recorded the project.
+
+### 3.17 `council.py <slug> <direction|copy|first-page|site> [--record]` (deep mode)
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §5.
+Agent instructions: `skills/web-build/references/mode-deep.md` and
+`skills/web-build/references/council/<role>.md`.
+
+- Members: `perancang`, `penulis`, `arsitek`, `penguji`, `wakil-klien`; the main agent is the
+  chair (`pimpinan`) and does not vote. Sittings and the member whose vote counts double:
+  direction (perancang), copy (penulis), first-page and site (penguji).
+- Without `--record`: writes `deliberation/<sitting>.packet.md` (task, rules, every graph id
+  that counts as evidence, and the five directions or the check summary) and prints the
+  role cards and the minutes path. Exits 1 for a project that is not `mode: deep`, and for
+  the direction sitting without `directions.yaml`.
+- With `--record`: validates `deliberation/<sitting>.yaml` against
+  `deliberation.schema.json` and `lib/council.validate_minutes()`: all five members
+  present; round 1 proposals and round 2 critique with every member exactly once; each
+  critique targets another member; every blocking objection cites evidence; every
+  evidence id resolves in the graph; `mufakat` only with no unresolved blocking objection;
+  a vote has one ballot per member and its outcome equals `weighted_outcome()` (owner ×2,
+  a tie goes to the owner's choice); the direction outcome is a direction id. Vetoes name
+  the `[[ISI: …]]` placeholder that replaces the fact. On failure nothing changes.
+- On success: the direction sitting runs `pick_direction.pick()` with `source: council`;
+  every sitting writes a `council` trace event. The graph adds `minutes:<sitting>` nodes
+  (owner `council`) with `decided_in` edges from the decisions they made, and `--why` walks
+  through them. `EXPLAIN.html` lists the sittings with method, outcome, summary, and a link
+  to the minutes, and marks steps 3 and 5 as the council's.
+- `handoff.py` in deep mode lists the recorded sittings, says when any was simulated, and
+  prints "Siap pakai" only when all four sittings are recorded and check reports zero
+  errors and zero warnings; otherwise it names what is missing.
 
 ## 4. Milestones and gates
 

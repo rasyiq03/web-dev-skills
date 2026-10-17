@@ -28,7 +28,7 @@ IMPACT_FORWARD = {"realized_by", "verified_by", "located_in", "contains", "fills
 IMPACT_BACKWARD = {"based_on", "about", "violates"}
 
 # Arah telusur alasan: kebalikannya, tanpa 'about' (check tidak menjelaskan token)
-WHY_FORWARD = {"based_on", "violates"}
+WHY_FORWARD = {"based_on", "violates", "decided_in"}
 WHY_BACKWARD = {"realized_by", "verified_by", "located_in", "contains", "fills"}
 
 # Pemilik simpul menurut sumber datanya (mekanisme delegasi Agentivism)
@@ -38,6 +38,7 @@ OWNER_BY_SOURCE = {
     "inferred": "ai",
     "sampled": "script",
     "overridden": "developer",
+    "council": "council",
 }
 
 # Jejak kerja; dibaca langsung di sini agar lib/trace.py bisa memanggil refresh()
@@ -323,6 +324,42 @@ def _add_decisions(builder, decisions, judgements):
             builder.edge(dec["id"], f"check:{check_id}", "verified_by")
 
 
+def _add_minutes(builder, proj_dir):
+    """
+    Menambah simpul notulen sidang dewan yang sudah dicatat, dan edge decided_in.
+
+    I.S. : Simpul keputusan sudah ada; peristiwa council di trace.jsonl menandai sidang
+           yang notulennya lolos pemeriksaan.
+    F.S. : Satu simpul minutes:<sidang> per sidang tercatat; keputusan bersumber council
+           (sidang arah) dan keputusan yang disebut di notulen terhubung lewat decided_in.
+    """
+    path = Path(proj_dir) / TRACE_FILE
+    recorded = {}
+
+    if path.is_file():
+        for line in io.read_text(path).splitlines():
+            entry = json.loads(line) if line.strip() else {}
+
+            if entry.get("event") == "council":
+                recorded[entry["sitting"]] = entry
+
+    for sitting, entry in recorded.items():
+        minutes_path = Path(proj_dir) / "deliberation" / f"{sitting}.yaml"
+        minutes = (io.read_yaml(minutes_path) or {}) if minutes_path.is_file() else {}
+        node_id = f"minutes:{sitting}"
+
+        builder.node(
+            node_id, "minutes", sitting, "council",
+            why=(minutes.get("resolution") or {}).get("summary"), method=entry.get("method"),
+            outcome=entry.get("outcome"), simulated=entry.get("simulated"), file=f"deliberation/{sitting}.yaml",
+        )
+
+        for node in list(builder.nodes):
+            if node["type"] == "decision" and (node["id"] in minutes.get("decisions", [])
+                                               or (sitting == "direction" and node.get("source") == "council")):
+                builder.edge(node["id"], node_id, "decided_in")
+
+
 def _add_findings(builder, report_data):
     """
     Menambah simpul temuan dari report.json dan menautkannya ke check atau file.
@@ -371,6 +408,7 @@ def build(proj_dir):
 
     _add_tokens(builder, tokens, has_site)
     _add_decisions(builder, decisions, _judgements(proj_dir))
+    _add_minutes(builder, proj_dir)
     _add_findings(builder, report_data)
 
     return {"version": GRAPH_VERSION, "project": proj_dir.name, "nodes": builder.nodes, "edges": builder.edges}

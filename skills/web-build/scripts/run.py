@@ -35,6 +35,7 @@ SCRIPTS = (
     "explain",
     "decide",
     "checkpoint",
+    "council",
     "check",
     "handoff",
 )
