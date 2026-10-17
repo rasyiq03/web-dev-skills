@@ -48,7 +48,8 @@ skills/
 		templates/   js/api/ config.js client.js endpoints.js mock-label.js
 		site-types/  company-profile.yaml dashboard.yaml landing.yaml portfolio.yaml umkm-catalog.yaml
 		scripts/     run.py validate_brief.py gaps.py serve.py pick_direction.py compile_tokens.py
-		             scaffold.py context.py graph.py explain.py check.py handoff.py lib/ (graph.py explain.py …)
+		             scaffold.py context.py graph.py explain.py decide.py check.py handoff.py
+		             lib/ (graph.py explain.py trace.py …)
 	web-design/
 		SKILL.md
 		styles/      index.yaml neobrutalism.yaml editorial.yaml _template.yaml
@@ -85,6 +86,7 @@ The project folder is `$PD_PROJECTS_DIR/<slug>/` when that variable is set,
 | `state.yaml` | every script | Current step, round counters, seed, config hashes |
 | `graph.json` | every script, through `lib/graph.py` | Context graph of the files above; see §3.13 |
 | `EXPLAIN.html` | `explain.py`, `handoff.py` | Visual explanation for the developer; see §3.14 |
+| `trace.jsonl` | every script, `decide.py` | One JSON line per event: step finished, decision changed or accepted; see §3.15 |
 
 ### Requirement ids
 
@@ -434,6 +436,32 @@ Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-desi
 - The SVG layout is computed in Python, so the page is complete without JavaScript; the
   script only highlights a node's chain on click, using the same traversal rules as
   `lib/graph.py`.
+
+### 3.15 `decide.py <slug> <decision> (--choice VALUE | --accept) --reason TEXT`
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §4.
+
+- Options: `--section` (layout), `--register lang=pronoun` (tone), `--by developer|ai|council`
+  (default `developer`), `--verification pick|compare|justify|predict|none` (default
+  `justify`). `--reason` is required and at least 10 characters, matching the schema.
+- A change is stored as `overrides` in `decisions.yaml` (palette, type_pairing, layout per
+  section, motion, tone, register, and the rationale per axis); `directions.yaml` is never
+  edited. `project.effective_direction()` merges them, and `compile_tokens.py` uses it.
+  `decisions.yaml` is rebuilt with `pick_direction.build_decisions()`; the changed axis
+  gets `source: overridden`, the others keep theirs. The style axis cannot be overridden.
+- Only downstream work is redone: palette or type pairing recompiles the tokens, copies
+  `tokens.css` into `site/css/`, and swaps the Google Fonts URL in every page; layout
+  changes `data-pd-pattern` on that one section and asks the agent to rebuild it; tone asks
+  for new copy; anything with a built site ends with "run check". If a downstream step
+  fails, `decisions.yaml` is restored and nothing is traced.
+- `lib/trace.py` appends to `trace.jsonl` (`seq`, `date` from `PD_DATE`, `event`, fields;
+  no wall-clock time). Pipeline scripts call `trace.finish()` (a `step` event plus
+  `graph.refresh()`); `decide.py` writes `decide` and `accept` events. The graph gives each
+  decision `accepted_by` and `verification` from its latest event, and a changed decision
+  belongs to whoever changed it. `EXPLAIN.html` shows both, and marks the current choice
+  among the five directions' options.
+- Gate: for each axis, every graph node that changes is in `graph.impact()` of that
+  decision (`tests/test_decide.py`).
 
 ## 4. Milestones and gates
 

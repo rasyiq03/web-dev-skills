@@ -7,6 +7,7 @@
 #             dampak (--impact) serta alasan (--why) satu simpul.
 # ============================================================
 
+import json
 from collections import deque
 from pathlib import Path
 
@@ -36,7 +37,11 @@ OWNER_BY_SOURCE = {
     "client-picked": "developer",
     "inferred": "ai",
     "sampled": "script",
+    "overridden": "developer",
 }
+
+# Jejak kerja; dibaca langsung di sini agar lib/trace.py bisa memanggil refresh()
+TRACE_FILE = "trace.jsonl"
 
 
 # ============================================================
@@ -234,12 +239,36 @@ def _add_style(builder, decision):
     builder.edge(decision["id"], f"style:{style_id}", "realized_by")
 
 
-def _add_decisions(builder, decisions):
+def _judgements(proj_dir):
+    """
+    Mengambil peristiwa accept atau decide terakhir per keputusan dari trace.jsonl.
+
+    I.S. : trace.jsonl boleh belum ada.
+    F.S. : dict {id keputusan: peristiwa terakhir} dikembalikan.
+    """
+    path = Path(proj_dir) / TRACE_FILE
+    found = {}
+
+    if not path.is_file():
+        return found
+
+    for line in io.read_text(path).splitlines():
+        entry = json.loads(line) if line.strip() else {}
+
+        if entry.get("event") in ("accept", "decide") and entry.get("decision"):
+            found[entry["decision"]] = entry
+
+    return found
+
+
+def _add_decisions(builder, decisions, judgements):
     """
     Menambah simpul keputusan, check, dan edge based_on, realized_by, verified_by, about.
 
-    I.S. : Simpul requirement, token, dan section sudah ada di builder.
-    F.S. : Simpul decision dan check ada; edge ke simpul yang tidak dikenal diabaikan.
+    I.S. : Simpul requirement, token, dan section sudah ada di builder; judgements adalah
+           hasil _judgements().
+    F.S. : Simpul decision dan check ada, dengan siapa yang menerima atau mengubahnya; edge
+           ke simpul yang tidak dikenal diabaikan.
     """
     sections_by_pattern = {}
 
@@ -258,11 +287,18 @@ def _add_decisions(builder, decisions):
                 builder.edge(f"check:{constraint['id']}", f"token:{constraint[key]}", "about")
 
     for dec in decisions.get("decisions", []):
+        judged = judgements.get(dec["id"], {})
+        owner = OWNER_BY_SOURCE.get(dec.get("source"), "ai")
+
+        # Keputusan yang diubah dimiliki pengubahnya; yang diterima tetap milik pembuatnya
+        if judged.get("event") == "decide":
+            owner = judged.get("by", owner)
+
         builder.node(
-            dec["id"], "decision", f"{dec.get('axis')}: {dec.get('choice')}",
-            OWNER_BY_SOURCE.get(dec.get("source"), "ai"),
+            dec["id"], "decision", f"{dec.get('axis')}: {dec.get('choice')}", owner,
             why=dec.get("rationale"), axis=dec.get("axis"), choice=dec.get("choice"),
-            source=dec.get("source"),
+            source=dec.get("source"), accepted_by=judged.get("by"),
+            verification=judged.get("verification"),
         )
 
         for req_id in dec.get("based_on", []):
@@ -270,6 +306,12 @@ def _add_decisions(builder, decisions):
 
         if dec.get("axis") == "style":
             _add_style(builder, dec)
+
+        # Semua warna, termasuk warna grafik dan status, diturunkan dari palet
+        if dec.get("axis") == "palette":
+            for node in list(builder.nodes):
+                if node["type"] == "token" and node.get("group") == "color":
+                    builder.edge(dec["id"], node["id"], "realized_by")
 
         for target in dec.get("realized_by", []):
             builder.edge(dec["id"], f"token:{target}", "realized_by")
@@ -328,7 +370,7 @@ def build(proj_dir):
         _add_pages_and_sections(builder, brief, site_type, decisions, has_site)
 
     _add_tokens(builder, tokens, has_site)
-    _add_decisions(builder, decisions)
+    _add_decisions(builder, decisions, _judgements(proj_dir))
     _add_findings(builder, report_data)
 
     return {"version": GRAPH_VERSION, "project": proj_dir.name, "nodes": builder.nodes, "edges": builder.edges}

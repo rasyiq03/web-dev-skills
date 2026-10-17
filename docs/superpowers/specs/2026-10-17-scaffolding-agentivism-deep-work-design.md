@@ -1,6 +1,6 @@
 # Scaffolding, Agentivism, and Deep Work — architecture design
 
-Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide, phase 1 (context graph), and phase 2 (EXPLAIN.html) shipped
+Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide and phases 1–3 (context graph, EXPLAIN.html, trace and decide) shipped
 
 ## Goal
 

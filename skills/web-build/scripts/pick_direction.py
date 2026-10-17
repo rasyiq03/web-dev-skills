@@ -16,7 +16,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import graph, io, paths, project, report
+from lib import io, paths, project, report, trace
 from lib.report import EXIT_INVALID, fail
 
 
@@ -299,7 +299,7 @@ def format_decisions_yaml(data):
     I.S. : data telah lolos decisions.schema.json.
     F.S. : Teks YAML dikembalikan.
     """
-    src = data["decisions"][0]["source"]
+    src = data["decisions"][0]["source"] if not data.get("overrides") else "client-picked/sampled + decide.py"
     header = (
         f"# Output dari: python skills/web-build/scripts/pick_direction.py {data['project']}\n"
         f"# (sumber: {src}; seed: {data['seed']})\n"
@@ -325,6 +325,13 @@ def format_decisions_yaml(data):
     lines.append("constraints:")
     for c in data["constraints"]:
         lines.append(f"  - {io.yaml_flow_map(c)}")
+
+    # Perubahan dari decide.py di atas arah terpilih
+    if data.get("overrides"):
+        lines.append("overrides:")
+        for key, value in data["overrides"].items():
+            text = io.yaml_flow_map(value) if isinstance(value, dict) else io.yaml_scalar(value)
+            lines.append(f"  {key}: {text}")
 
     return "\n".join(lines) + "\n"
 
@@ -389,7 +396,7 @@ def pick(slug, pick_id=None, seed_arg=None):
     yaml_content = format_decisions_yaml(decisions_data)
     io.write_text(proj_dir / "decisions.yaml", yaml_content)
     io.save_state(proj_dir, step="direction", seed=seed, direction=chosen["id"])
-    graph.refresh(proj_dir)
+    trace.finish(proj_dir, "pick_direction")
 
     lines = [
         f"Arah visual terpilih: {chosen['id']} ({chosen.get('summary', '')})",

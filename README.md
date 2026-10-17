@@ -52,6 +52,10 @@ The site is built in `<folder>/<slug>/`, for example `kopi-senja/`:
 Add "pakai mode interaktif" to the prompt to answer a short questionnaire in the browser
 first.
 
+Changed your mind about one decision? Ask for it ("ganti paletnya jadi sun-block, karena
+pelanggan suka warna cerah"). Only what depends on that decision is redone, and the reason
+is recorded. Ask "kenapa pakai font ini?" to get the chain of reasons.
+
 ## First run and the dependency cache
 
 The first build on a machine installs the Python packages and Node tools the checks need

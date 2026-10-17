@@ -14,7 +14,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import graph, io, node_tools, paths, project, report
+from lib import io, node_tools, paths, project, report, trace
 from lib.report import EXIT_INVALID, fail
 
 
@@ -357,7 +357,7 @@ def scaffold(slug, force=False):
         config_hashes=config_hashes,
         api_template_hashes=api_template_hashes,
     )
-    graph.refresh(proj_dir)
+    trace.finish(proj_dir, "scaffold")
 
     lines = [
         f"Scaffolding berhasil untuk '{slug}':",

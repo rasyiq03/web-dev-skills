@@ -77,7 +77,10 @@ TEXT = {
         "columns": ["Kebutuhan / isian", "Keputusan", "Gaya / token / seksi", "Check / file", "Temuan"],
         "answer": "Lihat jawaban",
         "owners": {"developer": "Anda", "ai": "AI", "script": "Skrip", "council": "Dewan AI"},
-        "sources": {"client-picked": "dipilih klien", "sampled": "diundi skrip dari lima arah", "stated": "disebut di brief", "inferred": "ditebak AI dari brief"},
+        "sources": {"client-picked": "dipilih klien", "sampled": "diundi skrip dari lima arah", "stated": "disebut di brief", "inferred": "ditebak AI dari brief", "overridden": "diubah setelah arah dipilih"},
+        "accepted": "Diterima oleh",
+        "moves": {"pick": "memilih sendiri", "compare": "membandingkan pilihan", "justify": "memberi alasan", "predict": "menebak dulu sebelum melihat", "none": "tanpa pemeriksaan"},
+        "not_in_directions": "tidak ada di kelima arah",
         "axes": {"style": "Gaya", "palette": "Palet warna", "typography": "Huruf", "layout": "Tata letak", "motion": "Gerak", "tone": "Nada bahasa"},
         "step_names": ["Brief", "Celah fakta", "Arah desain", "Token dan kerangka", "Isi teks", "Membangun halaman", "Pemeriksaan", "Serah terima"],
         "done": "selesai",
@@ -123,7 +126,10 @@ TEXT = {
         "columns": ["Requirements / gaps", "Decisions", "Style / tokens / sections", "Checks / files", "Findings"],
         "answer": "Show answer",
         "owners": {"developer": "You", "ai": "AI", "script": "Script", "council": "AI council"},
-        "sources": {"client-picked": "picked by the client", "sampled": "drawn by the script from five directions", "stated": "stated in the brief", "inferred": "inferred by the AI"},
+        "sources": {"client-picked": "picked by the client", "sampled": "drawn by the script from five directions", "stated": "stated in the brief", "inferred": "inferred by the AI", "overridden": "changed after the direction was picked"},
+        "accepted": "Accepted by",
+        "moves": {"pick": "picked it", "compare": "compared the options", "justify": "gave a reason", "predict": "predicted before looking", "none": "no check"},
+        "not_in_directions": "not in the five directions",
         "axes": {"style": "Style", "palette": "Palette", "typography": "Type", "layout": "Layout", "motion": "Motion", "tone": "Tone"},
         "step_names": ["Brief", "Missing facts", "Direction", "Tokens and scaffold", "Copy", "Build", "Check", "Handoff"],
         "done": "done",
@@ -364,29 +370,44 @@ def _agency_section(context_graph, text):
     )
 
 
-def _alternatives(decision, directions, chosen_id):
+def _field_text(value):
+    """
+    Menulis nilai satu kolom arah sebagai teks, termasuk peta layout.
+
+    I.S. : value boleh string, dict, atau None.
+    F.S. : Teks dikembalikan, atau None bila value None.
+    """
+    if isinstance(value, dict):
+        return ", ".join(f"{k}={v}" for k, v in value.items())
+
+    return value
+
+
+def _alternatives(decision, directions, current):
     """
     Mengumpulkan pilihan dari kelima arah untuk poros keputusan ini.
 
-    I.S. : directions adalah daftar arah dari directions.yaml.
-    F.S. : Daftar (nilai, peluang, dipilih) dikembalikan, nilai yang sama digabung.
+    I.S. : directions adalah daftar arah dari directions.yaml; current adalah arah terpilih
+           beserta overrides (boleh None).
+    F.S. : Daftar (nilai, peluang, dipilih) dikembalikan, nilai yang sama digabung. Pilihan
+           saat ini yang tidak ada di kelima arah ditambahkan dengan peluang None.
     """
     field = AXIS_FIELDS.get(decision.get("axis"))
+    now = _field_text((current or {}).get(field)) if field else None
     options = {}
 
     for direction in directions if field else []:
-        value = direction.get(field)
+        value = _field_text(direction.get(field))
 
-        if isinstance(value, dict):
-            value = ", ".join(f"{k}={v}" for k, v in value.items())
+        if value is not None:
+            options[value] = options.get(value, 0.0) + float(direction.get("probability", 0))
 
-        if value is None:
-            continue
+    found = [(value, prob, value == now) for value, prob in options.items()]
 
-        prob, chosen = options.get(value, (0.0, False))
-        options[value] = (prob + float(direction.get("probability", 0)), chosen or direction.get("id") == chosen_id)
+    if now is not None and now not in options:
+        found.append((now, None, True))
 
-    return [(value, prob, chosen) for value, (prob, chosen) in options.items()]
+    return found
 
 
 def _check_status(context_graph, check_id, has_report, text):
@@ -404,7 +425,7 @@ def _check_status(context_graph, check_id, has_report, text):
     return f'<span class="bad">✗ {esc(text["failed"])}</span>' if failed else f'<span class="ok">✓ {esc(text["passed"])}</span>'
 
 
-def _decision_card(context_graph, node, directions, chosen_id, has_report, text):
+def _decision_card(context_graph, node, directions, current, has_report, text):
     """
     Menyusun satu kartu keputusan: pilihan, alasan, dasar, pelaku, alternatif, dampak, check.
 
@@ -424,12 +445,18 @@ def _decision_card(context_graph, node, directions, chosen_id, has_report, text)
         f'<dt>{esc(text["based_on"])}</dt><dd><ul>{"".join("<li>" + esc(r["label"]) + "</li>" for r in reqs)}</ul></dd>',
         f'<dt>{esc(text["decided_by"])}</dt><dd>{esc(text["owners"][node["owner"]])} ({esc(source)})</dd>',
     ]
-    options = _alternatives(node, directions, chosen_id)
+
+    if node.get("accepted_by"):
+        move = text["moves"].get(node.get("verification"), node.get("verification") or "")
+        rows.append(f'<dt>{esc(text["accepted"])}</dt><dd>{esc(text["owners"][node["accepted_by"]])} · {esc(move)}</dd>')
+
+    options = _alternatives(node, directions, current)
 
     if options:
         items = "".join(
-            (f'<li class="chosen">{esc(value)} · {round(prob * 100)}% · {esc(text["chosen"])}</li>' if chosen
-             else f"<li>{esc(value)} · {round(prob * 100)}%</li>")
+            f'<li{" class=chosen" if chosen else ""}>{esc(value)} · '
+            f'{esc(text["not_in_directions"]) if prob is None else str(round(prob * 100)) + "%"}'
+            f'{" · " + esc(text["chosen"]) if chosen else ""}</li>'
             for value, prob, chosen in options
         )
         rows.append(f'<dt>{esc(text["alternatives"])}</dt><dd><ul>{items}</ul></dd>')
@@ -462,9 +489,10 @@ def _decisions_section(proj_dir, context_graph, text):
 
     directions_path = proj_dir / "directions.yaml"
     directions = (io.read_yaml(directions_path) or {}).get("directions", []) if directions_path.is_file() else []
-    chosen_id = io.load_state(proj_dir).get("direction")
+    decisions_data = io.read_yaml(proj_dir / "decisions.yaml") or {}
+    current = project.effective_direction(decisions_data, {"directions": directions})
     has_report = (proj_dir / "report.json").is_file()
-    cards = "".join(_decision_card(context_graph, n, directions, chosen_id, has_report, text) for n in decisions)
+    cards = "".join(_decision_card(context_graph, n, directions, current, has_report, text) for n in decisions)
 
     return f'<h2>{esc(text["decisions"])}</h2><div class="cards">{cards}</div>'
 

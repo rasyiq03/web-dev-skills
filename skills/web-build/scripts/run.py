@@ -33,6 +33,7 @@ SCRIPTS = (
     "context",
     "graph",
     "explain",
+    "decide",
     "check",
     "handoff",
 )

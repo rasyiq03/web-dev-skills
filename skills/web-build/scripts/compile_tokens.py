@@ -13,7 +13,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import color, graph, io, paths, project, report
+from lib import color, io, paths, project, report, trace
 from lib.report import EXIT_CHECK_FAILED, EXIT_INVALID, fail
 
 SERIF_FONTS = {
@@ -52,7 +52,8 @@ def compile_tokens(slug):
     directions_data = io.read_yaml(proj_dir / "directions.yaml")
 
     chosen_dir_id = decisions.get("direction")
-    chosen = next((d for d in directions_data.get("directions", []) if d["id"] == chosen_dir_id), None)
+    # Arah terpilih beserta perubahan dari decide.py
+    chosen = project.effective_direction(decisions, directions_data)
     if not chosen:
         fail(EXIT_INVALID, f"Arah {chosen_dir_id!r} dari decisions.yaml tidak ditemukan di directions.yaml.",
              "check direction id in decisions.yaml")
@@ -318,7 +319,7 @@ def compile_tokens(slug):
     io.write_text(proj_dir / "fonts.html", fonts_html_content)
 
     io.save_state(proj_dir, step="tokens")
-    graph.refresh(proj_dir)
+    trace.finish(proj_dir, "compile_tokens")
 
     lines = [
         f"Kompilasi token berhasil untuk '{slug}':",

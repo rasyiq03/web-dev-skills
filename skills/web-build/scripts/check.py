@@ -13,7 +13,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import audit_rules, graph, io, node_tools, paths, project, report
+from lib import audit_rules, io, node_tools, paths, project, report, trace
 from lib.report import EXIT_CHECK_FAILED, EXIT_INVALID, fail
 
 
@@ -342,7 +342,7 @@ def run_check(slug):
             stop = True
 
     io.save_state(proj_dir, check_round=current_round, rounds=round_history, last_summary=report_data["summary"])
-    graph.refresh(proj_dir)
+    trace.finish(proj_dir, "check")
 
     lines = [
         f"Ronde {current_round} selesai:",

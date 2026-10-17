@@ -101,7 +101,9 @@ def test_graph_data_matches_svg(kopi_tokens):
     assert "token:color.accent" in drawn
     assert "page:index" not in drawn
     assert ["d-palette-1", "req-audience", "based_on"] in data["edges"]
-    assert "28 token lain" in page
+    assert "token:color.chart-1" in drawn
+    assert "token:size.step-0" not in drawn
+    assert re.search(r"\d+ token lain tidak terkait keputusan", page)
 
 
 def test_page_is_deterministic(kopi_tokens):

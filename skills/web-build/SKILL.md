@@ -105,14 +105,23 @@ plugin support), it means the folder that contains `skills/`.
    who decided what, why, and what a change would touch. `run explain <slug>` rewrites it
    at any step.
 
-## Explaining a decision
+## Explaining, changing, and accepting a decision
 
 Every script keeps `<project>/graph.json` up to date: requirements, decisions, tokens,
-sections, files, checks, and findings, with how they connect. When the user asks why
-something looks the way it does, run `run graph <slug> --why <node>`; before changing a
-decision, run `run graph <slug> --impact <node>` and tell the user what it will touch.
-Node ids look like `d-palette-1`, `req-audience`, `color.accent`, or `section:index#hero`.
-Retell the answer in plain words; do not paste the raw output.
+sections, files, checks, and findings, with how they connect. Node ids look like
+`d-palette-1`, `req-audience`, `color.accent`, or `section:index#hero`. Retell every
+answer in plain words; do not paste raw output.
+
+- **Why?** `run graph <slug> --why <node>`.
+- **What would change?** `run graph <slug> --impact <node>`; tell the user before changing.
+- **Change one decision:** `run decide <slug> <decision> --choice <value> --reason "<why>"`
+  (layout also takes `--section <id>`, tone may take `--register id=Anda`). It reruns only
+  what depends on that decision and says what is left for you; its errors list the valid
+  values. The style itself cannot be changed alone: offer another direction instead.
+- **Accept a decision** the user confirmed: `run decide <slug> <decision> --accept
+  --verification <pick|compare|justify|predict> --reason "<why>"`.
+- The reason is the user's, in their words. Ask for it in one sentence; never invent it.
+  Use `--by ai` only when you change a decision yourself, for example to fix a check.
 
 ## Restyling an existing project
 

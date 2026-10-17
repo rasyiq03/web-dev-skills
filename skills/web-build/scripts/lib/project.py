@@ -262,3 +262,38 @@ def find_by_id(items, item_id):
     """
     return next((item for item in items if item.get("id") == item_id), None)
 
+
+# Kolom arah yang bisa diubah decide.py, dan poros keputusan yang terkena
+OVERRIDE_AXES = {
+    "palette": "palette",
+    "type_pairing": "typography",
+    "layout": "layout",
+    "motion": "motion",
+    "tone": "tone",
+    "register": "tone",
+}
+
+
+def effective_direction(decisions, directions_data):
+    """
+    Menggabungkan arah terpilih dengan perubahan dari decide.py.
+
+    I.S. : decisions adalah isi decisions.yaml; directions_data adalah isi directions.yaml.
+    F.S. : Salinan arah terpilih dengan overrides diterapkan dikembalikan (layout, register,
+           dan rationale digabung per kunci); None bila arahnya tidak ada.
+    """
+    chosen_id = decisions.get("direction")
+    chosen = find_by_id(directions_data.get("directions", []), chosen_id)
+
+    if chosen is None:
+        return None
+
+    merged = {key: (dict(value) if isinstance(value, dict) else value) for key, value in chosen.items()}
+
+    for key, value in (decisions.get("overrides") or {}).items():
+        if isinstance(value, dict):
+            merged[key] = {**merged.get(key, {}), **value}
+        else:
+            merged[key] = value
+
+    return merged
