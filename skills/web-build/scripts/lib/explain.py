@@ -11,7 +11,7 @@ import html
 import json
 from pathlib import Path
 
-from lib import graph, io, project
+from lib import graph, guided, io, project, trace
 
 # ============================================================
 # ========================= KONSTANTA ========================
@@ -81,6 +81,9 @@ TEXT = {
         "accepted": "Diterima oleh",
         "moves": {"pick": "memilih sendiri", "compare": "membandingkan pilihan", "justify": "memberi alasan", "predict": "menebak dulu sebelum melihat", "none": "tanpa pemeriksaan"},
         "not_in_directions": "tidak ada di kelima arah",
+        "support": "Tingkat dukungan",
+        "support_note": "Mode terpandu: bantuan AI dikurangi sedikit demi sedikit seiring Anda makin mandiri. Tiap checkpoint adalah saat Anda memeriksa dan memutuskan sendiri.",
+        "next_level": "Proyek berikutnya",
         "axes": {"style": "Gaya", "palette": "Palet warna", "typography": "Huruf", "layout": "Tata letak", "motion": "Gerak", "tone": "Nada bahasa"},
         "step_names": ["Brief", "Celah fakta", "Arah desain", "Token dan kerangka", "Isi teks", "Membangun halaman", "Pemeriksaan", "Serah terima"],
         "done": "selesai",
@@ -130,6 +133,9 @@ TEXT = {
         "accepted": "Accepted by",
         "moves": {"pick": "picked it", "compare": "compared the options", "justify": "gave a reason", "predict": "predicted before looking", "none": "no check"},
         "not_in_directions": "not in the five directions",
+        "support": "Support level",
+        "support_note": "Guided mode: the AI's help shrinks step by step as you grow more independent. Each checkpoint is where you check and decide yourself.",
+        "next_level": "Next project",
         "axes": {"style": "Style", "palette": "Palette", "typography": "Type", "layout": "Layout", "motion": "Motion", "tone": "Tone"},
         "step_names": ["Brief", "Missing facts", "Direction", "Tokens and scaffold", "Copy", "Build", "Check", "Handoff"],
         "done": "done",
@@ -381,6 +387,37 @@ def _field_text(value):
         return ", ".join(f"{k}={v}" for k, v in value.items())
 
     return value
+
+
+def _support_section(proj_dir, brief, text):
+    """
+    Menyusun bagian tingkat dukungan dan hasil checkpoint, khusus mode terpandu.
+
+    I.S. : brief adalah isi brief.yaml.
+    F.S. : HTML bagian dikembalikan; kosong bila mode bukan guided.
+    """
+    if brief.get("mode") != "guided":
+        return ""
+
+    lang = "id" if project.first_language(brief) == "id" else "en"
+    level = guided.project_level(brief)
+    results = guided.results_from_trace(trace.read(proj_dir))
+    rows = "".join(
+        f"<tr><td>{esc(guided.CHECKPOINT_NAMES[lang][name])}</td><td>{esc(guided.RESULT_NAMES[lang][results.get(name)])}</td></tr>"
+        for name in guided.CHECKPOINTS
+    )
+    history = guided.load_profile()["history"]
+    upcoming = ""
+
+    # Tingkat berikutnya hanya pasti setelah handoff mencatat proyek ini sebagai yang terakhir
+    if history and history[-1].get("project") == str(proj_dir.resolve()):
+        new_level = guided.load_profile()["support_level"]
+        upcoming = f'<p>{esc(text["next_level"])}: {esc(guided.LEVEL_NAMES[lang][new_level])} ({new_level})</p>'
+
+    return (
+        f'<h2>{esc(text["support"])}</h2><p class="note">{esc(text["support_note"])}</p>'
+        f'<p><b>{esc(guided.LEVEL_NAMES[lang][level])} ({level})</b></p><table>{rows}</table>{upcoming}'
+    )
 
 
 def _alternatives(decision, directions, current):
@@ -727,6 +764,7 @@ def build_html(proj_dir):
         f'<h1>{esc(text["title"])}: {esc(name)}</h1><p class="note">{esc(text["intro"])}</p>',
         _steps_section(proj_dir, decisions, text),
         _agency_section(context_graph, text),
+        _support_section(proj_dir, brief, text),
         _decisions_section(proj_dir, context_graph, text),
         _graph_section(context_graph, text),
         _todo_section(context_graph, text),

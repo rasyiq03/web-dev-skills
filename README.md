@@ -52,6 +52,11 @@ The site is built in `<folder>/<slug>/`, for example `kopi-senja/`:
 Add "pakai mode interaktif" to the prompt to answer a short questionnaire in the browser
 first.
 
+Add "pakai mode terpandu" (or "ajari aku") to learn while it builds: at three checkpoints you
+frame the problem, choose the direction, and explain the result back. The help fades as
+you pass the checkpoints over several projects (Demonstrasi → Terbimbing → Petunjuk →
+Mandiri); your level is kept in `profile.yaml` next to the dependency cache.
+
 Changed your mind about one decision? Ask for it ("ganti paletnya jadi sun-block, karena
 pelanggan suka warna cerah"). Only what depends on that decision is redone, and the reason
 is recorded. Ask "kenapa pakai font ini?" to get the chain of reasons.

@@ -43,13 +43,13 @@ audit/           anti-slop.yaml cliches-id.txt cliches-en.txt
 skills/
 	web-build/
 		SKILL.md
-		references/  conventions.md copy-id.md copy-en.md indonesia.md a11y-judge.md
+		references/  conventions.md copy-id.md copy-en.md indonesia.md mode-guided.md a11y-judge.md
 		schemas/     brief.schema.json directions.schema.json decisions.schema.json mock.schema.json
 		templates/   js/api/ config.js client.js endpoints.js mock-label.js
 		site-types/  company-profile.yaml dashboard.yaml landing.yaml portfolio.yaml umkm-catalog.yaml
 		scripts/     run.py validate_brief.py gaps.py serve.py pick_direction.py compile_tokens.py
-		             scaffold.py context.py graph.py explain.py decide.py check.py handoff.py
-		             lib/ (graph.py explain.py trace.py …)
+		             scaffold.py context.py graph.py explain.py decide.py checkpoint.py check.py
+		             handoff.py lib/ (graph.py explain.py trace.py guided.py …)
 	web-design/
 		SKILL.md
 		styles/      index.yaml neobrutalism.yaml editorial.yaml _template.yaml
@@ -86,7 +86,7 @@ The project folder is `$PD_PROJECTS_DIR/<slug>/` when that variable is set,
 | `state.yaml` | every script | Current step, round counters, seed, config hashes |
 | `graph.json` | every script, through `lib/graph.py` | Context graph of the files above; see §3.13 |
 | `EXPLAIN.html` | `explain.py`, `handoff.py` | Visual explanation for the developer; see §3.14 |
-| `trace.jsonl` | every script, `decide.py` | One JSON line per event: step finished, decision changed or accepted; see §3.15 |
+| `trace.jsonl` | every script, `decide.py`, `checkpoint.py` | One JSON line per event: step finished, decision changed or accepted, checkpoint result; see §3.15 |
 
 ### Requirement ids
 
@@ -462,6 +462,31 @@ Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-desi
   among the five directions' options.
 - Gate: for each axis, every graph node that changes is in `graph.impact()` of that
   decision (`tests/test_decide.py`).
+
+### 3.16 `checkpoint.py <slug> [framing|direction|acceptance --result R --note TEXT]` (guided mode)
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §4.
+Agent instructions: `skills/web-build/references/mode-guided.md`.
+
+- `brief.yaml` gains `mode: auto | guided | deep` (default `auto`) and, for guided mode,
+  an optional `support_level` 0–3 that overrides the profile for that project.
+- Without a checkpoint name: prints the support level (3 Demonstrasi, 2 Terbimbing,
+  1 Petunjuk, 0 Mandiri) and where it came from, the status of the three checkpoints, and
+  for the next one the instruction at that level from `lib/guided.py` (what the agent does,
+  what the developer does, when it passes) plus the feedback rule. For acceptance it also
+  prints two questions with their reference chains from `graph.why()` and `graph.impact()`.
+- With a name: `--result passed|failed|skipped` and `--note` (the developer's answer in
+  short, at least 10 characters) are required; writes a `checkpoint` event to the trace.
+  Exits 1 for a project that is not in guided mode.
+- The profile is `profile.yaml` in the dependency cache folder, or `PD_PROFILE`:
+  `support_level` (default 2) and a history of projects with their level and results.
+  `handoff.py` records the project (replacing an earlier entry for the same folder, so a
+  repeated handoff counts once; missing checkpoints count as skipped) and prints the next
+  level. `guided.next_level()`: a failed acceptance raises the level by one (max 3); two
+  consecutive projects at the same level with every checkpoint passed lower it by one
+  (min 0); otherwise it stays. Auto mode never reads or writes the profile.
+- `EXPLAIN.html` shows the level, the checkpoint results, and the next level once handoff
+  has recorded the project.
 
 ## 4. Milestones and gates
 

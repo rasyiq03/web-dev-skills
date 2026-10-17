@@ -22,6 +22,13 @@ second, checks last. Scripts do every deterministic step; you write only the fil
 | 7 Check | fix findings | `check` | `report.json` |
 | 8 Handoff | show the summary | `handoff` | summary and `EXPLAIN.html` |
 
+## Modes
+
+- **auto** (default): work through the steps without stopping.
+- **guided**: the user wants to learn or be guided ("mode terpandu", "ajari aku"). Read
+  `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/mode-guided.md` and follow it in every
+  step.
+
 ## Running scripts
 
 Every script runs through one command, from the folder Claude Code was opened in:
@@ -52,7 +59,7 @@ plugin support), it means the folder that contains `skills/`.
   steps 3 to 6 and whenever you talk to the user.
 - Talk to the user in their language, in short, plain sentences.
 - Work without stopping to ask, unless the user asked for interactive mode (then set
-  `interactive: true` in the brief) or a script exits with `3`.
+  `interactive: true` in the brief) or guided mode, or a script exits with `3`.
 
 ## Steps
 

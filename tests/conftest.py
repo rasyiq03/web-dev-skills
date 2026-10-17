@@ -71,13 +71,15 @@ def projects_dir(monkeypatch):
     Menyediakan folder projects/ sementara di dalam repo.
 
     I.S. : Belum ada folder proyek untuk tes ini.
-    F.S. : PD_PROJECTS_DIR menunjuk folder baru di .tmp-tests/; folder dihapus setelah tes.
+    F.S. : PD_PROJECTS_DIR menunjuk folder baru di .tmp-tests/ dan PD_PROFILE ke profil di
+           dalamnya, agar tes tidak menyentuh profil developer asli; folder dihapus setelah tes.
            Folder sengaja di dalam repo agar Node menemukan node_modules milik repo.
     """
     base = REPO / ".tmp-tests" / uuid.uuid4().hex[:10]
     base.mkdir(parents=True)
     monkeypatch.setenv("PD_PROJECTS_DIR", str(base))
     monkeypatch.setenv("PD_DATE", TEST_DATE)
+    monkeypatch.setenv("PD_PROFILE", str(base / "profile.yaml"))
     yield base
 
     # File read-only (misalnya objek git tiruan) tidak bisa dihapus rmtree di Windows

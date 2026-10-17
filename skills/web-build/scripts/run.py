@@ -34,6 +34,7 @@ SCRIPTS = (
     "graph",
     "explain",
     "decide",
+    "checkpoint",
     "check",
     "handoff",
 )

@@ -14,7 +14,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import explain, io, paths, project, report, trace
+from lib import explain, guided, io, paths, project, report, trace
 from lib.report import EXIT_INVALID, fail
 
 
@@ -178,6 +178,30 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
 # ============================================================
 
 
+def finish_guided(proj_dir, brief):
+    """
+    Mencatat hasil checkpoint proyek mode terpandu di profil developer.
+
+    I.S. : trace.jsonl berisi peristiwa checkpoint (boleh kosong).
+    F.S. : Untuk mode guided: profil diperbarui dan baris ringkasan dikembalikan;
+           mode lain: daftar kosong dan profil tidak disentuh.
+    """
+    if brief.get("mode") != "guided":
+        return []
+
+    lang = "id" if project.first_language(brief) == "id" else "en"
+    level = guided.project_level(brief)
+    results = guided.results_from_trace(trace.read(proj_dir))
+    recorded = {name: results.get(name, "skipped") for name in guided.CHECKPOINTS}
+    new_level = guided.record_project(str(proj_dir.resolve()), level, recorded)
+    states = ", ".join(f"{name} {guided.RESULT_NAMES[lang][result]}" for name, result in recorded.items())
+
+    return [
+        f"  - Mode terpandu: tingkat {level} ({guided.LEVEL_NAMES[lang][level]}); checkpoint: {states}",
+        f"  - Proyek berikutnya: tingkat {new_level} ({guided.LEVEL_NAMES[lang][new_level]})",
+    ]
+
+
 def handoff(slug, no_provenance=False):
     """
     Eksekusi serah terima proyek: tulis HANDOFF.md, API_CONTRACT.md, provenance.json.
@@ -254,6 +278,7 @@ def handoff(slug, no_provenance=False):
 
     io.save_state(proj_dir, step="handoff")
     trace.append(proj_dir, "step", script="handoff")
+    guided_lines = finish_guided(proj_dir, brief)
     explain.write(proj_dir)
 
     lines = [
@@ -267,6 +292,7 @@ def handoff(slug, no_provenance=False):
     else:
         lines.append(f"  - provenance.json tercatat ({len(site_hashes)} file di-hash)")
 
+    lines.extend(guided_lines)
     lines.append("")
     lines.append("=== ISI HANDOFF.MD ===")
     lines.extend(handoff_md.strip().splitlines())

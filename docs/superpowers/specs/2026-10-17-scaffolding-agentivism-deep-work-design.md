@@ -1,6 +1,6 @@
 # Scaffolding, Agentivism, and Deep Work — architecture design
 
-Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide and phases 1–3 (context graph, EXPLAIN.html, trace and decide) shipped
+Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide and phases 1–4 (context graph, EXPLAIN.html, trace and decide, guided mode) shipped
 
 ## Goal
 
@@ -247,6 +247,10 @@ history:
 
 Rules: two consecutive projects with all checkpoints passed lower the level by one; a
 failed acceptance raises it by one; it never moves more than one step per project (G14).
+The two projects must be at the same level, so the streak restarts after every change;
+a skipped checkpoint counts as not passed but does not raise the level. New developers
+start at level 2 (Terbimbing): the developer already picks and justifies, which keeps
+responsibility with them from the first project (P1).
 "pakai level 3" or "aku mau mandiri" in a prompt overrides it for that project (G17).
 
 ## 5. Deep work mode: musyawarah

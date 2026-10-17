@@ -9,7 +9,11 @@ import re
 import run
 from conftest import REPO
 
-SKILL_FILES = [REPO / "skills" / "web-build" / "SKILL.md", REPO / "skills" / "web-design" / "SKILL.md"]
+SKILL_FILES = [
+    REPO / "skills" / "web-build" / "SKILL.md",
+    REPO / "skills" / "web-design" / "SKILL.md",
+    REPO / "skills" / "web-build" / "references" / "mode-guided.md",
+]
 ROOT_REF = re.compile(r"\$\{CLAUDE_PLUGIN_ROOT\}/([^\s`\"')]+)")
 COMMAND = re.compile(r"`python ([^`]+)`")
 SHORTHAND = re.compile(r"`run ([a-z_]+)[ `]")
