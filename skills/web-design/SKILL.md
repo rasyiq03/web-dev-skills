@@ -5,41 +5,44 @@ description: Choose the visual direction for a website project - style, palette,
 
 # web-design
 
-Your job is to propose several genuinely different design directions for one brief and
-state how typical each one is. A script then picks one, so different clients end up with
-different sites while each site stays internally consistent.
+Propose five genuinely different design directions for one brief and say how typical each
+one is. A script then picks one, so different clients get different sites while each site
+stays internally consistent. Your only output is `<project>/directions.yaml`.
 
-## Inputs
+## Read first
 
-- `<project>/brief.yaml` and `<project>/gaps.json` (it lists requirement ids such as
-  `req-audience` that your rationale must cite). `<project>` is the folder printed by
-  `python "${CLAUDE_PLUGIN_ROOT}/skills/web-build/scripts/run.py" path <slug>`; web-build
-  step 1 has already run it.
-- `${CLAUDE_PLUGIN_ROOT}/skills/web-design/styles/index.yaml`: one line per style. Read only
-  this catalog first, then open the full file of each style you actually use.
-- `${CLAUDE_PLUGIN_ROOT}/skills/web-design/layouts/patterns.yaml`: the layout patterns
-  available for each section kind.
+`<project>` is the folder printed by web-build step 1. If `${CLAUDE_PLUGIN_ROOT}` appears
+literally in this file, it means the folder that contains `skills/`.
 
-If `${CLAUDE_PLUGIN_ROOT}/skills` appears literally in this file (the skill was loaded
-without plugin support), it means the folder that contains this skill's folder.
+1. `<project>/brief.yaml` and `<project>/gaps.json` (it lists the requirement ids, such as
+   `req-audience`, that your rationale cites).
+2. `${CLAUDE_PLUGIN_ROOT}/skills/web-design/styles/index.yaml`: one line per style. Read
+   only this catalog first, then open the full file of each style you actually use.
+3. `${CLAUDE_PLUGIN_ROOT}/skills/web-design/layouts/patterns.yaml`: the layout patterns for
+   each section kind.
 
-If the brief names a style (for example "neobrutalism") or a brand palette, every
-direction keeps it and varies only the other axes.
+## Rules
 
-## Write `<project>/directions.yaml`
+- Exactly 5 directions. Each `probability` (0 to 1) estimates how often a typical designer
+  would produce that direction for this brief; the five sum to 1.
+- Directions differ on at least three axes: style, palette, type pairing, layout, motion,
+  tone.
+- A style or brand palette named in the brief stays in every direction; vary the rest.
+- Every rationale line names something specific to this brief (audience, place, product,
+  or goal). A line that would fit any business needs rewriting.
+- `based_on` lists requirement ids exactly as `gaps.json` prints them.
+- The file must pass `${CLAUDE_PLUGIN_ROOT}/skills/web-build/schemas/directions.schema.json`;
+  `pick_direction` reports any mismatch.
 
-Propose exactly 5 directions. Give each a `probability` between 0 and 1 that estimates how
-often a typical designer would produce this direction for this brief; the five values sum
-to 1. Make the directions differ on at least three of these axes: style, palette,
-type pairing, layout patterns, motion, tone.
+## Shape of one direction
 
 ```yaml
 directions:
   - id: dir-1
     probability: 0.30
     style: neobrutalism          # id from styles/index.yaml
-    palette: warm-paper          # palette id from that style file
-    type_pairing: grotesk-mono   # pairing id from that style file
+    palette: warm-paper          # palette id from that style file, or custom
+    type_pairing: grotesk-mono   # pairing id from that style file, or custom
     layout:                      # section id (from site-types) -> pattern id (layouts/patterns.yaml)
       hero: split-offset
       services: list-with-prices
@@ -58,16 +61,11 @@ directions:
     based_on: [req-audience, req-business.location]
 ```
 
-Each rationale line names something specific to this brief: the audience, the place, the
-product, or the business goal. A rationale that would fit any business needs rewriting.
-`based_on` lists requirement ids exactly as `gaps.json` prints them. The file must pass
-`${CLAUDE_PLUGIN_ROOT}/skills/web-build/schemas/directions.schema.json`; `pick_direction`
-reports any mismatch.
-
 ## Custom values
 
-When no palette or pairing in the library fits the brief (for example, the client's brand
-colors), set `palette: custom` and add a `colors` map with `ink`, `paper`, `accent`, `muted`,
-and `accent-ink` as hex values. Likewise set `type_pairing: custom` and add a `fonts` map with
-`display`, `body`, and `mono` family names from Google Fonts. The compile step checks
-contrast and rejects pairs below WCAG AA.
+When no library palette or pairing fits (for example, the client's brand colors):
+
+- `palette: custom` plus a `colors` map with `ink`, `paper`, `accent`, `muted`, and
+  `accent-ink` as hex values. The compile step rejects pairs below WCAG AA contrast.
+- `type_pairing: custom` plus a `fonts` map with `display`, `body`, and `mono` family names
+  from Google Fonts.

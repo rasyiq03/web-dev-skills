@@ -228,7 +228,7 @@ def scaffold(slug, force=False):
             fail(
                 EXIT_INVALID,
                 f"Folder {site_dir} sudah berisi file. Gunakan --force untuk menimpa.",
-                f"run python skills/web-build/scripts/scaffold.py {slug} --force",
+                f"run scaffold.py {slug} --force (this deletes site/; save endpoints.js and data/mock/ first)",
             )
         shutil.rmtree(site_dir)
 
