@@ -102,6 +102,10 @@ Sites built while Claude Code is open in the clone go to `projects/<slug>/`.
 `python -m pytest --network` also runs the slow tests that install dependencies from the
 internet. For Codex, `python tools/sync_adapters.py` links the skills into `.agents/skills/`.
 
+`python tools/eval/collect.py <folder> --out eval-results.csv` collects every project in a
+folder into one CSV (mode, check scores, the Agentivism signals P1–P6, checkpoints, council
+sittings) to compare auto, guided, and deep work.
+
 `IMPLEMENTATION.md` specifies every script.
 
 ## License

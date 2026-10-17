@@ -14,7 +14,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import council, explain, guided, io, paths, project, report, trace
+from lib import council, explain, guided, io, paths, project, report, signals, trace
 from lib.report import EXIT_INVALID, fail
 
 
@@ -178,6 +178,19 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
 # ============================================================
 
 
+def signals_md(proj_dir, brief):
+    """
+    Menyusun bagian 7 HANDOFF.md: sinyal Agentivism P1-P6 dalam kalimat sederhana.
+
+    I.S. : Proyek punya brief.yaml; trace dan report boleh belum ada.
+    F.S. : Teks markdown bagian 7 dikembalikan.
+    """
+    lang = "id" if project.first_language(brief) == "id" else "en"
+    title, intro, items = signals.lines(signals.compute(proj_dir), lang)
+
+    return "\n".join(["", f"## 7. {title}", intro, *[f"- {item}" for item in items]]) + "\n"
+
+
 def finish_guided(proj_dir, brief):
     """
     Mencatat hasil checkpoint proyek mode terpandu di profil developer.
@@ -279,6 +292,7 @@ def handoff(slug, no_provenance=False):
 
     # 3. Tulis HANDOFF.md
     handoff_md = build_handoff_md(brief, decisions, gaps, report_summary, gaps.get("placeholders", {}))
+    handoff_md += signals_md(proj_dir, brief)
     io.write_text(proj_dir / "HANDOFF.md", handoff_md)
 
     # 4. Provenance

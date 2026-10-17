@@ -114,7 +114,8 @@ plugin support), it means the folder that contains `skills/`.
    printed: assumptions taken, placeholders to fill, and check scores. It also writes
    `EXPLAIN.html`; tell the user it opens with a double-click, needs no internet, and shows
    who decided what, why, and what a change would touch. `run explain <slug>` rewrites it
-   at any step.
+   at any step. Section 7 of `HANDOFF.md` lists the learning signals (P1–P6); when the
+   dependence risk is high, say so in one plain sentence and point to what lowers it.
 
 ## Explaining, changing, and accepting a decision
 

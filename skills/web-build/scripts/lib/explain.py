@@ -11,7 +11,7 @@ import html
 import json
 from pathlib import Path
 
-from lib import graph, guided, io, project, trace
+from lib import graph, guided, io, project, signals, trace
 
 # ============================================================
 # ========================= KONSTANTA ========================
@@ -744,6 +744,19 @@ def _quality_section(proj_dir, text):
     )
 
 
+def _signals_section(proj_dir, brief):
+    """
+    Menyusun bagian sinyal Agentivism P1-P6, sama dengan bagian 7 HANDOFF.md.
+
+    I.S. : Proyek punya brief.yaml.
+    F.S. : HTML bagian dikembalikan.
+    """
+    lang = "id" if project.first_language(brief) == "id" else "en"
+    title, intro, items = signals.lines(signals.compute(proj_dir), lang)
+
+    return f'<h2>{esc(title)}</h2><p class="note">{esc(intro)}</p><ul>{"".join("<li>" + esc(i) + "</li>" for i in items)}</ul>'
+
+
 def _chain_text(context_graph, visits):
     """
     Menulis hasil telusur sebagai daftar label, untuk jawaban soal.
@@ -825,6 +838,7 @@ def build_html(proj_dir):
         _graph_section(context_graph, text),
         _todo_section(context_graph, text),
         _quality_section(proj_dir, text),
+        _signals_section(proj_dir, brief),
         _quiz_section(context_graph, text),
     ])
 

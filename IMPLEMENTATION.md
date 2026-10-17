@@ -56,7 +56,8 @@ skills/
 		SKILL.md
 		styles/      index.yaml neobrutalism.yaml editorial.yaml _template.yaml
 		layouts/     patterns.yaml
-tools/           sync_adapters.py (v0.1) · render_check.py, build_cliches.py, eval/ (v0.3)
+tools/           sync_adapters.py (v0.1) · eval/collect.py (signals CSV) · render_check.py,
+                 build_cliches.py, eval/ model runs (v0.3)
                  export_rdf.py, shapes.ttl (v0.4)
 examples/kopi-senja/   brief.yaml directions.yaml decisions.yaml
 tests/
@@ -520,6 +521,32 @@ Agent instructions: `skills/web-build/references/mode-deep.md` and
 - `handoff.py` in deep mode lists the recorded sittings, says when any was simulated, and
   prints "Siap pakai" only when all four sittings are recorded and check reports zero
   errors and zero warnings; otherwise it names what is missing.
+
+### 3.18 Learning signals and `tools/eval/collect.py`
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md`
+§ "Agentivism" (propositions table) and phase 6.
+
+- `lib/signals.py` computes, from the graph, the trace, and `report.json`: P1 decisions
+  owned or accepted by the developer; P2 the developer's verification moves (accept and
+  decide events with a move other than `none`, plus one `pick` when the client picked the
+  direction); P3 decisions the developer changed with `decide` (file edits cannot be
+  attributed to a person, so they are not counted, and the text says so); P4 check errors,
+  warnings, and constraint score next to the acceptance checkpoint result; P5 the number
+  of trace events; P6 dependence risk `high` when there is no developer verification, no
+  client pick, and no passed checkpoint. Changes made `--by ai` or `--by council` never
+  count for the developer.
+- `handoff.py` appends section 7 to `HANDOFF.md` with one plain sentence per signal; in deep
+  mode a high P6 is explained as expected and points to `EXPLAIN.html` and
+  `decide --accept`. `EXPLAIN.html` shows the same list.
+- `python tools/eval/collect.py [folders…] [--out eval-results.csv]` finds every folder
+  with a `brief.yaml` (the folder itself or its direct children; default: the projects
+  folder) and writes one CSV row per project: mode, site type, languages, support level,
+  the signals, checkpoints passed, council sittings, votes, simulated, dissent, vetoes,
+  placeholders, signature score, and `ready` (zero errors and warnings, and for deep mode
+  all four sittings). It prints a per-mode summary. Same inputs give the same bytes.
+- This compares projects that were actually built. Running briefs through models
+  unattended (conditions C0–C2, §3.11) is still the v0.3 harness.
 
 ## 4. Milestones and gates
 

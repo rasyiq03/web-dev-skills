@@ -1,6 +1,6 @@
 # Scaffolding, Agentivism, and Deep Work — architecture design
 
-Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide and phases 1–5 (context graph, EXPLAIN.html, trace and decide, guided mode, deep mode) shipped
+Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide and phases 1–6 shipped
 
 ## Goal
 
@@ -398,6 +398,11 @@ Each phase ends with green tests and is usable on its own.
 | 4 | Guided mode: `references/mode-guided.md`, checkpoints, profile and fading | Unit tests for the fading rules; one guided build end to end |
 | 5 | Deep mode: role cards, `run council`, `deliberation.schema.json`, `references/mode-deep.md` | One-prompt build with zero errors and valid minutes; simulated-council fallback tested |
 | 6 | Measurement: Agentivism signals in `handoff`, and the eval harness compares auto, guided, and deep | Signals appear in `HANDOFF.md`; eval writes one CSV |
+
+Phase 6 as shipped: the signals are in `HANDOFF.md` §7 and `EXPLAIN.html`, and
+`tools/eval/collect.py` turns any set of built projects into one CSV. P3 counts only
+decisions the developer changed, because a file edit cannot be attributed to a person.
+Running the same briefs through models unattended stays with the v0.3 harness.
 
 ## 10. Decisions taken
 
