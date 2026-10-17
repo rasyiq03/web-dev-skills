@@ -3,10 +3,15 @@
 # Deskripsi : Pengujian unit dan CLI untuk compile_tokens.py.
 # ============================================================
 
+import shutil
 import subprocess
 import pytest
 from conftest import copy_fixture, next_line, run_script
+
 from lib import io
+
+# Tanpa shell=True: di Linux/macOS shell=True dengan list hanya menjalankan "npx" tanpa argumen
+NPX = shutil.which("npx") or "npx"
 
 
 @pytest.fixture
@@ -81,6 +86,6 @@ def test_tokens_css_passes_stylelint(kopi_dir2):
     css_file = kopi_dir2 / "tokens.css"
 
     # Jalankan stylelint pada tokens.css
-    cmd = ["npx", "stylelint", "--config", "config/.stylelintrc.json", str(css_file)]
-    res = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+    cmd = [NPX, "stylelint", "--config", "config/.stylelintrc.json", str(css_file)]
+    res = subprocess.run(cmd, capture_output=True, text=True)
     assert res.returncode == 0, f"stylelint gagal pada tokens.css:\n{res.stdout}\n{res.stderr}"

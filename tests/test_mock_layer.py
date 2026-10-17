@@ -4,6 +4,7 @@
 #             melalui Node.js dengan stub fetch dan simulasi DOM.
 # ============================================================
 
+import shutil
 import subprocess
 import pytest
 from conftest import copy_fixture, run_script
@@ -113,7 +114,8 @@ console.log('MOCK_LAYER_TEST_OK');
 """,
     )
 
-    cmd = ["node", str(node_test_script)]
-    res = subprocess.run(cmd, cwd=site_dir, capture_output=True, text=True, shell=True)
+    # Tanpa shell=True: di Linux/macOS shell=True dengan list hanya menjalankan 'node' tanpa skrip
+    cmd = [shutil.which("node") or "node", str(node_test_script)]
+    res = subprocess.run(cmd, cwd=site_dir, capture_output=True, text=True)
     assert res.returncode == 0, f"Node test gagal:\n{res.stdout}\n{res.stderr}"
     assert "MOCK_LAYER_TEST_OK" in res.stdout

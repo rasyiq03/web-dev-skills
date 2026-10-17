@@ -4,10 +4,15 @@
 #             bahwa skeleton lolos prettier, stylelint, dan html-validate.
 # ============================================================
 
+import shutil
 import subprocess
 import pytest
 from conftest import copy_fixture, next_line, run_script
+
 from lib import io
+
+# Tanpa shell=True: di Linux/macOS shell=True dengan list hanya menjalankan "npx" tanpa argumen
+NPX = shutil.which("npx") or "npx"
 
 
 @pytest.fixture
@@ -58,28 +63,28 @@ def test_scaffold_structure_and_idempotence(kopi_scaffolded):
 @pytest.mark.node
 def test_scaffold_skeleton_passes_linters(kopi_scaffolded):
     # 1. npx prettier --check
-    cmd_prettier = ["npx", "prettier", "--check", "site/**/*.{html,css}"]
-    res_p = subprocess.run(cmd_prettier, cwd=kopi_scaffolded, capture_output=True, text=True, shell=True)
+    cmd_prettier = [NPX, "prettier", "--check", "site/**/*.{html,css}"]
+    res_p = subprocess.run(cmd_prettier, cwd=kopi_scaffolded, capture_output=True, text=True)
     assert res_p.returncode == 0, f"prettier gagal:\n{res_p.stdout}\n{res_p.stderr}"
 
     # 2. npx stylelint
     cmd_stylelint = [
-        "npx",
+        NPX,
         "stylelint",
         "--config",
         ".stylelintrc.json",
         "site/css/**/*.css",
     ]
-    res_s = subprocess.run(cmd_stylelint, cwd=kopi_scaffolded, capture_output=True, text=True, shell=True)
+    res_s = subprocess.run(cmd_stylelint, cwd=kopi_scaffolded, capture_output=True, text=True)
     assert res_s.returncode == 0, f"stylelint gagal:\n{res_s.stdout}\n{res_s.stderr}"
 
     # 3. npx html-validate
     cmd_htmlval = [
-        "npx",
+        NPX,
         "html-validate",
         "--config",
         ".htmlvalidate.json",
         "site/**/*.html",
     ]
-    res_h = subprocess.run(cmd_htmlval, cwd=kopi_scaffolded, capture_output=True, text=True, shell=True)
+    res_h = subprocess.run(cmd_htmlval, cwd=kopi_scaffolded, capture_output=True, text=True)
     assert res_h.returncode == 0, f"html-validate gagal:\n{res_h.stdout}\n{res_h.stderr}"
