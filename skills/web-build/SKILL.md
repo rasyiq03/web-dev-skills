@@ -20,7 +20,7 @@ second, checks last. Scripts do every deterministic step; you write only the fil
 | 5 Copy | write copy and mock data | none | `content/<lang>.yaml` |
 | 6 Build | fill each page | `context` | finished `site/` |
 | 7 Check | fix findings | `check` | `report.json` |
-| 8 Handoff | show the summary | `handoff` | summary for the user |
+| 8 Handoff | show the summary | `handoff` | summary and `EXPLAIN.html` |
 
 ## Running scripts
 
@@ -100,7 +100,10 @@ plugin support), it means the folder that contains `skills/`.
    apply its findings as one extra round. Otherwise note "semantic review skipped".
 
 8. **Handoff.** Run `run handoff <slug>` and show its summary to the user exactly as
-   printed: assumptions taken, placeholders to fill, and check scores.
+   printed: assumptions taken, placeholders to fill, and check scores. It also writes
+   `EXPLAIN.html`; tell the user it opens with a double-click, needs no internet, and shows
+   who decided what, why, and what a change would touch. `run explain <slug>` rewrites it
+   at any step.
 
 ## Explaining a decision
 

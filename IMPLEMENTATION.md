@@ -48,7 +48,7 @@ skills/
 		templates/   js/api/ config.js client.js endpoints.js mock-label.js
 		site-types/  company-profile.yaml dashboard.yaml landing.yaml portfolio.yaml umkm-catalog.yaml
 		scripts/     run.py validate_brief.py gaps.py serve.py pick_direction.py compile_tokens.py
-		             scaffold.py context.py graph.py check.py handoff.py lib/ (deps.py graph.py …)
+		             scaffold.py context.py graph.py explain.py check.py handoff.py lib/ (graph.py explain.py …)
 	web-design/
 		SKILL.md
 		styles/      index.yaml neobrutalism.yaml editorial.yaml _template.yaml
@@ -84,6 +84,7 @@ The project folder is `$PD_PROJECTS_DIR/<slug>/` when that variable is set,
 | `provenance.json`, `HANDOFF.md` | `handoff.py` | File hashes and the summary for the client |
 | `state.yaml` | every script | Current step, round counters, seed, config hashes |
 | `graph.json` | every script, through `lib/graph.py` | Context graph of the files above; see §3.13 |
+| `EXPLAIN.html` | `explain.py`, `handoff.py` | Visual explanation for the developer; see §3.14 |
 
 ### Requirement ids
 
@@ -413,6 +414,26 @@ Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-desi
   print one line per step in plain Indonesian, with the relation read in the right
   direction (`d-palette-1 berdasar pada -> req-audience`,
   `req-audience menjadi dasar untuk -> d-palette-1`). An unknown node exits with code 1.
+
+### 3.14 `explain.py <slug>`
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §3.
+
+- `lib/explain.py` writes `<project>/EXPLAIN.html` from the context graph, `directions.yaml`,
+  `state.yaml`, and `report.json`. `handoff.py` calls it after saving state.
+- One self-contained file: inline CSS and JavaScript, no external URLs, no timestamps, so
+  the same inputs give the same bytes. Colours come from `tokens.json` (light) with a dark
+  variant; text follows the brief's first language (`id` or `en`).
+- Sections: the eight steps coloured by owner; the developer/AI/script split of
+  requirements and decisions (Agentivism P1); one card per decision (choice, why,
+  requirements, owner and source, the five directions' options with probabilities, what a
+  change affects, and each check as passed, failed, or not checked yet); the graph in five
+  columns with page filters (tokens not tied to a decision are counted, not drawn); the
+  placeholders with the sections that use them; the check summary; two questions with
+  hidden answers taken from `--why` and `--impact`.
+- The SVG layout is computed in Python, so the page is complete without JavaScript; the
+  script only highlights a node's chain on click, using the same traversal rules as
+  `lib/graph.py`.
 
 ## 4. Milestones and gates
 

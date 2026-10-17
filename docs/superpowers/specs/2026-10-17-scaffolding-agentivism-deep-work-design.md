@@ -1,6 +1,6 @@
 # Scaffolding, Agentivism, and Deep Work — architecture design
 
-Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide and phase 1 (context graph) shipped
+Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide, phase 1 (context graph), and phase 2 (EXPLAIN.html) shipped
 
 ## Goal
 
@@ -196,6 +196,10 @@ checkpoint. Four views:
    page. Clicking a node highlights its upstream and downstream chain.
 4. **Your turn** (guided mode): the reconstruction tasks for this project and whether they
    were done.
+
+Shipped in phase 2 for every mode: two questions with hidden answers (why one decision
+was made, what changing the main colour affects), so even `auto` runs end with a route to
+reconstruction. Guided mode (phase 4) adds tracking of whether they were answered.
 
 Rendering: inline SVG drawn by a small vendored script, laid out in columns by node type
 (requirements left, checks right), so it stays readable without a force layout. Light and

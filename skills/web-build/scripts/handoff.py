@@ -14,7 +14,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import graph, io, paths, project, report
+from lib import explain, io, paths, project, report
 from lib.report import EXIT_INVALID, fail
 
 
@@ -124,6 +124,9 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
         lines.append("python -m http.server 8000")
         lines.append("```")
         lines.append("Buka browser di `http://127.0.0.1:8000`.")
+        lines.append("")
+        lines.append("## 6. Penjelasan Keputusan")
+        lines.append("Buka `EXPLAIN.html` di folder proyek (bisa langsung diklik dua kali, tanpa server dan tanpa internet). Isinya: siapa memutuskan apa, kenapa, dan bagian mana yang ikut berubah bila satu keputusan diganti.")
     else:
         lines.append(f"# Site Handoff Report — {pname}")
         lines.append("")
@@ -163,6 +166,9 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
         lines.append("python -m http.server 8000")
         lines.append("```")
         lines.append("Open `http://127.0.0.1:8000` in your browser.")
+        lines.append("")
+        lines.append("## 6. Decision Explanation")
+        lines.append("Open `EXPLAIN.html` in the project folder (double-click works, no server or internet needed). It shows who decided what, why, and what changes if a decision is replaced.")
 
     return "\n".join(lines) + "\n"
 
@@ -247,12 +253,13 @@ def handoff(slug, no_provenance=False):
         io.write_json(prov_file, prov_data)
 
     io.save_state(proj_dir, step="handoff")
-    graph.refresh(proj_dir)
+    explain.write(proj_dir)
 
     lines = [
         f"Serah terima selesai untuk proyek '{slug}':",
         "  - HANDOFF.md berhasil dibuat",
         "  - API_CONTRACT.md berhasil disusun",
+        "  - EXPLAIN.html berhasil dibuat (penjelasan keputusan untuk developer)",
     ]
     if no_provenance:
         lines.append("  - provenance.json dilewati (--no-provenance), generator meta tag dibersihkan")

@@ -32,6 +32,7 @@ SCRIPTS = (
     "scaffold",
     "context",
     "graph",
+    "explain",
     "check",
     "handoff",
 )

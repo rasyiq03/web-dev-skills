@@ -33,6 +33,8 @@ def test_handoff_acceptance(projects_dir):
     result = run_script("handoff", "kopi-senja")
     assert result.returncode == 0, result.stderr
     assert next_line(result) == "NEXT: handoff complete"
+    assert (proj / "EXPLAIN.html").is_file()
+    assert "EXPLAIN.html" in result.stdout
 
     # 1. HANDOFF.md ada dan mencantumkan placeholder
     handoff_file = proj / "HANDOFF.md"

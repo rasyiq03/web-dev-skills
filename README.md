@@ -42,6 +42,10 @@ The site is built in `<folder>/<slug>/`, for example `kopi-senja/`:
   http://localhost:8000 (pages use ES modules, which do not load from `file://`).
 - `HANDOFF.md`: the chosen design direction, assumptions, and every placeholder
   `[[ISI: …]]` still to fill.
+- `EXPLAIN.html`: a page for you, the developer: who decided what and why, the design
+  decisions with the options that lost, a clickable graph from requirement to code to
+  check, and two questions to test your understanding. Double-click to open; no internet
+  needed.
 - `brief.yaml`, `decisions.yaml`, `content/`: the recorded decisions, kept for later
   changes.
 
