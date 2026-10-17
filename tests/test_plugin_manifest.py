@@ -61,3 +61,12 @@ def test_marketplace_installs_this_repository_as_the_plugin():
     assert plugin["name"] == "web-skills"
     assert len(entries) == 1
     assert entries[0]["source"] == "./"
+
+
+def test_lockfile_root_matches_package_json():
+    # Claude Code melewati pemasangan paket plugin bila keduanya berbeda
+    package = json.loads((REPO / "package.json").read_text(encoding="utf-8"))
+    lock_root = json.loads((REPO / "package-lock.json").read_text(encoding="utf-8"))["packages"][""]
+
+    for field in ("dependencies", "devDependencies"):
+        assert lock_root.get(field, {}) == package.get(field, {}), f"jalankan npm install --package-lock-only ({field})"
