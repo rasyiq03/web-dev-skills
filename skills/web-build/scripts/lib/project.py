@@ -4,6 +4,7 @@
 #             pola layout, validasi skema, dan id requirement.
 # ============================================================
 
+import re
 import shutil
 from pathlib import Path
 
@@ -294,6 +295,31 @@ def load_patterns():
     raw = io.read_yaml(paths.PATTERNS_FILE)
 
     return {kind: {item["id"]: item for item in items} for kind, items in raw.items()}
+
+
+PLACEHOLDER = re.compile(r"\[\[ISI: [^\]]+\]\]")
+
+
+def site_placeholders(site_dir):
+    """
+    Mengumpulkan placeholder [[ISI: ...]] yang benar-benar tampil di halaman situs.
+
+    I.S. : site_dir adalah folder proyek (boleh belum di-scaffold).
+    F.S. : dict {placeholder: [file relatif tempat ia muncul]} dikembalikan, urut menurut
+           kemunculan pertama; file kerja di .ScaffolDev tidak ikut dipindai.
+    """
+    found = {}
+
+    for page in paths.site_files(site_dir, "*.html"):
+        rel = page.relative_to(site_dir).as_posix()
+
+        for text in PLACEHOLDER.findall(io.read_text(page)):
+            files = found.setdefault(text, [])
+
+            if rel not in files:
+                files.append(rel)
+
+    return found
 
 
 def layout_risks(brief, site_type, layout_map):

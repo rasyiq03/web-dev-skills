@@ -89,3 +89,34 @@ def test_tokens_css_passes_stylelint(kopi_dir2):
     cmd = [NPX, "stylelint", "--config", "config/.stylelintrc.json", str(css_file)]
     res = subprocess.run(cmd, capture_output=True, text=True)
     assert res.returncode == 0, f"stylelint gagal pada tokens.css:\n{res.stdout}\n{res.stderr}"
+
+
+def test_every_advertised_token_exists_in_tokens_css(kopi_dir2):
+    # Nama token yang dicetak context harus persis variabel yang ada di tokens.css
+    import re
+
+    from lib import graph
+
+    for name in ("gaps", "pick_direction"):
+        args = ("--pick", "dir-2") if name == "pick_direction" else ()
+        assert run_script(name, "kopi-senja", *args).returncode == 0
+    assert run_script("compile_tokens", "kopi-senja").returncode == 0
+
+    defined = set(re.findall(r"(--pd-[a-z0-9-]+):", (kopi_dir2 / "tokens.css").read_text(encoding="utf-8")))
+    advertised = {n["label"] for n in graph.build(kopi_dir2)["nodes"] if n["type"] == "token"}
+    pattern = re.compile(r"^--pd-[a-z0-9]+(-[a-z0-9]+)*$")
+
+    assert advertised <= defined, sorted(advertised - defined)
+    assert all(pattern.match(name) for name in defined), [n for n in defined if not pattern.match(n)]
+
+
+def test_compile_after_scaffold_updates_the_site(kopi_dir2):
+    assert run_script("compile_tokens", "kopi-senja").returncode == 0
+    assert run_script("scaffold", "kopi-senja").returncode == 0
+    site_css = kopi_dir2.parent / "css" / "tokens.css"
+    site_css.write_text("/* lama */\n", encoding="utf-8")
+
+    result = run_script("compile_tokens", "kopi-senja")
+
+    assert next_line(result) == "NEXT: run check.py"
+    assert site_css.read_bytes() == (kopi_dir2 / "tokens.css").read_bytes()

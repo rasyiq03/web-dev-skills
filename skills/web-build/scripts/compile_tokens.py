@@ -6,6 +6,7 @@
 #             Memeriksa kepatuhan kontras WCAG 2.x (>= 4.5:1).
 # ============================================================
 
+import shutil
 import sys
 import urllib.parse
 from pathlib import Path
@@ -36,6 +37,17 @@ def is_serif(font_name):
 # ============================================================
 # ========================= KOMPILASI ========================
 # ============================================================
+
+
+def size_name(n):
+    """
+    Menamai satu langkah skala ukuran, sama di tokens.json dan tokens.css.
+
+    I.S. : n adalah langkah skala, boleh negatif.
+    F.S. : 'step-<n>' atau 'step-neg-<n>' dikembalikan; tanpa tanda hubung ganda, karena
+           stylelint (custom-property-pattern) menolak --pd-size-step--1.
+    """
+    return f"step-neg-{abs(n)}" if n < 0 else f"step-{n}"
 
 
 def compile_tokens(slug):
@@ -175,7 +187,7 @@ def compile_tokens(slug):
         step_val = base_rem_val * (ratio_val ** n)
         val_str = f"{step_val:.3f}rem"
         # Sertakan format Utopia/DTCG
-        size_tokens[f"step-{n}"] = val_str
+        size_tokens[size_name(n)] = val_str
 
     # 6. Ruang, Radius, Border, Shadow, Motion
     space_tokens = {k: str(v) for k, v in base.get("space", {}).items()}
@@ -249,12 +261,7 @@ def compile_tokens(slug):
         "\t/* ============================================================ */",
     ]
     for n in range(-2, 6):
-        val_str = size_tokens[f"step-{n}"]
-        if n < 0:
-            css_name = f"step-neg-{abs(n)}"
-        else:
-            css_name = f"step-{n}"
-        css_lines.append(f"\t--pd-size-{css_name}: {val_str};")
+        css_lines.append(f"\t--pd-size-{size_name(n)}: {size_tokens[size_name(n)]};")
 
     css_lines += [
         "",
@@ -333,6 +340,13 @@ def compile_tokens(slug):
         f"  - fonts.html (Google Fonts: {disp_family}, {body_family}, {mono_family})",
         f"  - Kontras: ink/paper {ratio_ink_paper:.2f}:1, muted/paper {ratio_muted_paper:.2f}:1, accent-ink/accent {ratio_accent_ink:.2f}:1",
     ]
+
+    # Situs yang sudah ada langsung memakai token baru; scaffold ulang akan ditolak
+    site_dir = paths.site_dir(proj_dir)
+    if paths.has_site_content(site_dir) and (site_dir / "css").is_dir():
+        shutil.copyfile(proj_dir / "tokens.css", site_dir / "css" / "tokens.css")
+        lines.append("  - css/tokens.css di situs diperbarui")
+        return lines, "run check.py"
 
     return lines, "run scaffold.py"
 

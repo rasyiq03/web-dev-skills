@@ -118,10 +118,10 @@ def build_base_css(project_name, today_str):
         "\tcolor: var(--pd-color-ink);\n"
         "}\n\n"
         "a {\n"
-        "\tcolor: inherit;\n"
+        "\tcolor: var(--pd-color-link);\n"
         "}\n\n"
         ":focus-visible {\n"
-        "\toutline: var(--pd-border-width) solid var(--pd-color-accent);\n"
+        "\toutline: max(2px, var(--pd-border-width)) solid var(--pd-color-link);\n"
         "\toutline-offset: var(--pd-space-xs);\n"
         "}\n"
     )

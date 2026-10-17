@@ -64,7 +64,33 @@ def build_api_contract(endpoints_data, mock_dir):
     return "\n".join(lines) + "\n"
 
 
-def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
+def placeholder_lines(site_ph, unused, lang):
+    """
+    Menulis bagian placeholder HANDOFF.md dari isi situs yang sebenarnya.
+
+    I.S. : site_ph adalah hasil project.site_placeholders(); unused adalah {fakta: teks} dari
+           gaps.json yang tidak tampil di situs.
+    F.S. : Daftar baris markdown dikembalikan.
+    """
+    lines = []
+
+    if site_ph:
+        lines.append("Tampil di situs; ganti semuanya sebelum situs dipakai:" if lang == "id"
+                     else "Shown on the site; replace every one before the site goes live:")
+        lines += [f"- `{text}`: {', '.join(files)}" for text, files in site_ph.items()]
+    else:
+        lines.append("- Tidak ada placeholder di halaman situs." if lang == "id" else "- No placeholders on the site pages.")
+
+    if unused:
+        lines.append("")
+        lines.append("Fakta yang belum diketahui dan belum dipakai di halaman (isi bila ingin ditambahkan):" if lang == "id"
+                     else "Facts still unknown and not used on any page (fill in if you want them added):")
+        lines += [f"- `{fact}`: `{text}`" for fact, text in unused.items()]
+
+    return lines
+
+
+def build_handoff_md(brief, decisions, gaps, report_summary, placeholders):
     """
     Menyusun dokumen HANDOFF.md dalam bahasa pertama brief.
 
@@ -103,11 +129,7 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
             lines.append("- Seluruh data dan keputusan sesuai pernyataan eksplisit dari brief.")
         lines.append("")
         lines.append("## 3. Placeholder yang Perlu Diisi Klien")
-        if placeholders_map:
-            for fact, ph_text in placeholders_map.items():
-                lines.append(f"- `{fact}`: `{ph_text}`")
-        else:
-            lines.append("- Tidak ada placeholder; seluruh fakta terisi.")
+        lines += placeholder_lines(*placeholders, "id")
         lines.append("")
         lines.append("## 4. Hasil Uji Otomatis (Quality Gates)")
         lines.append(f"- Error: {report_summary.get('errors', 0)}")
@@ -145,11 +167,7 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
             lines.append("- All facts and decisions follow stated brief requirements.")
         lines.append("")
         lines.append("## 3. Placeholders to Fill")
-        if placeholders_map:
-            for fact, ph_text in placeholders_map.items():
-                lines.append(f"- `{fact}`: `{ph_text}`")
-        else:
-            lines.append("- No placeholders remaining.")
+        lines += placeholder_lines(*placeholders, "en")
         lines.append("")
         lines.append("## 4. Automated Check Scores")
         lines.append(f"- Errors: {report_summary.get('errors', 0)}")
@@ -291,7 +309,9 @@ def handoff(slug, no_provenance=False):
     io.write_text(proj_dir / "API_CONTRACT.md", api_contract_md)
 
     # 3. Tulis HANDOFF.md
-    handoff_md = build_handoff_md(brief, decisions, gaps, report_summary, gaps.get("placeholders", {}))
+    site_ph = project.site_placeholders(site_dir)
+    unused = {fact: text for fact, text in gaps.get("placeholders", {}).items() if text not in site_ph}
+    handoff_md = build_handoff_md(brief, decisions, gaps, report_summary, (site_ph, unused))
     handoff_md += signals_md(proj_dir, brief)
     io.write_text(proj_dir / "HANDOFF.md", handoff_md)
 

@@ -251,6 +251,9 @@ within ±3 percentage points.
 sans-serif;` exist; a custom palette with ink `#777777` on paper `#888888` exits 2.
 - Also emits `color.link`: the accent when its contrast on the paper is at least 4.5:1,
   otherwise the ink. Pages set link text in `--pd-color-link`, never in the accent.
+- Size steps are named `step-<n>` and `step-neg-<n>` in both `tokens.json` and `tokens.css`
+  (never `step--1`, which stylelint's custom-property-pattern rejects). When the site already
+  exists, `tokens.css` is copied into `css/` and NEXT is `run check.py`.
 
 ### 3.6 `scaffold.py <slug>` (v0.1)
 
@@ -391,6 +394,9 @@ round reports zero errors; the restore picks the best round.
 - Writes `provenance.json`: SHA-256 of every file in `site/`, SHA-256 of `decisions.yaml`,
   tool version, ISO timestamp. `--no-provenance` skips this file and removes the
   generator meta tag (for clients who do not want it).
+- Section 3 lists the placeholders found in the built pages (`project.site_placeholders()`),
+  each with the files it appears in, then the facts from `gaps.json` that are still unknown
+  but not used on any page. `EXPLAIN.html` shows the same split.
 
 ### 3.10 `tools/sync_adapters.py` (v0.1)
 

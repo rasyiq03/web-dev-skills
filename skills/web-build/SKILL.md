@@ -118,6 +118,9 @@ plugin support), it means the folder that contains `skills/`.
    - Work at 360 px first, then add wider layouts with `min-width` media queries.
    - A `risk` section gets a labelled placeholder of the real content's size, so the page
      does not collapse when the client fills it in.
+   - Use placeholder texts exactly as `context` prints them, so the handoff list matches the
+     page; a WhatsApp button is `href="https://wa.me/[[ISI: nomor WhatsApp]]"`. Write a new
+     placeholder only for something no listed fact covers.
 
 7. **Check and fix.** Run `run check <slug>`. It formats the code, runs the linters and the
    audit, and writes `<work>/report.json` with each finding and a suggested fix (file paths

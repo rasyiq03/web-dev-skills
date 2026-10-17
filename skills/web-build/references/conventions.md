@@ -29,7 +29,8 @@ page. Deleting `.ScaffolDev/` leaves this tree:
 ```
 
 HTML holds content, CSS holds all styling, JavaScript holds only behaviour HTML and CSS
-cannot do. Every page stays readable and navigable with JavaScript off. Load CSS in the
+cannot do. Header, main content, and footer share one container width, so the brand name,
+the page heading, and the footer text start on the same left edge at every screen size. Every page stays readable and navigable with JavaScript off. Load CSS in the
 order tokens, base, layout, components, pages.
 
 ## Whitespace and density

@@ -91,3 +91,11 @@ def test_scaffold_skeleton_passes_linters(kopi_scaffolded):
     ]
     res_h = subprocess.run(cmd_htmlval, cwd=site_dir, capture_output=True, text=True)
     assert res_h.returncode == 0, f"html-validate gagal:\n{res_h.stdout}\n{res_h.stderr}"
+
+
+def test_base_css_uses_readable_link_color(kopi_scaffolded):
+    base = (kopi_scaffolded.parent / "css" / "base.css").read_text(encoding="utf-8")
+
+    assert "color: var(--pd-color-link);" in base
+    assert "solid var(--pd-color-link);" in base
+    assert "var(--pd-color-accent)" not in base

@@ -64,6 +64,7 @@ TEXT = {
         "todo_note": "Fakta ini belum ada di brief, jadi situs memakai penanda [[ISI: …]]. Ganti dengan data asli sebelum situs dipakai.",
         "todo_none": "Tidak ada. Semua fakta sudah tersedia.",
         "used_in": "dipakai di",
+        "not_on_site": "belum dipakai di halaman; isi bila ingin ditambahkan",
         "quality": "Hasil pemeriksaan",
         "quality_none": "Situs belum diperiksa. Jalankan langkah 7 (check).",
         "errors": "error",
@@ -125,6 +126,7 @@ TEXT = {
         "todo_note": "These facts were not in the brief, so the site shows [[ISI: …]] markers. Replace them with real data before the site goes live.",
         "todo_none": "Nothing. Every fact is available.",
         "used_in": "used in",
+        "not_on_site": "not used on any page yet; fill in if you want it added",
         "quality": "Check results",
         "quality_none": "The site has not been checked yet. Run step 7 (check).",
         "errors": "errors",
@@ -696,25 +698,31 @@ def _graph_section(context_graph, text):
     )
 
 
-def _todo_section(context_graph, text):
+def _todo_section(proj_dir, context_graph, text):
     """
-    Menyusun daftar placeholder beserta seksi yang memakainya.
+    Menyusun daftar placeholder yang tampil di situs, dan fakta kosong yang belum dipakai.
 
-    I.S. : context_graph adalah hasil graph.build().
-    F.S. : HTML bagian isian yang masih kosong dikembalikan.
+    I.S. : context_graph adalah hasil graph.build(); situs boleh belum di-scaffold.
+    F.S. : HTML bagian isian yang masih kosong dikembalikan. Sebelum halaman diisi, daftar
+           berasal dari celah fakta di graf beserta seksi yang akan memakainya.
     """
+    site_ph = project.site_placeholders(paths.site_dir(proj_dir))
     nodes = graph.index(context_graph)
     placeholders = [n for n in context_graph["nodes"] if n["type"] == "placeholder"]
-
-    if not placeholders:
-        return f'<h2>{esc(text["todo"])}</h2><p>{esc(text["todo_none"])}</p>'
-
-    rows = []
+    rows = [f'<tr><td><code>{esc(t)}</code></td><td>{esc(text["used_in"])} {esc(", ".join(files))}</td></tr>'
+            for t, files in site_ph.items()]
 
     for ph in placeholders:
+        if site_ph and ph["label"] in site_ph:
+            continue
+
         used = [nodes[e["to"]] for e in context_graph["edges"] if e["from"] == ph["id"] and e["type"] == "fills"]
         where = ", ".join(f'{u["page"]}#{u["label"]}' for u in used) or "—"
-        rows.append(f'<tr><td><code>{esc(ph["label"])}</code></td><td>{esc(text["used_in"])} {esc(where)}</td></tr>')
+        label = text["not_on_site"] if site_ph else f'{text["used_in"]} {where}'
+        rows.append(f'<tr><td><code>{esc(ph["label"])}</code></td><td>{esc(label)}</td></tr>')
+
+    if not rows:
+        return f'<h2>{esc(text["todo"])}</h2><p>{esc(text["todo_none"])}</p>'
 
     return (
         f'<h2>{esc(text["todo"])}</h2><p class="note">{esc(text["todo_note"])}</p>'
@@ -836,7 +844,7 @@ def build_html(proj_dir):
         _council_section(context_graph, brief, text),
         _decisions_section(proj_dir, context_graph, text),
         _graph_section(context_graph, text),
-        _todo_section(context_graph, text),
+        _todo_section(proj_dir, context_graph, text),
         _quality_section(proj_dir, text),
         _signals_section(proj_dir, brief),
         _quiz_section(context_graph, text),

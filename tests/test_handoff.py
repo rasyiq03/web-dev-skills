@@ -81,3 +81,29 @@ def test_handoff_no_provenance(projects_dir):
     # Pastikan tag meta generator terhapus dari HTML
     index_html = io.read_text(proj.parent / "index.html")
     assert '<meta name="generator"' not in index_html
+
+
+def test_handoff_lists_placeholders_found_on_the_site(projects_dir):
+    work = copy_fixture(projects_dir, "kopi-senja", ["brief.yaml", "directions.yaml"])
+    for args in (("gaps",), ("pick_direction", "--pick", "dir-2"), ("compile_tokens",), ("scaffold",)):
+        assert run_script(args[0], "kopi-senja", *args[1:]).returncode == 0
+
+    index = work.parent / "index.html"
+    index.write_text(index.read_text(encoding="utf-8").replace(
+        "</main>", '<p>[[ISI: alamat]] <a href="https://wa.me/[[ISI: nomor WhatsApp]]">WA</a> [[ISI: harga kopi]]</p></main>'),
+        encoding="utf-8")
+
+    assert run_script("handoff", "kopi-senja").returncode == 0
+
+    text = (work / "HANDOFF.md").read_text(encoding="utf-8")
+    shown, unused = text.split("Fakta yang belum diketahui")
+
+    assert "- `[[ISI: harga kopi]]`: index.html" in shown
+    assert "- `[[ISI: nomor WhatsApp]]`: index.html" in shown
+    assert "`hours`: `[[ISI: jam buka]]`" in unused
+    assert "[[ISI: alamat]]" not in unused
+
+    from lib import explain
+    page = explain.build_html(work)
+    assert "[[ISI: harga kopi]]</code></td><td>dipakai di index.html" in page
+    assert "belum dipakai di halaman" in page
