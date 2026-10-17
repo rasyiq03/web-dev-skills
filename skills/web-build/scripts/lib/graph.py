@@ -523,6 +523,19 @@ def describe(node):
     return f"{text}: {node['why']}" if node.get("why") else text
 
 
+def _page_placeholders(graph, page):
+    """
+    Mencari placeholder yang mengisi seksi halaman ini.
+
+    I.S. : page adalah id halaman.
+    F.S. : Daftar simpul placeholder dikembalikan, urut seperti di graf.
+    """
+    prefix = f"section:{page}#"
+    used = {edge["from"] for edge in graph["edges"] if edge["type"] == "fills" and edge["to"].startswith(prefix)}
+
+    return [node for node in graph["nodes"] if node["id"] in used]
+
+
 def page_view(graph, page):
     """
     Mengambil bagian graf yang dibutuhkan untuk membangun satu halaman.
@@ -542,4 +555,5 @@ def page_view(graph, page):
         ],
         "style": style,
         "placeholders": [node for node in nodes if node["type"] == "placeholder"],
+        "page_placeholders": _page_placeholders(graph, page),
     }

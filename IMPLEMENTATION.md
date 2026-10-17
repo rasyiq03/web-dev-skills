@@ -285,6 +285,9 @@ sans-serif;` exist; a custom palette with ink `#777777` on paper `#888888` exits
 
 **Accept:** after scaffolding kopi-senja, `npx prettier --check`, `npx stylelint`, and
 `npx html-validate` all pass on the untouched skeleton.
+- Writes a stand-in icon `assets/img/favicon.svg` (first letter of the business name on the
+  accent, letter in accent-ink) and links it in every page's `<head>`; `handoff.py` asks for
+  the real logo while it exists.
 
 ### 3.7 `context.py <slug> <page>` (v0.1)
 
@@ -306,6 +309,9 @@ End with the approximate size (`characters / 4` tokens). Target: under 1,500 tok
 - Adds a `risk | <section> | <pattern> needs <paths> (unknown) | …` line for each section
   of the page whose pattern needs a fact or asset the brief lacks, telling the agent to
   build a labelled placeholder of the real content's size.
+- Placeholders come in two lines: `placeholders |` for the facts this page's sections use
+  (graph `fills` edges) and `placeholders-site |` for the rest, which header, footer, and
+  buttons may still need.
 
 ### 3.8 `check.py <slug>` (v0.1 core, v0.2 full)
 

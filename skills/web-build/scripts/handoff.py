@@ -64,12 +64,12 @@ def build_api_contract(endpoints_data, mock_dir):
     return "\n".join(lines) + "\n"
 
 
-def placeholder_lines(site_ph, unused, lang):
+def placeholder_lines(site_ph, unused, favicon, lang):
     """
     Menulis bagian placeholder HANDOFF.md dari isi situs yang sebenarnya.
 
     I.S. : site_ph adalah hasil project.site_placeholders(); unused adalah {fakta: teks} dari
-           gaps.json yang tidak tampil di situs.
+           gaps.json yang tidak tampil di situs; favicon True bila ikon sementara masih ada.
     F.S. : Daftar baris markdown dikembalikan.
     """
     lines = []
@@ -80,6 +80,11 @@ def placeholder_lines(site_ph, unused, lang):
         lines += [f"- `{text}`: {', '.join(files)}" for text, files in site_ph.items()]
     else:
         lines.append("- Tidak ada placeholder di halaman situs." if lang == "id" else "- No placeholders on the site pages.")
+
+    if favicon:
+        lines.append("")
+        lines.append("Ikon situs `assets/img/favicon.svg` masih sementara (huruf pertama nama); ganti dengan logo usaha." if lang == "id"
+                     else "The site icon `assets/img/favicon.svg` is a stand-in (the first letter of the name); replace it with the real logo.")
 
     if unused:
         lines.append("")
@@ -311,7 +316,8 @@ def handoff(slug, no_provenance=False):
     # 3. Tulis HANDOFF.md
     site_ph = project.site_placeholders(site_dir)
     unused = {fact: text for fact, text in gaps.get("placeholders", {}).items() if text not in site_ph}
-    handoff_md = build_handoff_md(brief, decisions, gaps, report_summary, (site_ph, unused))
+    favicon = (site_dir / "assets" / "img" / "favicon.svg").is_file()
+    handoff_md = build_handoff_md(brief, decisions, gaps, report_summary, (site_ph, unused, favicon))
     handoff_md += signals_md(proj_dir, brief)
     io.write_text(proj_dir / "HANDOFF.md", handoff_md)
 

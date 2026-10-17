@@ -99,3 +99,16 @@ def test_base_css_uses_readable_link_color(kopi_scaffolded):
     assert "color: var(--pd-color-link);" in base
     assert "solid var(--pd-color-link);" in base
     assert "var(--pd-color-accent)" not in base
+
+
+def test_scaffold_writes_a_stand_in_favicon(kopi_scaffolded):
+    site = kopi_scaffolded.parent
+    icon = (site / "assets" / "img" / "favicon.svg").read_text(encoding="utf-8")
+
+    assert '>K</text>' in icon
+    assert 'fill="#F26B3A"' in icon
+    assert '<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"' in (site / "index.html").read_text(encoding="utf-8")
+    assert 'href="../assets/img/favicon.svg"' in (site / "pages" / "kontak.html").read_text(encoding="utf-8")
+
+    assert run_script("handoff", "kopi-senja").returncode == 0
+    assert "`assets/img/favicon.svg` masih sementara" in (kopi_scaffolded / "HANDOFF.md").read_text(encoding="utf-8")

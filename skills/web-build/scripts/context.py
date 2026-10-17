@@ -73,8 +73,13 @@ def get_page_context(slug, page):
         lines.append(f"signature | {move}")
 
     # Placeholders
-    if view["placeholders"]:
-        lines.append(f"placeholders | {' '.join(n['label'] for n in view['placeholders'])}")
+    # Placeholder halaman ini dulu; sisanya untuk kepala, kaki, dan tombol (misalnya WhatsApp)
+    own = view["page_placeholders"]
+    rest = [n for n in view["placeholders"] if n not in own]
+    if own:
+        lines.append(f"placeholders | {' '.join(n['label'] for n in own)}")
+    if rest:
+        lines.append(f"placeholders-site | {' '.join(n['label'] for n in rest)} | for header, footer, and calls to action")
 
     # Konten file
     lines.append(f"content | {paths.WORK_DIR}/content/{project.first_language(brief)}.yaml#{page}")

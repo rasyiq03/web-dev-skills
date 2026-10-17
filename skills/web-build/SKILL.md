@@ -106,8 +106,9 @@ plugin support), it means the folder that contains `skills/`.
 6. **Build.** Read `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/conventions.md` once
    (for a dashboard also `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/dashboard.md`).
    Then, one page at a time, run `run context <slug> <page>`; it prints exactly what that
-   page needs (decisions, section patterns, token names, component recipes, placeholders,
-   and `risk` lines for sections whose facts are missing). Fill each section shell from
+   page needs (decisions, section patterns, token names, component recipes, this page's
+   placeholders and the rest of the site's, and `risk` lines for sections whose facts are
+   missing). Fill each section shell from
    `<work>/content/<lang>.yaml`, keeping its `class`, `id`, and `data-pd-pattern`. Write CSS
    and JS in the files the scaffold made, using only the variables in `css/tokens.css`.
    - Build `index` first and completely; the other pages reuse its header, footer, and

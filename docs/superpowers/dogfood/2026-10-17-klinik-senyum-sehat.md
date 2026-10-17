@@ -30,10 +30,15 @@ muda, pasien bisa booking lewat WhatsApp".
 | Agent wrote its own placeholder wording | handoff and page lists drift apart | step 6 rule: reuse the placeholder text `context` prints |
 | Header and footer ran to the screen edges, content was centred | edges did not line up on desktop | conventions rule: header, main, and footer share one container width |
 
+## Resolved afterwards
+
+- Favicon: the scaffold writes a stand-in `assets/img/favicon.svg` (the first letter of the
+  name on the accent color) and links it on every page, so no `/favicon.ico` 404; the
+  handoff asks the client to replace it with the real logo.
+- `context` now prints the page's own placeholders (`placeholders |`) apart from the rest of
+  the site (`placeholders-site |`, still needed for header, footer, and buttons).
+
 ## Still open
 
-- Browsers request `/favicon.ico`; the scaffold creates none, so every page load logs one
-  404 until the client adds an icon.
-- `context` lists every placeholder of the project on every page, not only the page's own.
 - The semantic accessibility review (subagent with `a11y-judge.md`) was done by the same
   agent here; an independent subagent would be stronger.

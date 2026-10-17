@@ -7,6 +7,7 @@
 # ============================================================
 
 import argparse
+import html
 import shutil
 import sys
 from pathlib import Path
@@ -128,6 +129,28 @@ def build_base_css(project_name, today_str):
     return header + "\n" + body
 
 
+FAVICON_FILE = "assets/img/favicon.svg"
+
+
+def build_favicon_svg(project_name, colors):
+    """
+    Menyusun ikon situs sementara: huruf pertama nama usaha di atas warna aksen.
+
+    I.S. : colors berisi accent dan accent-ink dari tokens.json (boleh kosong).
+    F.S. : Teks SVG dikembalikan; menghindari 404 favicon.ico sampai klien memberi logo.
+    """
+    letter = html.escape((project_name.strip()[:1] or "S").upper())
+    accent = colors.get("accent", "#1C1C1E")
+    ink = colors.get("accent-ink", "#FFFFFF")
+
+    return (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+        f'<rect width="64" height="64" rx="14" fill="{accent}"/>'
+        f'<text x="32" y="44" font-family="sans-serif" font-size="36" font-weight="700" '
+        f'text-anchor="middle" fill="{ink}">{letter}</text></svg>\n'
+    )
+
+
 def build_skeleton_html(page_id, site_type, chosen_layout, project_name, today_str, lang, fonts_links, has_data_sections, file_rel=None):
     """
     Menyusun kerangka file HTML untuk satu halaman sesuai konvensi.
@@ -163,7 +186,8 @@ def build_skeleton_html(page_id, site_type, chosen_layout, project_name, today_s
     for fl in fonts_links.strip().splitlines():
         lines.append(f"\t{fl}")
 
-    # CSS links in order: tokens, base, layout, components
+    # Ikon situs sementara, lalu CSS: tokens, base, layout, components
+    lines.append(f'\t<link rel="icon" href="{prefix}{FAVICON_FILE}" type="image/svg+xml">')
     lines.append(f'\t<link rel="stylesheet" href="{prefix}css/tokens.css">')
     lines.append(f'\t<link rel="stylesheet" href="{prefix}css/base.css">')
     lines.append(f'\t<link rel="stylesheet" href="{prefix}css/layout.css">')
@@ -275,8 +299,11 @@ def scaffold(slug, force=False):
     for d in dirs_to_create:
         d.mkdir(parents=True, exist_ok=True)
 
-    # 2. Salin tokens.css
+    # 2. Salin tokens.css, dan buat ikon situs sementara dari warna proyek
     shutil.copyfile(proj_dir / "tokens.css", site_dir / "css" / "tokens.css")
+    token_colors = io.read_json(proj_dir / "tokens.json").get("color", {}) if (proj_dir / "tokens.json").is_file() else {}
+    colors = {k: (v.get("$value") if isinstance(v, dict) else v) for k, v in token_colors.items()}
+    io.write_text(site_dir / FAVICON_FILE, build_favicon_svg(project_name, colors))
 
     # 3. Tulis css/base.css, css/layout.css, css/components.css
     base_css_content = build_base_css(project_name, today_str)

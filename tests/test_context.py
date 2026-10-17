@@ -44,3 +44,17 @@ def test_context_invalid_page_exits_1(projects_dir):
     result = run_script("context", "kopi-senja", "nonexistent")
     assert result.returncode == 1
     assert "tidak ditemukan" in result.stdout
+
+
+def test_context_separates_page_and_site_placeholders(projects_dir):
+    copy_fixture(projects_dir, "kopi-senja", ["brief.yaml", "directions.yaml"])
+    for args in (("gaps",), ("pick_direction", "--pick", "dir-2"), ("compile_tokens",)):
+        assert run_script(args[0], "kopi-senja", *args[1:]).returncode == 0
+
+    lines = {page: run_script("context", "kopi-senja", page).stdout.splitlines() for page in ("index", "kontak")}
+    own = {page: next(l for l in out if l.startswith("placeholders |")) for page, out in lines.items()}
+    site = {page: next(l for l in out if l.startswith("placeholders-site |")) for page, out in lines.items()}
+
+    assert "[[ISI: alamat]]" in own["kontak"] and "[[ISI: alamat]]" not in own["index"]
+    assert "[[ISI: nomor WhatsApp]]" in site["index"]
+    assert "[[ISI: daftar layanan atau menu]]" in own["index"]
