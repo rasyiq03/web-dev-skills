@@ -1,0 +1,52 @@
+id: soft-organic
+name: Soft Organic
+summary: Warm earthy colors, rounded shapes, friendly serif headings, and photos of real hands and products.
+suits: Home cooking and catering, bakeries, coffee roasters, crafts and batik makers, wellness and spa, family businesses, kids' classes, and local products sold through WhatsApp.
+formality: neutral
+avoid: Law, finance, government, and data-heavy dashboards.
+
+base:
+  type_scale: { base: 1.0625rem, ratio: 1.25 }
+  space: { xs: 0.25rem, sm: 0.5rem, md: 1rem, lg: 2rem, xl: 4rem, section: 6rem }
+  radius: { none: 0, sm: 0.875rem }
+  border: { width: 1px, strong: "1px solid var(--pd-color-muted)" }
+  shadow: { hard: "0 0.5rem 1.5rem -0.75rem var(--pd-color-muted)", hard-sm: "0 0.25rem 0.75rem -0.5rem var(--pd-color-muted)" }
+  motion: { fast: 150ms, base: 260ms, easing: "cubic-bezier(0.3, 0, 0.2, 1)" }
+
+palettes:
+  - id: kunyit
+    mood: Cream and turmeric-brown; warm kitchen, homemade, generous.
+    colors: { ink: "#2B1E12", paper: "#FBF5EA", accent: "#8F4410", muted: "#6A5847", accent-ink: "#FFFFFF" }
+  - id: daun-pisang
+    mood: Pale leaf and deep banana-leaf green; fresh, natural, wrapped by hand.
+    colors: { ink: "#1D291B", paper: "#F3F6EC", accent: "#3B6527", muted: "#55614E", accent-ink: "#FFFFFF" }
+  - id: gula-aren
+    mood: Rose-beige and palm-sugar red-brown; sweet, traditional, cosy.
+    colors: { ink: "#2A1A14", paper: "#F8EFE6", accent: "#763828", muted: "#655349", accent-ink: "#FFFFFF" }
+
+pairings:
+  - id: dm-serif-sans
+    display: DM Serif Display
+    body: DM Sans
+    mono: DM Mono
+  - id: nunito-rounded
+    display: Nunito
+    body: Nunito Sans
+    mono: Ubuntu Mono
+  - id: lora-work
+    display: Lora
+    body: Work Sans
+    mono: Fira Code
+
+components:
+  button: Pill shape (radius sm on both ends), accent fill, accent-ink text, soft shadow; on hover
+    the shadow grows a little and the button lifts 2px.
+  card: Paper background, rounded corners, soft shadow, photo on top filling the card width.
+  section: Gently alternating paper and a 6% tint of the accent; rounded section corners on wide screens only.
+  label: Small rounded tag with a muted border, body font, used for prices, sizes, and "pre-order".
+  image: Rounded corners, warm natural light, hands and products rather than stock people.
+
+signature_moves:
+  - Prices and order buttons always next to each other, so ordering takes one tap.
+  - One handwritten-feeling note per page set in the display font (a tip, a story line).
+  - Product photos on a consistent background, cropped square, never stretched.

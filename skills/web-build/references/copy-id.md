@@ -10,6 +10,9 @@ customer: concrete, warm, and short.
 - **Register follows the audience.** Students and young customers: "kamu", short sentences,
   everyday words. Professionals, government, health, finance: "Anda", full sentences, no slang.
   Keep one register on the whole site.
+- **Hero in three parts, two sentences at most**: what the business is, for whom (or where),
+  and the one action, usually "Chat via WhatsApp". Example: "Kopi susu gula aren untuk
+  mahasiswa di Dago. Pesan dulu, ambil tanpa antre."
 - **One idea per sentence; one or two sentences per paragraph** in hero and card text.
 - **Easy to understand.** Write for someone reading on a phone between other things:
   everyday words over formal ones ("pakai" or "gunakan", not "pergunakanlah"), no jargon,

@@ -2,6 +2,8 @@ id: editorial
 name: Editorial
 summary: Magazine-like serif display type, generous margins, rules and columns, quiet color.
 suits: Professional services, architects, consultants, writers, heritage brands, NGOs, and report-style dashboards.
+formality: neutral
+avoid: Discount shops, playful youth brands, and briefs that need loud, quick calls to action.
 
 base:
   type_scale: { base: 1.125rem, ratio: 1.414 }

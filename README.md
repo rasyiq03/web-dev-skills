@@ -2,7 +2,8 @@
 
 A Claude Code plugin that turns a short prompt into a finished website: company profile,
 landing page, portfolio, small-business catalog, or dashboard, in Indonesian, English, or
-both. Every design decision is recorded and every page is formatted, linted, and audited
+both. It ships five visual styles (Neobrutalism, Editorial, Clean Swiss, Soft
+Organic, Data Utility), each with three contrast-checked palettes and three font pairings. Every design decision is recorded and every page is formatted, linted, and audited
 before handoff.
 
 ## Requirements

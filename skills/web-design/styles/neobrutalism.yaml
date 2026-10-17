@@ -2,6 +2,8 @@ id: neobrutalism
 name: Neobrutalism
 summary: Thick ink borders, hard offset shadows, flat bold color blocks, blunt type.
 suits: Cafes, street food, creative studios, student and youth products, events, and playful internal dashboards.
+formality: casual
+avoid: Clinics, law, finance, government, and anything that must feel calm and formal.
 
 # Values shared by every palette and pairing of this style.
 base:

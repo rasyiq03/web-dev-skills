@@ -73,10 +73,3 @@ the time zone (WIB, WITA, WIT) whenever hours appear.
 - **Warm and friendly reads as trustworthy** for most small businesses; government,
   health, finance, and education lean formal ("Anda", fuller sentences, calmer colors).
   Let the brief's audience decide, as `copy-id.md` says for register.
-
-## In deep work mode
-
-The council works the Indonesian way: musyawarah untuk mufakat. Every role is heard once
-before anyone critiques. Objections are phrased as suggestions with a reason. The chair
-looks for the option all roles can accept before calling a vote. The Wakil klien also
-checks that each page would make sense to the business owner reading it on their phone.

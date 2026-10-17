@@ -5,6 +5,8 @@ id: your-style
 name: Your style
 summary: One sentence a model can use to decide whether this style fits a brief.
 suits: Kinds of business and audiences this style serves well.
+formality: casual | neutral | formal (how serious the style reads)
+avoid: Kinds of business this style should not be used for.
 
 base:
   type_scale: { base: 1rem, ratio: 1.25 }

@@ -55,6 +55,12 @@ def get_page_context(slug, page):
     for s in view["sections"]:
         lines.append(f"section | {s['label']} | pattern {s.get('pattern', '')} | layout: {s.get('layout', '')}")
 
+    # Seksi yang polanya butuh fakta atau aset yang belum ada
+    layout_map = {s["label"]: s.get("pattern") for s in view["sections"]}
+    site_type = project.load_site_type(brief.get("site_type"))
+    for sec_id, pattern, missing in project.layout_risks(brief, site_type, layout_map):
+        lines.append(f"risk | {sec_id} | {pattern} needs {', '.join(missing)} (unknown) | build that area as a labelled [[ISI: ...]] placeholder, same size as the real content")
+
     # Token-token penting
     if view["tokens"]:
         lines.append(f"tokens | {' '.join(n['label'] for n in view['tokens'])}")

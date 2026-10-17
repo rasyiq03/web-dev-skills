@@ -366,6 +366,10 @@ def change(slug, proj_dir, decisions, decision, args):
         f"Alasan: {args.reason} (oleh {args.by}, verifikasi: {args.verification}).",
         impact_summary(before, decision["id"]),
     ]
+    if axis == "layout":
+        for sec_id, pattern, missing in project.layout_risks(brief, site_type, patch["layout"]):
+            lines.append(f"  - peringatan: {sec_id}={pattern} butuh {', '.join(missing)} yang belum ada di brief")
+
     lines += [f"  - sudah: {item}" for item in done]
     lines += [f"  - masih perlu: {item}" for item in todo]
 

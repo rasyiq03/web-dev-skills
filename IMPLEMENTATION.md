@@ -43,7 +43,7 @@ audit/           anti-slop.yaml cliches-id.txt cliches-en.txt
 skills/
 	web-build/
 		SKILL.md
-		references/  conventions.md copy-id.md copy-en.md indonesia.md mode-guided.md mode-deep.md
+		references/  conventions.md dashboard.md copy-id.md copy-en.md indonesia.md mode-guided.md mode-deep.md
 		             a11y-judge.md council/ (one card per role)
 		schemas/     brief.schema.json directions.schema.json decisions.schema.json mock.schema.json
 		             deliberation.schema.json
@@ -54,7 +54,8 @@ skills/
 		             check.py handoff.py lib/ (graph.py explain.py trace.py guided.py council.py …)
 	web-design/
 		SKILL.md
-		styles/      index.yaml neobrutalism.yaml editorial.yaml _template.yaml
+		styles/      index.yaml neobrutalism.yaml editorial.yaml clean-swiss.yaml soft-organic.yaml
+		             data-utility.yaml _template.yaml
 		layouts/     patterns.yaml
 tools/           sync_adapters.py (v0.1) · eval/collect.py (signals CSV) · render_check.py,
                  build_cliches.py, eval/ model runs (v0.3)
@@ -219,6 +220,10 @@ Standard library only (`http.server`, `secrets`, `json`, `threading`).
 `examples/kopi-senja/decisions.yaml` exactly, except `seed`. The same `--seed` gives the
 same choice on every run. Over 1,000 seeds the choice frequencies match the probabilities
 within ±3 percentage points.
+- Warnings (exit 0) for the chosen direction: probabilities nearly flat (spread under 0.10),
+  and each section whose pattern lists `needs` (brief paths in `patterns.yaml`, such as
+  `assets.photos` or `facts.client_names`) that the brief leaves unknown, via
+  `project.layout_risks()`. `decide.py` gives the same warning for a new layout.
 
 ### 3.5 `compile_tokens.py <slug>` (v0.1)
 
@@ -244,6 +249,8 @@ within ±3 percentage points.
 
 **Accept:** for dir-2, `--pd-color-paper: #F4EBDD;`, `--pd-font-display: 'Archivo Black',
 sans-serif;` exist; a custom palette with ink `#777777` on paper `#888888` exits 2.
+- Also emits `color.link`: the accent when its contrast on the paper is at least 4.5:1,
+  otherwise the ink. Pages set link text in `--pd-color-link`, never in the accent.
 
 ### 3.6 `scaffold.py <slug>` (v0.1)
 
@@ -293,6 +300,9 @@ content | content/id.yaml#index
 ```
 
 End with the approximate size (`characters / 4` tokens). Target: under 1,500 tokens per page.
+- Adds a `risk | <section> | <pattern> needs <paths> (unknown) | …` line for each section
+  of the page whose pattern needs a fact or asset the brief lacks, telling the agent to
+  build a labelled placeholder of the real content's size.
 
 ### 3.8 `check.py <slug>` (v0.1 core, v0.2 full)
 

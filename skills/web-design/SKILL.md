@@ -25,18 +25,40 @@ If `${CLAUDE_PLUGIN_ROOT}` appears literally in this file, it means the folder t
    `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/indonesia.md` (phone-first, WhatsApp,
    trust signals, and local identity from the brief rather than ornament).
 
-## Rules
+## How to build the five directions
 
-- Exactly 5 directions. Each `probability` (0 to 1) estimates how often a typical designer
-  would produce that direction for this brief; the five sum to 1.
-- Directions differ on at least three axes: style, palette, type pairing, layout, motion,
-  tone.
-- A style or brand palette named in the brief stays in every direction; vary the rest.
+1. **Anchor on the brief.** Before choosing anything, name three anchors: *who* (the
+   audience sets formality and register), *where* (the place or community sets palette
+   mood and local detail), and *what* (the offer sets type and layout). Every direction
+   serves all three; they differ in how.
+2. **Filter styles by formality.** Health, law, finance, government, and education use only
+   `formal` or `neutral` styles; youth, food, events, and creative work may use any. Read
+   `fits` and `avoid` in the catalog and skip a style whose `avoid` names this business.
+3. **Spread the styles.** Use at least three different styles across the five when the
+   filter leaves three or more. A style or brand palette named in the brief is the exception:
+   keep it in every direction and vary the other axes.
+4. **Spread the probabilities.** The script samples by probability, so the spread decides
+   how often clients get the obvious site. Give the most fitting conventional direction
+   0.30–0.40, two credible variants 0.15–0.25 each, and one bold but defensible direction
+   0.05–0.12. Never make all five nearly equal.
+5. **Pick layouts the brief can fill.** Prefer patterns whose `needs` (in `patterns.yaml`)
+   are stated in the brief. Without stated photos, use a type-led hero (`full-bleed-type`,
+   `stacked-statement`); without client names or quotes, use `facts-ledger` for proof. A
+   direction that uses a pattern with unmet needs gets at most 0.15.
+6. **Match motion and register to the audience.** Motion `none` or `low` for formal sectors,
+   phone-first audiences, and dashboards; `medium` only when the brief asks for liveliness.
+   Register "Anda" for formal sectors and older audiences, "kamu" for students and youth.
+
+## Rules the script checks
+
+- Exactly 5 directions; the five probabilities sum to 1.
+- Any two directions differ on at least three axes: style, palette, type pairing, layout,
+  motion, tone.
 - Every rationale line names something specific to this brief (audience, place, product,
   or goal). A line that would fit any business needs rewriting.
 - `based_on` lists requirement ids exactly as `gaps.json` prints them.
 - The file must pass `${CLAUDE_PLUGIN_ROOT}/skills/web-build/schemas/directions.schema.json`;
-  `pick_direction` reports any mismatch.
+  `pick_direction` reports any mismatch and warns about patterns whose needs are missing.
 
 ## Shape of one direction
 

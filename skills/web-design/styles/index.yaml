@@ -1,9 +1,29 @@
-# One line per style. Read this first; open a style file only when you use it.
+# One line per style. Read this first and pick by formality and fit; open a style file only
+# when you use it. formality: casual | neutral | formal.
 styles:
   - id: neobrutalism
     file: neobrutalism.yaml
+    formality: casual
     summary: Thick ink borders, hard offset shadows, flat bold color blocks, blunt type.
+    fits: cafes, street food, creative studios, youth products, events, playful dashboards
   - id: editorial
     file: editorial.yaml
+    formality: neutral
     summary: Magazine-like serif display type, generous margins, rules and columns, quiet color.
+    fits: consultants, architects, writers, heritage brands, NGOs, report-style dashboards
+  - id: clean-swiss
+    file: clean-swiss.yaml
+    formality: formal
+    summary: Calm grid, generous white space, thin rules, one confident accent, no decoration.
+    fits: clinics, law and accounting, finance, government, schools and courses, B2B services
+  - id: soft-organic
+    file: soft-organic.yaml
+    formality: neutral
+    summary: Warm earthy colors, rounded shapes, friendly serif headings, real product photos.
+    fits: home cooking, bakeries, coffee roasters, crafts and batik, wellness, family businesses
+  - id: data-utility
+    file: data-utility.yaml
+    formality: neutral
+    summary: Dense neutral interface for numbers and tables; color only for meaning.
+    fits: dashboards, admin panels, internal tools, order and stock tracking
   # Add your own style by copying _template.yaml and listing it here.

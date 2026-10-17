@@ -407,6 +407,16 @@ def pick(slug, pick_id=None, seed_arg=None, source_override=None):
         f"File decisions.yaml berhasil dibuat dengan {len(decisions_data['decisions'])} keputusan dan {len(decisions_data['constraints'])} batasan.",
     ]
 
+    # Peluang yang hampir rata membuat undian tidak berarti dan situs antarklien mirip
+    probs = [d.get("probability", 0) for d in dirs]
+    if max(probs) - min(probs) < 0.10:
+        lines.append("  - Peringatan: kelima peluang hampir sama; beri arah yang paling wajar 0.30-0.40 dan satu arah berani 0.05-0.12.")
+
+    # Pola yang butuh fakta atau aset yang belum ada akan tampil sebagai blok placeholder
+    for section, pattern, missing in project.layout_risks(brief, site_type, chosen.get("layout", {})):
+        lines.append(f"  - Peringatan: {section}={pattern} butuh {', '.join(missing)} yang belum ada di brief; "
+                     "bangun sebagai placeholder berlabel, atau ganti pola dengan decide.")
+
     return lines, "run compile_tokens.py"
 
 

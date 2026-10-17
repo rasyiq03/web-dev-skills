@@ -122,12 +122,17 @@ def compile_tokens(slug):
         "warning": color.derive_state_color(80, paper),
     }
 
+    # Warna tautan: aksen bila terbaca sebagai teks di atas paper (4.5:1), selain itu ink.
+    # Aksen boleh lebih lembut untuk blok dan tombol bergaris, tetapi teks harus terbaca.
+    link = accent if color.contrast_ratio(accent, paper) >= 4.5 else ink
+
     all_colors = {
         "ink": ink,
         "paper": paper,
         "accent": accent,
         "muted": muted,
         "accent-ink": accent_ink,
+        "link": link,
         **chart_colors,
         **state_colors,
     }

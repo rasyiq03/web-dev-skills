@@ -103,17 +103,33 @@ plugin support), it means the folder that contains `skills/`.
      (see "Data and the mock API" in the conventions below).
    - A stated API source means `API_MODE = 'live'` with that API's paths.
 
-6. **Build.** Read `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/conventions.md` once.
+6. **Build.** Read `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/conventions.md` once
+   (for a dashboard also `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/dashboard.md`).
    Then, one page at a time, run `run context <slug> <page>`; it prints exactly what that
-   page needs (decisions, section patterns, token names, component recipes, placeholders).
-   Fill each section shell from `<work>/content/<lang>.yaml`, keeping its `class`, `id`, and
-   `data-pd-pattern`. Write CSS and JS in the files the scaffold made, using only the
-   variables in `css/tokens.css`.
+   page needs (decisions, section patterns, token names, component recipes, placeholders,
+   and `risk` lines for sections whose facts are missing). Fill each section shell from
+   `<work>/content/<lang>.yaml`, keeping its `class`, `id`, and `data-pd-pattern`. Write CSS
+   and JS in the files the scaffold made, using only the variables in `css/tokens.css`.
+   - Build `index` first and completely; the other pages reuse its header, footer, and
+     components instead of restyling them.
+   - Write the style's components once in `css/components.css` (button, card, label), then
+     compose sections from them. A second variant of the same thing is a modifier, not a
+     new class.
+   - Work at 360 px first, then add wider layouts with `min-width` media queries.
+   - A `risk` section gets a labelled placeholder of the real content's size, so the page
+     does not collapse when the client fills it in.
 
 7. **Check and fix.** Run `run check <slug>`. It formats the code, runs the linters and the
    audit, and writes `<work>/report.json` with each finding and a suggested fix (file paths
    are relative to `<project>`). Fix every `error`,
    then every `warning`, and run it again; the script counts rounds and says when to stop.
+   Fix in this order, because each kind can cause the next:
+   - `tool-failed` first: nothing else in the report is reliable until every tool ran.
+   - Contrast or token findings: change the decision with `run decide`, never override a
+     color in page CSS.
+   - Rules that repeat across files: fix the shared component or the cause once, not each
+     occurrence.
+   - Then HTML structure, then CSS and JS style, then the design and copy audit.
    If you can start a subagent, give it
    `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/a11y-judge.md` and the built HTML, and
    apply its findings as one extra round. Otherwise note "semantic review skipped".

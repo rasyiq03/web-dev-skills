@@ -296,6 +296,27 @@ def load_patterns():
     return {kind: {item["id"]: item for item in items} for kind, items in raw.items()}
 
 
+def layout_risks(brief, site_type, layout_map):
+    """
+    Mencari seksi yang polanya butuh fakta atau aset yang belum ada di brief.
+
+    I.S. : layout_map adalah {id seksi: id pola}; pola boleh punya needs (path brief).
+    F.S. : Daftar (seksi, pola, [path yang belum diketahui]) dikembalikan, urut seperti tipe situs.
+    """
+    patterns_all = load_patterns()
+    risks = []
+
+    for section in site_type.get("sections", []):
+        pattern_id = layout_map.get(section["id"])
+        entry = patterns_all.get(section.get("pattern_kind", ""), {}).get(pattern_id or "", {})
+        missing = [path for path in entry.get("needs", []) if is_unknown(brief, path)]
+
+        if missing:
+            risks.append((section["id"], pattern_id, missing))
+
+    return risks
+
+
 def find_by_id(items, item_id):
     """
     Mencari satu entri berdasarkan id di list dict.
