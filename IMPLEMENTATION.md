@@ -43,7 +43,7 @@ audit/           anti-slop.yaml cliches-id.txt cliches-en.txt
 skills/
 	web-build/
 		SKILL.md
-		references/  conventions.md copy-id.md copy-en.md a11y-judge.md
+		references/  conventions.md copy-id.md copy-en.md indonesia.md a11y-judge.md
 		schemas/     brief.schema.json directions.schema.json decisions.schema.json mock.schema.json
 		templates/   js/api/ config.js client.js endpoints.js mock-label.js
 		site-types/  company-profile.yaml dashboard.yaml landing.yaml portfolio.yaml umkm-catalog.yaml

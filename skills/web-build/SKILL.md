@@ -47,6 +47,10 @@ plugin support), it means the folder that contains `skills/`.
 - Use only facts the user gave. Every other fact (address, phone, prices, hours,
   testimonials, client logos, statistics) becomes a placeholder `[[ISI: <what>]]`.
 - `<project>` is the folder printed in step 1. Write every project file there.
+- When the brief's languages include `id` or the business is in Indonesia, read
+  `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/indonesia.md` once and follow it in
+  steps 3 to 6 and whenever you talk to the user.
+- Talk to the user in their language, in short, plain sentences.
 - Work without stopping to ask, unless the user asked for interactive mode (then set
   `interactive: true` in the brief) or a script exits with `3`.
 

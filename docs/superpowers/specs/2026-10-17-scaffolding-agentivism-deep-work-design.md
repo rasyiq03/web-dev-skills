@@ -1,6 +1,6 @@
 # Scaffolding, Agentivism, and Deep Work — architecture design
 
-Date: 2026-10-17 · Status: draft for review, nothing implemented yet
+Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide shipped, phases 1–6 not started
 
 ## Goal
 
@@ -30,6 +30,8 @@ and the deliberation never disagree about what the project is.
   council's minutes, and invents no facts: what the prompt does not say is still a
   `[[ISI: …]]` placeholder.
 - `SKILL.md` stays short. Mode instructions load only when that mode is active.
+- For Indonesian projects, the agents work, design, and write the Indonesian way (§7), and
+  everything a developer or client reads is in plain Indonesian.
 
 ## Theoretical basis
 
@@ -329,7 +331,38 @@ route to verification and reconstruction (Agentivism mechanisms 2 and 3).
 `brief.yaml` gets `mode: auto | guided | deep`. The existing `interactive: true` (browser
 questionnaire for missing facts) stays independent and works in every mode except `deep`.
 
-## 7. Keeping the skill light
+## 7. Indonesian culture and plain language
+
+The shared guide is `skills/web-build/references/indonesia.md` (already shipped, read in
+steps 3 to 6 whenever the brief includes `id` or the business is in Indonesia). This design
+builds on it in three places.
+
+**How the agents work.** Musyawarah untuk mufakat is the council's protocol (§5), and
+the same norms apply to the single agent in every mode:
+
+- *Santun tapi jujur*: polite, and still plain about every problem. No *asal bapak
+  senang*: a failed check or missing fact is never softened away.
+- *Usul, bukan vonis*: choices are offered as proposals with a reason; the developer's call
+  is final once they have the evidence (Agentivism P1).
+- *Gotong royong*: council roles build on each other's proposals instead of competing;
+  round 2 asks each role to improve one other proposal before objecting to it.
+- *Tepa selira*: objections are phrased as suggestions, but must still cite evidence.
+
+**What the designs reflect.** Phone-first and light pages for mid-range Android on mobile
+data, WhatsApp as the main call to action, landmark-based directions, trust signals that
+only appear when stated (NIB, P-IRT, BPOM, halal, QRIS), Indonesian formats (Rp25.000,
+08.00–21.00 WIB), and local identity taken from the brief rather than generic ornament.
+The council's Wakil klien checks these, and a future `check.py` rule can verify the
+measurable ones (a `wa.me` link in the hero, `lang="id"`, page weight).
+
+**Plain language everywhere a person reads.** Checkpoint questions, decision cards,
+`EXPLAIN.html`, `HANDOFF.md`, and council minutes use short sentences and everyday words.
+A technical term is explained the first time it appears ("token warna (nilai warna yang
+dipakai ulang di seluruh situs)"). The support levels have Indonesian names the developer
+sees (Demonstrasi, Terbimbing, Petunjuk, Mandiri), and the explanation page's labels are
+Indonesian when the brief is.
+
+## 8. Keeping the skill light
 
 - `SKILL.md` gains one short "Modes" section that names the three modes and says which
   reference file to read. The detail lives in `references/mode-guided.md`,
@@ -339,7 +372,7 @@ questionnaire for missing facts) stays independent and works in every mode excep
   exit codes, deterministic output.
 - `auto` mode costs one extra script call (`explain`) compared with today.
 
-## 8. Implementation phases
+## 9. Implementation phases
 
 Each phase ends with green tests and is usable on its own.
 
@@ -352,16 +385,17 @@ Each phase ends with green tests and is usable on its own.
 | 5 | Deep mode: role cards, `run council`, `deliberation.schema.json`, `references/mode-deep.md` | One-prompt build with zero errors and valid minutes; simulated-council fallback tested |
 | 6 | Measurement: Agentivism signals in `handoff`, and the eval harness compares auto, guided, and deep | Signals appear in `HANDOFF.md`; eval writes one CSV |
 
-## 9. Open decisions for review
+## 10. Decisions taken
 
-1. **Default mode**: keep `auto` as the default (recommended, no surprise for existing
-   users), or make `guided` the default for new developers?
-2. **Council size**: six roles as above (recommended), or a lighter three-role council
-   (Perancang, Penguji mutu, Wakil klien) to halve the cost?
-3. **Profile location**: per machine next to the cache (recommended), or per project only,
-   with no fading across projects?
-4. **Language of the explanation page**: the brief's first language (recommended,
-   consistent with `HANDOFF.md`), or always Indonesian?
+Accepted in conversation on 2026-10-17:
+
+| Topic | Decision |
+| --- | --- |
+| Default mode | `auto`, so existing users see no change; `guided` and `deep` on request |
+| Council | six roles as in §5 |
+| Profile | per machine, next to the dependency cache, so support fades across projects |
+| Explanation page language | the brief's first language, like `HANDOFF.md` |
+| Culture | agents, designs, and texts follow `references/indonesia.md` for Indonesian projects |
 
 ## References
 

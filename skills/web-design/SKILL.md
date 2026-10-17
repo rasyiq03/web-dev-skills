@@ -20,6 +20,9 @@ literally in this file, it means the folder that contains `skills/`.
    only this catalog first, then open the full file of each style you actually use.
 3. `${CLAUDE_PLUGIN_ROOT}/skills/web-design/layouts/patterns.yaml`: the layout patterns for
    each section kind.
+4. For a business in Indonesia or a brief with `id`:
+   `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/indonesia.md` (phone-first, WhatsApp,
+   trust signals, and local identity from the brief rather than ornament).
 
 ## Rules
 
