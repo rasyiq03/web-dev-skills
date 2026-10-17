@@ -1,6 +1,6 @@
 # ============================================================
 # File      : context.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Mencetak konteks terkompresi (linearized triples)
 #             yang dibutuhkan agen untuk membangun satu halaman.
 # ============================================================

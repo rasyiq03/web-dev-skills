@@ -1,5 +1,5 @@
 {
-	"name": "web-skills",
+	"name": "scaffoldev",
 	"private": true,
 	"type": "module",
 	"description": "Formatter and linters used by skills/web-build/scripts/check.py",

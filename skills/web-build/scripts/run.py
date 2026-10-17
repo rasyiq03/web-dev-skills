@@ -1,6 +1,6 @@
 # ============================================================
 # File      : run.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Satu pintu untuk semua skrip web-build. Memastikan paket Python
 #             dan alat Node tersedia (memasangnya sekali ke cache bila perlu),
 #             lalu menjalankan skrip yang diminta di proses yang sama.
@@ -96,7 +96,7 @@ def main():
     """
     if sys.version_info < MIN_PYTHON:
         fail(EXIT_INVALID,
-             f"Python {platform.python_version()} terlalu lama; web-skills butuh Python 3.11 atau lebih baru.",
+             f"Python {platform.python_version()} terlalu lama; ScaffolDev butuh Python 3.11 atau lebih baru.",
              "tell the user to install Python 3.11 or newer, then run the same command again")
 
     commands = ("path", *SCRIPTS)

@@ -1,6 +1,6 @@
 # ============================================================
 # File      : scaffold.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Membuat struktur direktori site/, menyalin token & konfigurasi,
 #             menyiapkan skeleton HTML per halaman, base.css, main.js,
 #             dan lapisan mock API.

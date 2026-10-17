@@ -2,7 +2,7 @@
 
 This repository turns a short prompt into a finished website, with every design
 decision recorded and every page checked before handoff. It is also the Claude Code
-plugin `web-skills`; `README.md` explains installing it.
+plugin ScaffolDev (`scaffoldev`); `README.md` explains installing it.
 
 - To build or redesign a site, follow `skills/web-build/SKILL.md`.
 - Projects live in `projects/<slug>/` while you work in this repository, in

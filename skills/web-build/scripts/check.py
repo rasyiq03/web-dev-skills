@@ -1,6 +1,6 @@
 # ============================================================
 # File      : check.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Format kode, jalankan linter & audit, evaluasi batasan desain,
 #             kelola snapshot ronde (rounds/<n>/), dan tulis report.json.
 # ============================================================

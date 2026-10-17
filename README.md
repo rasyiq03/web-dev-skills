@@ -1,4 +1,4 @@
-# web-skills
+# ScaffolDev
 
 A Claude Code plugin that turns a short prompt into a finished website: company profile,
 landing page, portfolio, small-business catalog, or dashboard, in Indonesian, English, or
@@ -18,8 +18,15 @@ In Claude Code:
 
 ```
 /plugin marketplace add rasyiq03/web-dev-skills
-/plugin install web-skills@web-dev-skills
+/plugin install scaffoldev@scaffoldev
 ```
+
+The skills appear as `scaffoldev:web-build` and `scaffoldev:web-design`.
+
+Installed it before the rename to ScaffolDev (as `web-skills@web-dev-skills`)? Remove the
+old one first with `/plugin uninstall web-skills@web-dev-skills` and
+`/plugin marketplace remove web-dev-skills`, then run the two commands above. The old
+dependency cache folder (`web-skills`) can be deleted.
 
 ## Use
 
@@ -46,8 +53,8 @@ first.
 The first build on a machine installs the Python packages and Node tools the checks need
 (about a minute, needs internet). They go to a cache that later builds reuse:
 
-- Windows: `%LOCALAPPDATA%\web-skills`
-- macOS and Linux: `~/.cache/web-skills`
+- Windows: `%LOCALAPPDATA%\scaffoldev`
+- macOS and Linux: `~/.cache/scaffoldev`
 
 Set `PD_CACHE_DIR` to use another folder. Uninstalling the plugin does not remove the
 cache; delete the folder by hand.
@@ -55,7 +62,7 @@ cache; delete the folder by hand.
 ## Update
 
 ```
-/plugin marketplace update web-dev-skills
+/plugin marketplace update scaffoldev
 ```
 
 ## Development
@@ -71,7 +78,7 @@ python -m pytest
 ```
 
 Load the working copy as the plugin, so edits apply without reinstalling: in Claude Code,
-`/plugin marketplace add <path to the clone>` and `/plugin install web-skills@web-dev-skills`.
+`/plugin marketplace add <path to the clone>` and `/plugin install scaffoldev@scaffoldev`.
 Sites built while Claude Code is open in the clone go to `projects/<slug>/`.
 `python -m pytest --network` also runs the slow tests that install dependencies from the
 internet. For Codex, `python tools/sync_adapters.py` links the skills into `.agents/skills/`.

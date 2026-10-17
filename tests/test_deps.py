@@ -55,7 +55,7 @@ def test_cache_root_windows_default(monkeypatch, tmp_path):
     monkeypatch.delenv("PD_CACHE_DIR", raising=False)
     monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
 
-    assert deps.cache_root() == tmp_path / "web-skills"
+    assert deps.cache_root() == tmp_path / "scaffoldev"
 
 
 @pytest.mark.skipif(os.name == "nt", reason="aturan POSIX")
@@ -63,7 +63,7 @@ def test_cache_root_posix_default(monkeypatch, tmp_path):
     monkeypatch.delenv("PD_CACHE_DIR", raising=False)
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path))
 
-    assert deps.cache_root() == tmp_path / "web-skills"
+    assert deps.cache_root() == tmp_path / "scaffoldev"
 
 
 def test_python_packages_already_importable_need_no_cache(tmp_path):

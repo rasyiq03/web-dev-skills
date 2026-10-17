@@ -100,7 +100,7 @@ client supplies real ones.
 {
   "_mock": true,
   "endpoint": "GET /metrics",
-  "generated_by": "pd-web-skills 0.1",
+  "generated_by": "scaffoldev 0.1",
   "data": [{ "date": "2026-09-01", "revenue": 1250000, "orders": 42 }]
 }
 ```

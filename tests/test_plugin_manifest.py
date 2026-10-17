@@ -57,8 +57,8 @@ def test_marketplace_installs_this_repository_as_the_plugin():
 
     entries = [entry for entry in market["plugins"] if entry["name"] == plugin["name"]]
 
-    assert market["name"] == "web-dev-skills"
-    assert plugin["name"] == "web-skills"
+    assert market["name"] == "scaffoldev"
+    assert plugin["name"] == "scaffoldev"
     assert len(entries) == 1
     assert entries[0]["source"] == "./"
 

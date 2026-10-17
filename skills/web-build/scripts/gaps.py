@@ -1,6 +1,6 @@
 # ============================================================
 # File      : gaps.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Mengumpulkan requirement, placeholder fakta yang belum ada,
 #             keputusan desain terbuka, dan pertanyaan ke gaps.json.
 # ============================================================

@@ -1,6 +1,6 @@
 # ============================================================
 # File      : audit_rules.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Pemeriksa aturan konvensi kode, batasan keputusan (TFS),
 #             dan audit integritas anti-slop serta data layer.
 # ============================================================

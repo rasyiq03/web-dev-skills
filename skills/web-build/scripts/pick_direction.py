@@ -1,6 +1,6 @@
 # ============================================================
 # File      : pick_direction.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Memvalidasi directions.yaml, memilih satu arah visual
 #             (via --pick atau sampling acak tertimbang), dan
 #             menghasilkan decisions.yaml dengan batasan uji.

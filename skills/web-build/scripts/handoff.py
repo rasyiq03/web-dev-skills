@@ -1,6 +1,6 @@
 # ============================================================
 # File      : handoff.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Menyusun HANDOFF.md, API_CONTRACT.md, dan provenance.json
 #             sebagai paket serah terima akhir untuk klien.
 # ============================================================

@@ -14,7 +14,7 @@ from pathlib import Path
 # ============================================================
 
 VERSION = "0.1"
-TOOL_NAME = "pd-web-skills"
+TOOL_NAME = "scaffoldev"
 GENERATOR = f"{TOOL_NAME} {VERSION}"
 
 SLUG_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
@@ -44,7 +44,7 @@ def find_repo_root(start):
         if (folder / "audit" / "anti-slop.yaml").is_file() and (folder / "config" / "eslint.config.js").is_file():
             return folder
 
-    raise RuntimeError(f"Akar web-skills (audit/ dan config/) tidak ditemukan di atas {start}")
+    raise RuntimeError(f"Akar ScaffolDev (audit/ dan config/) tidak ditemukan di atas {start}")
 
 
 REPO_ROOT = find_repo_root(Path(__file__).parent)

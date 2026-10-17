@@ -1,6 +1,6 @@
 # ============================================================
 # File      : compile_tokens.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Mengompilasi keputusan desain menjadi tokens.json (DTCG),
 #             tokens.css (variabel CSS), dan fonts.html (Google Fonts).
 #             Memeriksa kepatuhan kontras WCAG 2.x (>= 4.5:1).

@@ -227,7 +227,7 @@ sans-serif;` exist; a custom palette with ink `#777777` on paper `#888888` exits
   `layout.css`, `components.css`, `js/main.js`, each with its file header.
 - For every page of the site type writes a skeleton HTML: doctype, file header comment,
   `<html lang>` from the first brief language, meta charset and viewport,
-  `<meta name="generator" content="pd-web-skills <version>">`, the `fonts.html` links, CSS
+  `<meta name="generator" content="scaffoldev <version>">`, the `fonts.html` links, CSS
   links in order, `<header>`, `<main>`, `<footer>`, and for each section of that page:
   its three-line banner and
   `<section class="pd-section pd-section--<id>" id="<id>" data-pd-pattern="<pattern>"></section>`.

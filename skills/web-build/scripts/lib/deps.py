@@ -39,8 +39,8 @@ def cache_root():
     Menentukan folder cache dependensi milik pengguna.
 
     I.S. : PD_CACHE_DIR, LOCALAPPDATA, atau XDG_CACHE_HOME boleh diatur.
-    F.S. : Urutan: PD_CACHE_DIR; %LOCALAPPDATA%/web-skills di Windows;
-           $XDG_CACHE_HOME/web-skills; ~/.cache/web-skills. Path belum tentu ada.
+    F.S. : Urutan: PD_CACHE_DIR; %LOCALAPPDATA%/scaffoldev di Windows;
+           $XDG_CACHE_HOME/scaffoldev; ~/.cache/scaffoldev. Path belum tentu ada.
     """
     override = os.environ.get("PD_CACHE_DIR")
 
@@ -50,12 +50,12 @@ def cache_root():
     local_app_data = os.environ.get("LOCALAPPDATA")
 
     if os.name == "nt" and local_app_data:
-        return Path(local_app_data) / "web-skills"
+        return Path(local_app_data) / "scaffoldev"
 
     xdg = os.environ.get("XDG_CACHE_HOME")
     base = Path(xdg) if xdg else Path.home() / ".cache"
 
-    return base / "web-skills"
+    return base / "scaffoldev"
 
 
 def file_hash(path):

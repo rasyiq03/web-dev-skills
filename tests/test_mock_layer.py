@@ -36,7 +36,7 @@ def test_mock_layer_behavior_in_node(projects_dir):
         {
             "_mock": True,
             "endpoint": "GET /metrics",
-            "generated_by": "pd-web-skills 0.1",
+            "generated_by": "scaffoldev 0.1",
             "data": [{"val": 100}],
         },
     )

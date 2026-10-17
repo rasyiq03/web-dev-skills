@@ -214,7 +214,7 @@ export const ENDPOINTS = {
         {
             "_mock": True,
             "endpoint": "GET /metrics",
-            "generated_by": "pd-web-skills 0.1",
+            "generated_by": "scaffoldev 0.1",
             "data": [
                 {"date": "2026-10-01", "users": 1200, "revenue": 50000000},
                 {"date": "2026-10-02", "users": 1250, "revenue": 52000000},

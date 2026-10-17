@@ -1,6 +1,6 @@
 # ============================================================
 # File      : serve.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Server HTTP interaktif untuk kuesioner brief.
 #             Menggunakan standard library saja dengan token acak
 #             dan perlindungan Host header.

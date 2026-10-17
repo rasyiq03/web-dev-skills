@@ -51,7 +51,7 @@ def test_handoff_acceptance(projects_dir):
     prov_file = proj / "provenance.json"
     assert prov_file.is_file()
     prov_data = io.read_json(prov_file)
-    assert prov_data["tool"] == "pd-web-skills"
+    assert prov_data["tool"] == "scaffoldev"
     assert prov_data["version"] == "0.1"
 
     site_dir = proj / "site"

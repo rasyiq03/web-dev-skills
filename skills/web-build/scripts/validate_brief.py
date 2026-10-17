@@ -1,6 +1,6 @@
 # ============================================================
 # File      : validate_brief.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Memvalidasi brief.yaml terhadap skema, kecocokan slug,
 #             dan ketersediaan field wajib dari tipe situs.
 # ============================================================
