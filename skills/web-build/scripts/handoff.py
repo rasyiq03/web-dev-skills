@@ -14,7 +14,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import io, paths, project, report
+from lib import graph, io, paths, project, report
 from lib.report import EXIT_INVALID, fail
 
 
@@ -247,6 +247,7 @@ def handoff(slug, no_provenance=False):
         io.write_json(prov_file, prov_data)
 
     io.save_state(proj_dir, step="handoff")
+    graph.refresh(proj_dir)
 
     lines = [
         f"Serah terima selesai untuk proyek '{slug}':",

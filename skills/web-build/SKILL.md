@@ -102,6 +102,15 @@ plugin support), it means the folder that contains `skills/`.
 8. **Handoff.** Run `run handoff <slug>` and show its summary to the user exactly as
    printed: assumptions taken, placeholders to fill, and check scores.
 
+## Explaining a decision
+
+Every script keeps `<project>/graph.json` up to date: requirements, decisions, tokens,
+sections, files, checks, and findings, with how they connect. When the user asks why
+something looks the way it does, run `run graph <slug> --why <node>`; before changing a
+decision, run `run graph <slug> --impact <node>` and tell the user what it will touch.
+Node ids look like `d-palette-1`, `req-audience`, `color.accent`, or `section:index#hero`.
+Retell the answer in plain words; do not paste the raw output.
+
 ## Restyling an existing project
 
 Keep the slug and brief, then repeat steps 3, 4, and 6 to 8. `run scaffold <slug> --force`

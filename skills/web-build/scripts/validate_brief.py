@@ -11,7 +11,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import io, project, report
+from lib import graph, io, project, report
 from lib.report import EXIT_ASK, EXIT_INVALID, fail
 
 
@@ -79,6 +79,7 @@ def validate(slug):
     # Sukses
     reqs = project.requirements(brief)
     io.save_state(proj_dir, step="brief", slug=slug)
+    graph.refresh(proj_dir)
 
     summary_lines = [
         f"Brief sah untuk proyek '{slug}' (tipe: {site_type_id}, bahasa: {', '.join(brief.get('languages', []))}).",

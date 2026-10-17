@@ -13,7 +13,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import color, io, paths, project, report
+from lib import color, graph, io, paths, project, report
 from lib.report import EXIT_CHECK_FAILED, EXIT_INVALID, fail
 
 SERIF_FONTS = {
@@ -318,6 +318,7 @@ def compile_tokens(slug):
     io.write_text(proj_dir / "fonts.html", fonts_html_content)
 
     io.save_state(proj_dir, step="tokens")
+    graph.refresh(proj_dir)
 
     lines = [
         f"Kompilasi token berhasil untuk '{slug}':",

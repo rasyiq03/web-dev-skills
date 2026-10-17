@@ -31,6 +31,7 @@ SCRIPTS = (
     "compile_tokens",
     "scaffold",
     "context",
+    "graph",
     "check",
     "handoff",
 )

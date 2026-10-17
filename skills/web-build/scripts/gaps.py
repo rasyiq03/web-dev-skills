@@ -11,7 +11,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import io, labels, project, report
+from lib import graph, io, labels, project, report
 from lib.report import EXIT_INVALID, fail
 
 
@@ -82,6 +82,7 @@ def build_gaps(slug):
     gaps_file = proj_dir / "gaps.json"
     io.write_json(gaps_file, gaps_data)
     io.save_state(proj_dir, step="gaps")
+    graph.refresh(proj_dir)
 
     lines = [
         f"gaps.json selesai untuk '{slug}':",

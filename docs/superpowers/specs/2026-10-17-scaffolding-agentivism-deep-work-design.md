@@ -1,6 +1,6 @@
 # Scaffolding, Agentivism, and Deep Work — architecture design
 
-Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide shipped, phases 1–6 not started
+Date: 2026-10-17 · Status: open decisions accepted (§9); culture guide and phase 1 (context graph) shipped
 
 ## Goal
 
@@ -138,16 +138,20 @@ One file, `<project>/graph.json`, built and updated by scripts. Nodes:
 | Type | Id example | Comes from |
 | --- | --- | --- |
 | `requirement` | `req-audience` | `brief.yaml` |
-| `placeholder` | `ph-alamat` | `gaps.json` |
+| `placeholder` | `ph:address` | `gaps.json` |
 | `decision` | `d-palette-1` | `decisions.yaml`, `decide`, council |
-| `token` | `color.accent` | `tokens.json` |
-| `section` | `index#hero` | site type + scaffold |
-| `file` | `css/components.css` | scaffold |
-| `check` | `c-contrast-body` | `decisions.yaml` constraints |
-| `finding` | `f-12` | `report.json` |
-| `deliberation` | `m-direction` | council minutes |
+| `token` | `token:color.accent` | `tokens.json` |
+| `section` | `section:index#hero` | site type + scaffold |
+| `file` | `file:css/components.css` | scaffold |
+| `check` | `check:c-contrast-body` | `decisions.yaml` constraints |
+| `finding` | `finding:12` | `report.json` |
+| `deliberation` | `minutes:direction` (phase 5) | council minutes |
 
-Edges: `based_on` (decision → requirement), `realized_by` (decision → token, section),
+Also `page` (`page:index`) and `style` (`style:neobrutalism`, carrying the style's
+components and signature moves for `context`).
+
+Edges: `based_on` (decision → requirement), `realized_by` (decision → token, section,
+style), `about` (check → token it inspects), `contains` (page → section),
 `located_in` (token, section → file), `verified_by` (decision → check), `violates`
 (finding → check), `decided_in` (decision → deliberation), `fills` (placeholder → section).
 

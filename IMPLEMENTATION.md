@@ -48,7 +48,7 @@ skills/
 		templates/   js/api/ config.js client.js endpoints.js mock-label.js
 		site-types/  company-profile.yaml dashboard.yaml landing.yaml portfolio.yaml umkm-catalog.yaml
 		scripts/     run.py validate_brief.py gaps.py serve.py pick_direction.py compile_tokens.py
-		             scaffold.py context.py check.py handoff.py lib/ (deps.py node_tools.py …)
+		             scaffold.py context.py graph.py check.py handoff.py lib/ (deps.py graph.py …)
 	web-design/
 		SKILL.md
 		styles/      index.yaml neobrutalism.yaml editorial.yaml _template.yaml
@@ -83,6 +83,7 @@ The project folder is `$PD_PROJECTS_DIR/<slug>/` when that variable is set,
 | `report.json`, `rounds/<n>/` | `check.py` | Findings and per-round snapshots |
 | `provenance.json`, `HANDOFF.md` | `handoff.py` | File hashes and the summary for the client |
 | `state.yaml` | every script | Current step, round counters, seed, config hashes |
+| `graph.json` | every script, through `lib/graph.py` | Context graph of the files above; see §3.13 |
 
 ### Requirement ids
 
@@ -390,6 +391,28 @@ round reports zero errors; the restore picks the best round.
 - Writes each constraint as a SHACL shape; validates with pySHACL against facts extracted
   from the built site; compares the result with `check.py`'s `tfs_auto`.
 - Condition C3 of the evaluation: same information as C2, delivered through the ontology.
+
+### 3.13 `graph.py <slug> [--impact NODE | --why NODE]`
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §2.
+
+- `lib/graph.py` builds the context graph from `brief.yaml`, `gaps.json`, `decisions.yaml`,
+  `tokens.json`, `site/`, and `report.json`, whichever exist, and writes `graph.json`.
+  Every pipeline script calls `graph.refresh()` right after `io.save_state()`;
+  `context.py` refreshes it and reads the page subgraph, with output unchanged.
+- Nodes: `requirement` (`req-…`), `placeholder` (`ph:<fact>`), `page` (`page:<id>`),
+  `section` (`section:<page>#<id>`), `token` (`token:<group>.<name>`), `style`, `decision`
+  (`d-…`), `check` (`check:<id>`), `file` (`file:<path in site/>`), `finding`
+  (`finding:<n>`). Each has `owner` (`developer`, `ai`, `script`) and, where known, `why`.
+- Edges: `based_on`, `realized_by`, `verified_by`, `about` (check → token), `located_in`,
+  `contains` (page → section), `fills` (placeholder → section), `violates`
+  (finding → check, from rules named `constraint-<id>`).
+- Nodes and edges keep the order of their source files; no timestamps, so the file is
+  byte-identical for the same inputs.
+- `--impact` lists what is affected downstream; `--why` lists the chain upstream. Both
+  print one line per step in plain Indonesian, with the relation read in the right
+  direction (`d-palette-1 berdasar pada -> req-audience`,
+  `req-audience menjadi dasar untuk -> d-palette-1`). An unknown node exits with code 1.
 
 ## 4. Milestones and gates
 

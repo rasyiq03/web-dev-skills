@@ -16,7 +16,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import io, paths, project, report
+from lib import graph, io, paths, project, report
 from lib.report import EXIT_INVALID, fail
 
 
@@ -389,6 +389,7 @@ def pick(slug, pick_id=None, seed_arg=None):
     yaml_content = format_decisions_yaml(decisions_data)
     io.write_text(proj_dir / "decisions.yaml", yaml_content)
     io.save_state(proj_dir, step="direction", seed=seed, direction=chosen["id"])
+    graph.refresh(proj_dir)
 
     lines = [
         f"Arah visual terpilih: {chosen['id']} ({chosen.get('summary', '')})",
