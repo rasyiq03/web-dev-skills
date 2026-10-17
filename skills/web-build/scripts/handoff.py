@@ -64,6 +64,44 @@ def build_api_contract(endpoints_data, mock_dir):
     return "\n".join(lines) + "\n"
 
 
+A11Y_FILE = "a11y-review.json"
+
+
+def a11y_line(proj_dir, lang):
+    """
+    Meringkas tinjauan aksesibilitas semantik dari a11y-review.json, apa adanya.
+
+    I.S. : <work>/a11y-review.json boleh belum ada; isinya {"reviewer": "subagent" | "self",
+           "pages": [ {page, findings}, ... ]} sesuai references/a11y-judge.md.
+    F.S. : Satu kalimat dikembalikan: siapa meninjau, berapa temuan, halaman mana yang
+           belum ditinjau; "dilewati" bila file tidak ada atau tidak terbaca.
+    """
+    path = proj_dir / A11Y_FILE
+    pages = [p.relative_to(paths.site_dir(proj_dir)).as_posix() for p in paths.site_files(paths.site_dir(proj_dir), "*.html")]
+
+    try:
+        data = io.read_json(path) if path.is_file() else None
+        reviewed = {entry["page"]: entry.get("findings", []) for entry in data["pages"]} if data else None
+    except (KeyError, TypeError, ValueError):
+        reviewed = None
+
+    if reviewed is None:
+        return "dilewati (tidak ada a11y-review.json)" if lang == "id" else "skipped (no a11y-review.json)"
+
+    count = sum(len(f) for f in reviewed.values())
+    missing = [p for p in pages if p not in reviewed]
+    independent = data.get("reviewer") == "subagent"
+
+    if lang == "id":
+        who = "subagent independen" if independent else "agen yang sama (kurang independen)"
+        text = f"dilakukan oleh {who}: {count} temuan di {len(pages) - len(missing)} dari {len(pages)} halaman"
+        return text + (f"; belum ditinjau: {', '.join(missing)}" if missing else "")
+
+    who = "an independent subagent" if independent else "the same agent (less independent)"
+    text = f"done by {who}: {count} findings on {len(pages) - len(missing)} of {len(pages)} pages"
+    return text + (f"; not reviewed: {', '.join(missing)}" if missing else "")
+
+
 def placeholder_lines(site_ph, unused, favicon, lang):
     """
     Menulis bagian placeholder HANDOFF.md dari isi situs yang sebenarnya.
@@ -95,7 +133,7 @@ def placeholder_lines(site_ph, unused, favicon, lang):
     return lines
 
 
-def build_handoff_md(brief, decisions, gaps, report_summary, placeholders):
+def build_handoff_md(brief, decisions, gaps, report_summary, placeholders, a11y):
     """
     Menyusun dokumen HANDOFF.md dalam bahasa pertama brief.
 
@@ -141,7 +179,7 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders):
         lines.append(f"- Warning: {report_summary.get('warnings', 0)}")
         lines.append(f"- Kepatuhan Batasan (TFS Auto): {report_summary.get('tfs_auto', 1.0) * 100:.0f}%")
         lines.append(f"- Skor Tanda Tangan Konvensi: {report_summary.get('signature', 1.0) * 100:.0f}%")
-        lines.append("- Review semantik aksesibilitas: semantic review skipped")
+        lines.append(f"- Review semantik aksesibilitas: {a11y}")
         lines.append("")
         lines.append("## 5. Cara Pratinjau (Preview)")
         lines.append("Karena situs menggunakan ES Modules (`import`/`export`) dan `fetch()` lokal, halaman tidak dapat dibuka langsung sebagai `file://`.")
@@ -179,7 +217,7 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders):
         lines.append(f"- Warnings: {report_summary.get('warnings', 0)}")
         lines.append(f"- TFS Auto Score: {report_summary.get('tfs_auto', 1.0) * 100:.0f}%")
         lines.append(f"- Signature Score: {report_summary.get('signature', 1.0) * 100:.0f}%")
-        lines.append("- Accessibility Review: semantic review skipped")
+        lines.append(f"- Accessibility Review: {a11y}")
         lines.append("")
         lines.append("## 5. Preview Instructions")
         lines.append("Because the site relies on ES Modules and local fetch, previewing as a raw `file://` URL is blocked by browser CORS.")
@@ -317,7 +355,8 @@ def handoff(slug, no_provenance=False):
     site_ph = project.site_placeholders(site_dir)
     unused = {fact: text for fact, text in gaps.get("placeholders", {}).items() if text not in site_ph}
     favicon = (site_dir / "assets" / "img" / "favicon.svg").is_file()
-    handoff_md = build_handoff_md(brief, decisions, gaps, report_summary, (site_ph, unused, favicon))
+    a11y = a11y_line(proj_dir, "id" if project.first_language(brief) == "id" else "en")
+    handoff_md = build_handoff_md(brief, decisions, gaps, report_summary, (site_ph, unused, favicon), a11y)
     handoff_md += signals_md(proj_dir, brief)
     io.write_text(proj_dir / "HANDOFF.md", handoff_md)
 

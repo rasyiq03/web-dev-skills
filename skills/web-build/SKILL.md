@@ -135,8 +135,10 @@ plugin support), it means the folder that contains `skills/`.
      occurrence.
    - Then HTML structure, then CSS and JS style, then the design and copy audit.
    If you can start a subagent, give it
-   `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/a11y-judge.md` and the built HTML, and
-   apply its findings as one extra round. Otherwise note "semantic review skipped".
+   `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/a11y-judge.md` and the built pages, and
+   apply its findings as one extra round. Save its answer as `<work>/a11y-review.json`:
+   `{"reviewer": "subagent", "pages": [<its objects>]}` (`"self"` if you reviewed without a
+   subagent). Without that file the handoff reports the review as skipped.
 
 8. **Handoff.** Run `run handoff <slug>` and show its summary to the user exactly as
    printed: assumptions taken, placeholders to fill, and check scores. It also writes

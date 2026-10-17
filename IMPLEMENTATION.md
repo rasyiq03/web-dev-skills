@@ -391,7 +391,9 @@ round reports zero errors; the restore picks the best round.
 - Writes `HANDOFF.md` in the brief's first language and prints it: the chosen direction
   and why; assumptions (inferred requirements and sampled decisions); every placeholder
   with its page; every mock endpoint (data the client or a backend must replace); check
-  summary (errors, warnings, `tfs_auto`, signature score, semantic review done or skipped);
+  summary (errors, warnings, `tfs_auto`, signature score, and the semantic review read from `<work>/a11y-review.json`: who
+  reviewed (independent subagent or the same agent), findings, and pages not reviewed;
+  "skipped" when the file is missing);
   where the files are; how to preview: `python -m http.server` inside `site/`, because
   ES modules and `fetch()` do not work when a page is opened as `file://`.
 - Writes `API_CONTRACT.md` from `endpoints.js` and the mock files: one section per

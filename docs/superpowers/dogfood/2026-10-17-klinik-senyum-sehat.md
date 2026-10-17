@@ -38,7 +38,13 @@ muda, pasien bisa booking lewat WhatsApp".
 - `context` now prints the page's own placeholders (`placeholders |`) apart from the rest of
   the site (`placeholders-site |`, still needed for header, footer, and buttons).
 
+- Semantic accessibility review: rerun by an independent subagent with `a11y-judge.md`;
+  0 findings on 3 of 3 pages (`index.html`, `pages/tentang.html`, `pages/kontak.html`),
+  which a manual check confirms (no images, headings in order, labelled nav, no forms).
+  The handoff used to print "semantic review skipped" whatever happened; it now reads
+  `.ScaffolDev/a11y-review.json` and says who reviewed, how many findings, and which pages
+  were not reviewed.
+
 ## Still open
 
-- The semantic accessibility review (subagent with `a11y-judge.md`) was done by the same
-  agent here; an independent subagent would be stronger.
+- Nothing from this build.
