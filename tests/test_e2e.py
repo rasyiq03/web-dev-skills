@@ -80,7 +80,7 @@ def test_kopi_senja_end_to_end(projects_dir):
     io.write_text(content_dir / "id.yaml", content_yaml)
 
     # 8. Isi konten minimal ke section index.html (menjaga class, id, dan data-pd-pattern)
-    site_dir = proj / "site"
+    site_dir = proj.parent
     index_file = site_dir / "index.html"
     index_html = io.read_text(index_file)
 

@@ -36,7 +36,7 @@ def test_bilingual_scaffolding_and_parity(projects_dir):
     res_scaf = run_script("scaffold", "kopi-senja")
     assert res_scaf.returncode == 0, res_scaf.stderr
 
-    site_dir = proj / "site"
+    site_dir = proj.parent
     assert (site_dir / "index.html").is_file()
     assert (site_dir / "pages" / "tentang.html").is_file()
     assert (site_dir / "en" / "index.html").is_file()

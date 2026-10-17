@@ -62,7 +62,8 @@ def project_path(args):
 
     folder = paths.project_dir(args[0]).resolve()
 
-    return [f"PROJECT: {folder}"], "write the project files in that folder"
+    return [f"PROJECT: {folder}", f"WORK: {folder / paths.WORK_DIR}"], \
+        "write brief.yaml and every other ScaffolDev file in WORK; the site goes in PROJECT"
 
 
 def prepare_dependencies():

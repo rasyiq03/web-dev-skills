@@ -72,7 +72,26 @@ two drift apart. `sync_adapters.py` warns when it finds one.
 
 The project folder is `$PD_PROJECTS_DIR/<slug>/` when that variable is set,
 `projects/<slug>/` when the scripts run from the repository root, and otherwise
-`<current folder>/<slug>/`. `run.py path <slug>` prints it.
+`<current folder>/<slug>/`. `run.py path <slug>` prints it (`PROJECT:`) and its work folder
+(`WORK:`).
+
+**Layout.** The project folder holds only the website, laid out as in `conventions.md`
+(`index.html`, `pages/`, `css/`, `js/`, `data/`, `assets/`). Every other file below lives in
+the work folder `<slug>/.ScaffolDev/`, so deleting it leaves a clean site, and no site file
+refers to it. In this document "`site/`" means those site files in the project folder.
+
+- `paths.WORK_DIR` is `.ScaffolDev`; `project.open_project()` returns the work folder, and
+  `paths.site_dir(work)` is its parent. `paths.site_files()` walks the site and skips
+  `.ScaffolDev/` and `.git/` (`paths.SITE_IGNORED_DIRS`); linters get explicit file lists
+  from it, run from the project folder, and read their config from the work folder.
+  Finding paths are relative to the project folder (`index.html`, `css/base.css`).
+- `scaffold.py --force` deletes only site entries, never `.ScaffolDev/` or `.git/`; check
+  snapshots (`rounds/<n>/site/`) and provenance hashes skip both.
+- A project in the old layout (`brief.yaml` at the root, site in `site/`) is moved once by
+  `project.migrate_legacy()` the first time any script opens it: work files into
+  `.ScaffolDev/`, the contents of `site/` up to the project folder.
+
+Files in the work folder:
 
 | File | Written by | Purpose |
 | --- | --- | --- |
@@ -82,10 +101,9 @@ The project folder is `$PD_PROJECTS_DIR/<slug>/` when that variable is set,
 | `decisions.yaml` | `pick_direction.py` | Chosen decisions and constraints; schema `decisions.schema.json` |
 | `tokens.json`, `tokens.css`, `fonts.html` | `compile_tokens.py` | DTCG tokens, CSS variables, Google Fonts link |
 | `content/<lang>.yaml` | agent (step 5) | Copy per page and section |
-| `site/` | `scaffold.py`, agent | The website |
 | `.prettierrc.json` … | `scaffold.py` | Copies of `config/`, hashed in `state.yaml` |
 | `report.json`, `rounds/<n>/` | `check.py` | Findings and per-round snapshots |
-| `provenance.json`, `HANDOFF.md` | `handoff.py` | File hashes and the summary for the client |
+| `provenance.json`, `HANDOFF.md`, `API_CONTRACT.md` | `handoff.py` | File hashes, the summary for the client, the mock API contract |
 | `state.yaml` | every script | Current step, round counters, seed, config hashes |
 | `graph.json` | every script, through `lib/graph.py` | Context graph of the files above; see §3.13 |
 | `EXPLAIN.html` | `explain.py`, `handoff.py` | Visual explanation for the developer; see §3.14 |

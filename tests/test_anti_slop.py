@@ -19,7 +19,7 @@ def test_anti_slop_rules_execution(projects_dir):
     Memverifikasi bahwa aturan anti-slop mendeteksi pelanggaran yang disengaja.
     """
     proj = copy_fixture(projects_dir, "kopi-senja", ["brief.yaml", "decisions.yaml"])
-    site_dir = proj / "site"
+    site_dir = proj.parent
     site_dir.mkdir(parents=True, exist_ok=True)
     (site_dir / "css").mkdir(parents=True, exist_ok=True)
     (site_dir / "js").mkdir(parents=True, exist_ok=True)

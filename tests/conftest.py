@@ -95,7 +95,7 @@ def kopi(projects_dir):
     Menyalin brief kopi-senja ke folder proyek sementara.
 
     I.S. : projects_dir kosong.
-    F.S. : projects_dir/kopi-senja/brief.yaml ada; path folder proyek dikembalikan.
+    F.S. : projects_dir/kopi-senja/.ScaffolDev/brief.yaml ada; path folder kerja dikembalikan.
     """
     return copy_fixture(projects_dir, "kopi-senja", ["brief.yaml"])
 
@@ -107,12 +107,12 @@ def kopi(projects_dir):
 
 def copy_fixture(projects_dir, name, files):
     """
-    Menyalin sebagian file fixture examples/<name>/ ke projects_dir/<name>/.
+    Menyalin sebagian file fixture examples/<name>/ ke folder kerja projects_dir/<name>/.ScaffolDev/.
 
     I.S. : examples/<name>/ berisi file yang diminta.
-    F.S. : File tersalin; path folder proyek dikembalikan.
+    F.S. : File tersalin; path folder kerja dikembalikan (situsnya ada di folder induknya).
     """
-    target = projects_dir / name
+    target = projects_dir / name / ".ScaffolDev"
     target.mkdir(parents=True, exist_ok=True)
 
     for file in files:

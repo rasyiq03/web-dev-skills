@@ -166,7 +166,7 @@ def _add_pages_and_sections(builder, brief, site_type, decisions, has_site):
     """
     Menambah simpul halaman dan seksi beserta polanya, dan menautkan placeholder ke seksi.
 
-    I.S. : site_type adalah isi file tipe situs; has_site True bila site/ sudah di-scaffold.
+    I.S. : site_type adalah isi file tipe situs; has_site True bila situs sudah di-scaffold.
     F.S. : Simpul page dan section ada; edge contains, located_in, dan fills tercatat.
     """
     patterns_all = project.load_patterns()
@@ -205,7 +205,7 @@ def _add_tokens(builder, tokens, has_site):
     Menambah simpul token dari tokens.json, dengan urutan file aslinya.
 
     I.S. : tokens adalah isi tokens.json (boleh kosong).
-    F.S. : Simpul token ada; bila site/ ada, setiap token terhubung ke css/tokens.css.
+    F.S. : Simpul token ada; bila situs ada, setiap token terhubung ke css/tokens.css.
     """
     if has_site:
         builder.node("file:css/tokens.css", "file", "css/tokens.css", "script")
@@ -388,7 +388,8 @@ def build(proj_dir):
     """
     Membangun graf konteks dari file proyek yang sudah ada.
 
-    I.S. : proj_dir berisi minimal brief.yaml; file lain boleh belum ada.
+    I.S. : proj_dir adalah folder kerja (.ScaffolDev) berisi minimal brief.yaml; file lain
+           boleh belum ada; situs di folder induknya.
     F.S. : dict graf {version, project, nodes, edges} dikembalikan; tidak ada file ditulis.
     """
     proj_dir = Path(proj_dir)
@@ -397,7 +398,7 @@ def build(proj_dir):
     decisions = _read_optional(proj_dir, "decisions.yaml", io.read_yaml)
     tokens = _read_optional(proj_dir, "tokens.json", io.read_json)
     report_data = _read_optional(proj_dir, "report.json", io.read_json)
-    has_site = (proj_dir / "site").is_dir()
+    has_site = paths.has_site_content(paths.site_dir(proj_dir))
 
     builder = _Builder()
     _add_requirements(builder, gaps)
@@ -411,7 +412,7 @@ def build(proj_dir):
     _add_minutes(builder, proj_dir)
     _add_findings(builder, report_data)
 
-    return {"version": GRAPH_VERSION, "project": proj_dir.name, "nodes": builder.nodes, "edges": builder.edges}
+    return {"version": GRAPH_VERSION, "project": paths.site_dir(proj_dir).name, "nodes": builder.nodes, "edges": builder.edges}
 
 
 def refresh(proj_dir):

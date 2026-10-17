@@ -22,7 +22,7 @@ ROLE_CARDS = "skills/web-build/references/council"
 
 NEXT_AFTER = {
     "direction": "run compile_tokens.py",
-    "copy": "write the agreed copy into content/<lang>.yaml, add the mock data, then build the first page (step 6)",
+    "copy": "write the agreed copy into .ScaffolDev/content/<lang>.yaml, add the mock data, then build the first page (step 6)",
     "first-page": "apply the agreed fixes, build the remaining pages, then hold the site sitting",
     "site": "apply the agreed fixes, then run check until it reports zero errors and zero warnings",
 }
@@ -132,7 +132,7 @@ def write_packet(proj_dir, sitting):
     if sitting == "direction":
         lines += _directions_lines(proj_dir)
     else:
-        lines += ["## Bahan", "", "Baca `run context <slug> <page>` untuk tiap halaman dan `content/<lang>.yaml` bila sudah ada.", ""]
+        lines += ["## Bahan", "", "Baca `run context <slug> <page>` untuk tiap halaman dan `.ScaffolDev/content/<lang>.yaml` bila sudah ada.", ""]
         lines += _report_lines(proj_dir)
 
     lines += [

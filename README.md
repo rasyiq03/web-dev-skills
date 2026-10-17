@@ -36,18 +36,25 @@ Open Claude Code in the folder where the site should go and describe it, for exa
 buat company profile Kopi Senja, kedai kopi di Bandung, target mahasiswa
 ```
 
-The site is built in `<folder>/<slug>/`, for example `kopi-senja/`:
+The site is built in `<folder>/<slug>/`, for example `kopi-senja/`. That folder holds only
+the website (`index.html`, `pages/`, `css/`, `js/`, `data/`, `assets/`). Preview it with
+`python -m http.server` inside it, then open http://localhost:8000 (pages use ES modules,
+which do not load from `file://`).
 
-- `site/`: the website. Preview it with `python -m http.server` inside `site/`, then open
-  http://localhost:8000 (pages use ES modules, which do not load from `file://`).
-- `HANDOFF.md`: the chosen design direction, assumptions, and every placeholder
-  `[[ISI: …]]` still to fill.
+Everything else ScaffolDev made is in `kopi-senja/.ScaffolDev/`. Delete that folder when you
+no longer need it and the site stays untouched:
+
+- `HANDOFF.md`: the chosen design direction, assumptions, every placeholder `[[ISI: …]]`
+  still to fill, and the learning signals.
 - `EXPLAIN.html`: a page for you, the developer: who decided what and why, the design
   decisions with the options that lost, a clickable graph from requirement to code to
   check, and two questions to test your understanding. Double-click to open; no internet
   needed.
-- `brief.yaml`, `decisions.yaml`, `content/`: the recorded decisions, kept for later
-  changes.
+- `brief.yaml`, `decisions.yaml`, `content/`, `graph.json`, `trace.jsonl`: the recorded
+  decisions and their history, kept for later changes.
+
+Projects built with an older version (files next to a `site/` folder) are moved into this
+layout automatically the first time ScaffolDev opens them.
 
 Add "pakai mode interaktif" to the prompt to answer a short questionnaire in the browser
 first.
@@ -98,7 +105,8 @@ python -m pytest
 
 Load the working copy as the plugin, so edits apply without reinstalling: in Claude Code,
 `/plugin marketplace add <path to the clone>` and `/plugin install scaffoldev@scaffoldev`.
-Sites built while Claude Code is open in the clone go to `projects/<slug>/`.
+Sites built while Claude Code is open in the clone go to `projects/<slug>/` (with their
+`.ScaffolDev/` inside).
 `python -m pytest --network` also runs the slow tests that install dependencies from the
 internet. For Codex, `python tools/sync_adapters.py` links the skills into `.agents/skills/`.
 

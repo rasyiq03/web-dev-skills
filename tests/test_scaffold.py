@@ -30,7 +30,7 @@ def kopi_scaffolded(projects_dir):
 
 
 def test_scaffold_structure_and_idempotence(kopi_scaffolded):
-    site_dir = kopi_scaffolded / "site"
+    site_dir = kopi_scaffolded.parent
     assert (site_dir / "index.html").is_file()
     assert (site_dir / "pages" / "tentang.html").is_file()
     assert (site_dir / "pages" / "kontak.html").is_file()
@@ -53,7 +53,7 @@ def test_scaffold_structure_and_idempotence(kopi_scaffolded):
     # Uji idempotensi: jalankan lagi tanpa --force harus gagal
     res_repeat = run_script("scaffold", "kopi-senja")
     assert res_repeat.returncode == 1
-    assert "sudah berisi file" in res_repeat.stdout
+    assert "sudah berisi situs" in res_repeat.stdout
 
     # Jalankan dengan --force harus berhasil
     res_force = run_script("scaffold", "kopi-senja", "--force")
@@ -63,8 +63,10 @@ def test_scaffold_structure_and_idempotence(kopi_scaffolded):
 @pytest.mark.node
 def test_scaffold_skeleton_passes_linters(kopi_scaffolded):
     # 1. npx prettier --check
-    cmd_prettier = [NPX, "prettier", "--check", "site/**/*.{html,css}"]
-    res_p = subprocess.run(cmd_prettier, cwd=kopi_scaffolded, capture_output=True, text=True)
+    # Linter dijalankan dari folder situs; config ada di .ScaffolDev
+    site_dir = kopi_scaffolded.parent
+    cmd_prettier = [NPX, "prettier", "--check", "--config", ".ScaffolDev/.prettierrc.json", "*.html", "pages/*.html", "css/**/*.css"]
+    res_p = subprocess.run(cmd_prettier, cwd=site_dir, capture_output=True, text=True)
     assert res_p.returncode == 0, f"prettier gagal:\n{res_p.stdout}\n{res_p.stderr}"
 
     # 2. npx stylelint
@@ -72,10 +74,10 @@ def test_scaffold_skeleton_passes_linters(kopi_scaffolded):
         NPX,
         "stylelint",
         "--config",
-        ".stylelintrc.json",
-        "site/css/**/*.css",
+        ".ScaffolDev/.stylelintrc.json",
+        "css/**/*.css",
     ]
-    res_s = subprocess.run(cmd_stylelint, cwd=kopi_scaffolded, capture_output=True, text=True)
+    res_s = subprocess.run(cmd_stylelint, cwd=site_dir, capture_output=True, text=True)
     assert res_s.returncode == 0, f"stylelint gagal:\n{res_s.stdout}\n{res_s.stderr}"
 
     # 3. npx html-validate
@@ -83,8 +85,9 @@ def test_scaffold_skeleton_passes_linters(kopi_scaffolded):
         NPX,
         "html-validate",
         "--config",
-        ".htmlvalidate.json",
-        "site/**/*.html",
+        ".ScaffolDev/.htmlvalidate.json",
+        "index.html",
+        "pages/*.html",
     ]
-    res_h = subprocess.run(cmd_htmlval, cwd=kopi_scaffolded, capture_output=True, text=True)
+    res_h = subprocess.run(cmd_htmlval, cwd=site_dir, capture_output=True, text=True)
     assert res_h.returncode == 0, f"html-validate gagal:\n{res_h.stdout}\n{res_h.stderr}"

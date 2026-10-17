@@ -40,20 +40,21 @@ MODES = ("auto", "guided", "deep")
 
 def find_projects(folders):
     """
-    Mencari folder proyek (yang berisi brief.yaml) langsung di dalam folder yang diberikan.
+    Mencari proyek (folder berisi .ScaffolDev/brief.yaml) di folder yang diberikan atau anaknya.
 
     I.S. : folders adalah daftar Path.
-    F.S. : Daftar folder proyek dikembalikan, urut menurut path, tanpa duplikat.
+    F.S. : Daftar folder kerja (.ScaffolDev) dikembalikan, urut menurut path, tanpa duplikat.
     """
     found = set()
 
     for folder in folders:
-        if (folder / "brief.yaml").is_file():
-            found.add(folder.resolve())
+        candidates = [folder, *(sorted(folder.iterdir()) if folder.is_dir() else [])]
 
-        for child in folder.iterdir() if folder.is_dir() else []:
-            if child.is_dir() and (child / "brief.yaml").is_file():
-                found.add(child.resolve())
+        for candidate in candidates:
+            work = candidate / paths.WORK_DIR
+
+            if (work / "brief.yaml").is_file():
+                found.add(work.resolve())
 
     return sorted(found)
 
@@ -62,7 +63,7 @@ def row_for(proj_dir):
     """
     Menyusun satu baris CSV untuk satu proyek.
 
-    I.S. : proj_dir berisi brief.yaml.
+    I.S. : proj_dir adalah folder kerja (.ScaffolDev) berisi brief.yaml.
     F.S. : dict dengan kunci COLUMNS dikembalikan.
     """
     brief = io.read_yaml(proj_dir / "brief.yaml") or {}
@@ -75,7 +76,7 @@ def row_for(proj_dir):
         ready = ready and found["council_sittings"] == 4
 
     row = {
-        "project": f"{proj_dir.parent.name}/{proj_dir.name}",
+        "project": f"{proj_dir.parent.parent.name}/{proj_dir.parent.name}",
         "site_type": brief.get("site_type"),
         "languages": " ".join(brief.get("languages", [])),
         "support_level": brief.get("support_level", ""),
@@ -126,7 +127,7 @@ def main():
     projects = find_projects(args.folders or [paths.projects_dir()])
 
     if not projects:
-        fail(EXIT_INVALID, "Tidak ada proyek (folder berisi brief.yaml) di folder yang diberikan.",
+        fail(EXIT_INVALID, "Tidak ada proyek (folder berisi .ScaffolDev/brief.yaml) di folder yang diberikan.",
              "pass the folder that holds the projects")
 
     rows = [row_for(proj) for proj in projects]

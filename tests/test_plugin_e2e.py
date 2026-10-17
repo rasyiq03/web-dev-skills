@@ -18,12 +18,12 @@ PLUGIN_DIRS = ("skills", "audit", "config", ".claude-plugin")
 PLUGIN_FILES = ("package.json", "package-lock.json", "requirements.txt", "LICENSE")
 
 STEPS = [
-    (("path", "kopi-senja"), "NEXT: write the project files in that folder"),
+    (("path", "kopi-senja"), "NEXT: write brief.yaml and every other ScaffolDev file in WORK; the site goes in PROJECT"),
     (("validate_brief", "kopi-senja"), "NEXT: run gaps.py"),
     (("gaps", "kopi-senja"), "NEXT: write directions.yaml (web-design skill)"),
     (("pick_direction", "kopi-senja", "--pick", "dir-2"), "NEXT: run compile_tokens.py"),
     (("compile_tokens", "kopi-senja"), "NEXT: run scaffold.py"),
-    (("scaffold", "kopi-senja"), "NEXT: write content/id.yaml (web-build skill step 5)"),
+    (("scaffold", "kopi-senja"), "NEXT: write .ScaffolDev/content/id.yaml (web-build skill step 5)"),
     (("check", "kopi-senja"), "NEXT: run handoff.py"),
     (("handoff", "kopi-senja"), "NEXT: handoff complete"),
 ]
@@ -38,9 +38,9 @@ def test_fresh_plugin_install_builds_site(tmp_path):
         shutil.copyfile(REPO / name, plugin / name)
 
     work = tmp_path / "work"
-    (work / "kopi-senja").mkdir(parents=True)
+    (work / "kopi-senja" / ".ScaffolDev").mkdir(parents=True)
     for name in ("brief.yaml", "directions.yaml"):
-        shutil.copyfile(REPO / "examples" / "kopi-senja" / name, work / "kopi-senja" / name)
+        shutil.copyfile(REPO / "examples" / "kopi-senja" / name, work / "kopi-senja" / ".ScaffolDev" / name)
 
     env = {k: v for k, v in os.environ.items() if k not in ("PD_PROJECTS_DIR", "PD_NODE_MODULES")}
     env.update(PD_CACHE_DIR=str(tmp_path / "cache"), PD_DATE="2026-10-08", PYTHONIOENCODING="utf-8")
@@ -60,8 +60,10 @@ def test_fresh_plugin_install_builds_site(tmp_path):
         assert result.returncode == 0, f"{args}:\n{result.stdout}\n{result.stderr}"
         assert next_line(result) == expected, f"{args}:\n{result.stdout}"
 
-    report = json.loads((work / "kopi-senja" / "report.json").read_text(encoding="utf-8"))
+    report = json.loads((work / "kopi-senja" / ".ScaffolDev" / "report.json").read_text(encoding="utf-8"))
     assert report["summary"]["errors"] == 0
     assert not [f for f in report["findings"] if f["rule"] == "tool-failed"]
-    assert (work / "kopi-senja" / "site" / "index.html").is_file()
+    assert (work / "kopi-senja" / "index.html").is_file()
+    assert sorted(p.name for p in (work / "kopi-senja").iterdir() if not p.name.startswith(".")) == [
+        "assets", "css", "data", "index.html", "js", "pages"]
     assert {p.name.split("-")[0] for p in (tmp_path / "cache").iterdir()} == {"py", "node"}

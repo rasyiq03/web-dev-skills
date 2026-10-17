@@ -19,7 +19,7 @@ def test_mock_layer_behavior_in_node(projects_dir):
     run_script("compile_tokens", "kopi-senja")
     run_script("scaffold", "kopi-senja")
 
-    site_dir = proj / "site"
+    site_dir = proj.parent
 
     # Siapkan endpoints.js dan mock file yang valid
     ep_file = site_dir / "js" / "api" / "endpoints.js"

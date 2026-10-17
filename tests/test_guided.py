@@ -203,7 +203,7 @@ def test_missing_checkpoints_count_as_skipped(guided_kopi):
 
 
 def test_auto_mode_never_touches_the_profile(kopi):
-    copy_fixture(kopi.parent, "kopi-senja", ["directions.yaml"])
+    copy_fixture(kopi.parent.parent, "kopi-senja", ["directions.yaml"])
 
     for args in (("gaps",), ("pick_direction", "--pick", "dir-2"), ("compile_tokens",), ("scaffold",), ("handoff",)):
         assert run_script(args[0], "kopi-senja", *args[1:]).returncode == 0

@@ -183,17 +183,17 @@ def refresh_tokens(slug, proj_dir):
     tokens_script.compile_tokens(slug)
     io.save_state(proj_dir, step=step)
     done = ["tokens.json, tokens.css, dan fonts.html disusun ulang"]
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
 
-    if not site_dir.is_dir():
+    if not paths.has_site_content(site_dir):
         return done
 
     shutil.copyfile(proj_dir / "tokens.css", site_dir / "css" / "tokens.css")
-    done.append("site/css/tokens.css diperbarui")
+    done.append("css/tokens.css di situs diperbarui")
     new_fonts = FONT_URL.findall(io.read_text(proj_dir / "fonts.html"))
 
     if old_fonts and new_fonts and old_fonts != new_fonts:
-        for page in sorted(site_dir.rglob("*.html")):
+        for page in paths.site_files(site_dir, "*.html"):
             text = io.read_text(page)
 
             if old_fonts[0] in text:
@@ -208,12 +208,12 @@ def retag_section(proj_dir, site_type, section_id, pattern):
     """
     Mengganti data-pd-pattern satu seksi di file halamannya.
 
-    I.S. : site/ boleh belum ada.
+    I.S. : Situs boleh belum di-scaffold.
     F.S. : (pekerjaan selesai, pekerjaan tersisa) dikembalikan sebagai dua daftar.
     """
     section = next(s for s in site_type["sections"] if s["id"] == section_id)
     page_file = paths.page_file(section["page"])
-    path = proj_dir / "site" / page_file
+    path = paths.site_dir(proj_dir) / page_file
 
     if not path.is_file():
         return [], []
@@ -248,7 +248,7 @@ def downstream(slug, proj_dir, axis, patch, site_type, brief):
         files = ", ".join(f"content/{lang}.yaml" for lang in brief.get("languages", []))
         todo.append(f"tulis ulang teks di {files} dengan nada baru, lalu perbarui halamannya")
 
-    if (proj_dir / "site").is_dir():
+    if paths.has_site_content(paths.site_dir(proj_dir)):
         todo.append("jalankan check lagi")
 
     return done, todo

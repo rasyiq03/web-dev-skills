@@ -13,7 +13,7 @@ def test_handoff_provenance_skips_git_folder(projects_dir):
     run_script("pick_direction", "kopi-senja", "--pick", "dir-2")
     run_script("compile_tokens", "kopi-senja")
     run_script("scaffold", "kopi-senja")
-    add_git_folder(proj / "site")
+    add_git_folder(proj.parent)
 
     result = run_script("handoff", "kopi-senja")
 
@@ -56,7 +56,7 @@ def test_handoff_acceptance(projects_dir):
     assert prov_data["tool"] == "scaffoldev"
     assert prov_data["version"] == "0.1"
 
-    site_dir = proj / "site"
+    site_dir = proj.parent
     for rel_path, exp_hash in prov_data["files"].items():
         actual_hash = io.sha256_file(site_dir / rel_path)
         assert actual_hash == exp_hash, f"Hash tidak cocok untuk {rel_path}"
@@ -79,5 +79,5 @@ def test_handoff_no_provenance(projects_dir):
     assert not prov_file.exists()
 
     # Pastikan tag meta generator terhapus dari HTML
-    index_html = io.read_text(proj / "site" / "index.html")
+    index_html = io.read_text(proj.parent / "index.html")
     assert '<meta name="generator"' not in index_html

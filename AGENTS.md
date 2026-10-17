@@ -8,7 +8,10 @@ plugin ScaffolDev (`scaffoldev`); `README.md` explains installing it.
 - Projects live in `projects/<slug>/` while you work in this repository, in
   `<folder>/<slug>/` when the plugin runs elsewhere, and in `$PD_PROJECTS_DIR/<slug>/`
   when that variable is set. `python skills/web-build/scripts/run.py path <slug>` prints
-  the folder. Each run writes only inside its own project folder.
+  the folder. The project folder holds only the website; every ScaffolDev file (brief,
+  decisions, reports, graph, trace, `HANDOFF.md`, `EXPLAIN.html`) goes in
+  `<slug>/.ScaffolDev/`, so deleting that folder leaves a clean site. Each run writes only
+  inside its own project folder.
 - Scripts run from the repository root with
   `python skills/web-build/scripts/run.py <name> <slug>`.
 - Files in `config/` and `audit/` are fixed; change them only when the user asks.

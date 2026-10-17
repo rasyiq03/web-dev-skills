@@ -7,9 +7,9 @@ the developer: help where they need it, and step back as they grow.
 
 ## Setup
 
-- In step 1 write `mode: guided` in `brief.yaml`. If the user names a level ("pakai level
-  3", "aku mau mandiri"), also write `support_level` (3, 2, 1, or 0); otherwise the
-  developer profile decides.
+- In step 1 write `mode: guided` in `<work>/brief.yaml`. If the user names a level
+  ("pakai level 3", "aku mau mandiri"), also write `support_level` (3, 2, 1, or 0);
+  otherwise the developer profile decides.
 - Run `run checkpoint <slug>` whenever you reach a checkpoint. It prints the level, what you
   and the developer each do at that level, when the checkpoint counts as passed, and for
   acceptance the two questions with their reference answers.
@@ -31,7 +31,7 @@ the developer: help where they need it, and step back as they grow.
    Record their choice with `run decide <slug> d-style-1 --accept --verification <move>
    --reason "<their words>"`.
 3. **Acceptance**, after step 7: the developer answers the two questions (why one decision
-   was made; what changing the main colour would affect) and reviews `EXPLAIN.html`.
+   was made; what changing the main colour would affect) and reviews `<work>/EXPLAIN.html`.
 
 After each one, record it:
 `run checkpoint <slug> <framing|direction|acceptance> --result <passed|failed|skipped>

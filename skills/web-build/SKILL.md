@@ -9,18 +9,24 @@ Turn one prompt into a finished site in its own project folder. Decisions come f
 second, checks last. Scripts do every deterministic step; you write only the files marked
 "you" below and fix what the checks report.
 
+**Two folders.** `<project>` is the website and nothing else (`index.html`, `pages/`,
+`css/`, `js/`, `data/`, `assets/`). `<work>` is `<project>/.ScaffolDev/` and holds every
+other file ScaffolDev reads or writes: brief, decisions, copy, graph, trace, reports,
+`HANDOFF.md`, `EXPLAIN.html`. Deleting `<work>` leaves a clean site. Never put a ScaffolDev
+file in `<project>`, and never make a site file depend on `<work>`.
+
 ## At a glance
 
-| Step | You | Script (`run …`) | Result in `<project>/` |
+| Step | You | Script (`run …`) | Result |
 | --- | --- | --- | --- |
-| 1 Brief | write `brief.yaml` | `path`, `validate_brief` | `brief.yaml` |
-| 2 Gaps | relay the URL (interactive only) | `gaps`, `serve` | `gaps.json` |
-| 3 Direction | write `directions.yaml` | `pick_direction` | `decisions.yaml` |
-| 4 Scaffold | nothing | `compile_tokens`, `scaffold` | `site/` skeleton |
-| 5 Copy | write copy and mock data | none | `content/<lang>.yaml` |
-| 6 Build | fill each page | `context` | finished `site/` |
-| 7 Check | fix findings | `check` | `report.json` |
-| 8 Handoff | show the summary | `handoff` | summary and `EXPLAIN.html` |
+| 1 Brief | write `<work>/brief.yaml` | `path`, `validate_brief` | `<work>/brief.yaml` |
+| 2 Gaps | relay the URL (interactive only) | `gaps`, `serve` | `<work>/gaps.json` |
+| 3 Direction | write `<work>/directions.yaml` | `pick_direction` | `<work>/decisions.yaml` |
+| 4 Scaffold | nothing | `compile_tokens`, `scaffold` | site skeleton in `<project>` |
+| 5 Copy | write copy and mock data | none | `<work>/content/<lang>.yaml` |
+| 6 Build | fill each page | `context` | finished site in `<project>` |
+| 7 Check | fix findings | `check` | `<work>/report.json` |
+| 8 Handoff | show the summary | `handoff` | `<work>/HANDOFF.md`, `<work>/EXPLAIN.html` |
 
 ## Modes
 
@@ -47,7 +53,7 @@ plugin support), it means the folder that contains `skills/`.
   means `run gaps <slug>`.
 - **Exit codes.** `0` done. `1` bad or missing input: fix what the message names, run again.
   `2` the check found problems: go on with step 7. `3` facts are missing: ask the user the
-  printed questions, update `brief.yaml`, run again. `4` the interactive form timed out.
+  printed questions, update `<work>/brief.yaml`, run again. `4` the interactive form timed out.
 - **First run on a machine** (usually `validate_brief`) installs Python packages and Node
   tools once. It needs internet and can take several minutes: give it a 10-minute timeout
   and do not interrupt or repeat it.
@@ -57,7 +63,7 @@ plugin support), it means the folder that contains `skills/`.
 - Go through the steps in order. Write site files only after step 4 succeeds.
 - Use only facts the user gave. Every other fact (address, phone, prices, hours,
   testimonials, client logos, statistics) becomes a placeholder `[[ISI: <what>]]`.
-- `<project>` is the folder printed in step 1. Write every project file there.
+- `<project>` and `<work>` are the folders printed in step 1 (`PROJECT:` and `WORK:`).
 - When the brief's languages include `id` or the business is in Indonesia, read
   `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/indonesia.md` once and follow it in
   steps 3 to 6 and whenever you talk to the user.
@@ -68,43 +74,45 @@ plugin support), it means the folder that contains `skills/`.
 ## Steps
 
 1. **Brief.** Pick a short kebab-case slug and run `run path <slug>`; it prints
-   `PROJECT: <folder>`, which is `<project>`. Write `<project>/brief.yaml` following
+   `PROJECT:` (`<project>`) and `WORK:` (`<work>`). Write `<work>/brief.yaml` following
    `${CLAUDE_PLUGIN_ROOT}/skills/web-build/schemas/brief.schema.json`: fields the prompt
    states get `source: stated`, every other field is `unknown`. Run
    `run validate_brief <slug>` until it passes.
 
 2. **Gaps.** Run `run gaps <slug>`. It turns missing facts into placeholders and lists the
-   open design decisions in `gaps.json`. Interactive mode only: start `run serve <slug>` in
+   open design decisions in `<work>/gaps.json`. Interactive mode only: start `run serve <slug>` in
    the background, give the user the printed URL, and wait for the script to report the
    answers.
 
 3. **Direction.** Follow `${CLAUDE_PLUGIN_ROOT}/skills/web-design/SKILL.md` to write
-   `directions.yaml`, then run `run pick_direction <slug>`. It writes `decisions.yaml`.
+   `<work>/directions.yaml`, then run `run pick_direction <slug>`. It writes
+   `<work>/decisions.yaml`.
 
 4. **Tokens and scaffold.** Run `run compile_tokens <slug>`, then `run scaffold <slug>`.
-   This creates `site/`: the folders, `css/tokens.css`, `css/base.css`, and one skeleton
-   HTML file per page with empty section shells in the right order.
+   This creates the site in `<project>`: the folders, `css/tokens.css`, `css/base.css`, and
+   one skeleton HTML file per page with empty section shells in the right order.
 
 5. **Copy.** Read `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/copy-<lang>.md` for each
    language in the brief, and
    `${CLAUDE_PLUGIN_ROOT}/skills/web-build/site-types/<site_type>.yaml`. Write
-   `content/<lang>.yaml` with one entry per section of the site type: headings, body text,
-   button labels.
+   `<work>/content/<lang>.yaml` with one entry per section of the site type: headings, body
+   text, button labels.
    - Collections the brief gives (a product list, projects) are content: write them in.
    - Collections it lacks, and every dashboard figure, are data: one endpoint each in
-     `site/js/api/endpoints.js` plus its response in `site/data/mock/<name>.mock.json`
+     `<project>/js/api/endpoints.js` plus its response in `<project>/data/mock/<name>.mock.json`
      (see "Data and the mock API" in the conventions below).
    - A stated API source means `API_MODE = 'live'` with that API's paths.
 
 6. **Build.** Read `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/conventions.md` once.
    Then, one page at a time, run `run context <slug> <page>`; it prints exactly what that
    page needs (decisions, section patterns, token names, component recipes, placeholders).
-   Fill each section shell from `content/<lang>.yaml`, keeping its `class`, `id`, and
+   Fill each section shell from `<work>/content/<lang>.yaml`, keeping its `class`, `id`, and
    `data-pd-pattern`. Write CSS and JS in the files the scaffold made, using only the
    variables in `css/tokens.css`.
 
 7. **Check and fix.** Run `run check <slug>`. It formats the code, runs the linters and the
-   audit, and writes `report.json` with each finding and a suggested fix. Fix every `error`,
+   audit, and writes `<work>/report.json` with each finding and a suggested fix (file paths
+   are relative to `<project>`). Fix every `error`,
    then every `warning`, and run it again; the script counts rounds and says when to stop.
    If you can start a subagent, give it
    `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/a11y-judge.md` and the built HTML, and
@@ -112,14 +120,14 @@ plugin support), it means the folder that contains `skills/`.
 
 8. **Handoff.** Run `run handoff <slug>` and show its summary to the user exactly as
    printed: assumptions taken, placeholders to fill, and check scores. It also writes
-   `EXPLAIN.html`; tell the user it opens with a double-click, needs no internet, and shows
+   `<work>/EXPLAIN.html`; tell the user it opens with a double-click, needs no internet, and shows
    who decided what, why, and what a change would touch. `run explain <slug>` rewrites it
    at any step. Section 7 of `HANDOFF.md` lists the learning signals (P1–P6); when the
    dependence risk is high, say so in one plain sentence and point to what lowers it.
 
 ## Explaining, changing, and accepting a decision
 
-Every script keeps `<project>/graph.json` up to date: requirements, decisions, tokens,
+Every script keeps `<work>/graph.json` up to date: requirements, decisions, tokens,
 sections, files, checks, and findings, with how they connect. Node ids look like
 `d-palette-1`, `req-audience`, `color.accent`, or `section:index#hero`. Retell every
 answer in plain words; do not paste raw output.
@@ -138,5 +146,7 @@ answer in plain words; do not paste raw output.
 ## Restyling an existing project
 
 Keep the slug and brief, then repeat steps 3, 4, and 6 to 8. `run scaffold <slug> --force`
-deletes `site/`, so first copy `site/js/api/endpoints.js` and `site/data/mock/` aside and put
-them back afterwards; `content/` is kept.
+deletes the site files in `<project>` (never `<work>` or `.git`), so first copy
+`js/api/endpoints.js` and `data/mock/` aside and put them back afterwards; `<work>/content/`
+is kept. Projects made before `.ScaffolDev/` existed are moved into this layout
+automatically the first time a script opens them.

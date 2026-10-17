@@ -80,7 +80,7 @@ def test_palette_change_rebuilds_tokens_and_site_css(kopi_site):
     assert palette["rationale"] == "Warna cerah untuk layar HP di siang hari."
     assert set(others) == {"client-picked"}
     assert decisions["overrides"]["palette"] == "sun-block"
-    assert (kopi_site / "site" / "css" / "tokens.css").read_bytes() == (kopi_site / "tokens.css").read_bytes()
+    assert (kopi_site.parent / "css" / "tokens.css").read_bytes() == (kopi_site / "tokens.css").read_bytes()
 
 
 def test_typography_change_swaps_font_link_in_every_page(kopi_site):
@@ -89,7 +89,7 @@ def test_typography_change_swaps_font_link_in_every_page(kopi_site):
     assert result.returncode == 0, result.stdout
 
     for page in ("index.html", "pages/tentang.html", "pages/kontak.html"):
-        text = (kopi_site / "site" / page).read_text(encoding="utf-8")
+        text = (kopi_site.parent / page).read_text(encoding="utf-8")
         assert "family=Unbounded" in text, page
         assert "family=Archivo+Black" not in text, page
 
@@ -100,7 +100,7 @@ def test_layout_change_retags_only_that_section(kopi_site):
     assert result.returncode == 0, result.stdout
     assert next_line(result) == "NEXT: rebuild the listed section with its new pattern, then run check"
 
-    index_html = (kopi_site / "site" / "index.html").read_text(encoding="utf-8")
+    index_html = (kopi_site.parent / "index.html").read_text(encoding="utf-8")
 
     assert 'data-pd-pattern="full-bleed-type"' in index_html
     assert 'data-pd-pattern="list-with-prices"' in index_html

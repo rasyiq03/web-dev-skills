@@ -13,7 +13,7 @@ from lib import io
 
 @pytest.mark.node
 def test_dashboard_end_to_end_smoke(projects_dir):
-    dash_dir = projects_dir / "analytics-demo"
+    dash_dir = projects_dir / "analytics-demo" / ".ScaffolDev"
     dash_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. Buat brief dashboard
@@ -177,7 +177,7 @@ def test_dashboard_end_to_end_smoke(projects_dir):
     res_s = run_script("scaffold", "analytics-demo")
     assert res_s.returncode == 0, res_s.stderr
 
-    site_dir = dash_dir / "site"
+    site_dir = dash_dir.parent
 
     # Verifikasi file khusus dashboard dibuat
     assert (site_dir / "js" / "charts.js").is_file()

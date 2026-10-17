@@ -5,8 +5,12 @@ writing it right the first time saves fix rounds.
 
 ## Layout of a project
 
+The site lives in the project folder itself; everything ScaffolDev needs to work
+(brief, decisions, copy, reports) lives in `.ScaffolDev/` next to it and never ends up in a
+page. Deleting `.ScaffolDev/` leaves this tree:
+
 ```
-site/
+<project>/
 	index.html
 	pages/            other pages, e.g. tentang.html
 	css/
@@ -93,7 +97,7 @@ client supplies real ones.
 - **Components ask the API, never the file.** A component imports
   `request` from `js/api/client.js` and calls `await request('metrics', { from, to })`.
   `fetch()` appears only in `client.js`; HTML and components contain no data literals.
-- **Each endpoint has one mock file**: `site/data/mock/<mock>.mock.json`, shaped by
+- **Each endpoint has one mock file**: `data/mock/<mock>.mock.json`, shaped by
   `schemas/mock.schema.json`:
 
 ```json

@@ -11,7 +11,7 @@ import html
 import json
 from pathlib import Path
 
-from lib import graph, guided, io, project, signals, trace
+from lib import graph, guided, io, paths, project, signals, trace
 
 # ============================================================
 # ========================= KONSTANTA ========================
@@ -357,7 +357,7 @@ def _steps_section(proj_dir, decisions, text, deep=False):
         # Di mode deep, arah dan isi teks diputuskan dewan
         if deep and number in (3, 5):
             owner = "council"
-        done = (proj_dir / marker).exists()
+        done = paths.has_site_content(paths.site_dir(proj_dir)) if marker == "site" else (proj_dir / marker).exists()
         state = text["done"] if done else text["pending"]
         css = "" if done else ' class="is-pending"'
         items.append(f'<li{css}{_owner_style(owner)}><b>{number}. {esc(name)}</b><small>{esc(text["owners"][owner])} · {esc(state)}</small></li>')
@@ -826,7 +826,7 @@ def build_html(proj_dir):
     context_graph = graph.refresh(proj_dir)
     decisions_path = proj_dir / "decisions.yaml"
     decisions = (io.read_yaml(decisions_path) or {}) if decisions_path.is_file() else {}
-    name = (brief.get("business", {}).get("name") or {}).get("value") or proj_dir.name
+    name = (brief.get("business", {}).get("name") or {}).get("value") or paths.site_dir(proj_dir).name
 
     body = "".join([
         f'<h1>{esc(text["title"])}: {esc(name)}</h1><p class="note">{esc(text["intro"])}</p>',

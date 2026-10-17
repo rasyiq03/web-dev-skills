@@ -7,14 +7,15 @@ description: Choose the visual direction for a website project - style, palette,
 
 Propose five genuinely different design directions for one brief and say how typical each
 one is. A script then picks one, so different clients get different sites while each site
-stays internally consistent. Your only output is `<project>/directions.yaml`.
+stays internally consistent. Your only output is `<work>/directions.yaml`.
 
 ## Read first
 
-`<project>` is the folder printed by web-build step 1. If `${CLAUDE_PLUGIN_ROOT}` appears
-literally in this file, it means the folder that contains `skills/`.
+`<work>` is the `WORK:` folder printed by web-build step 1 (`<project>/.ScaffolDev/`).
+If `${CLAUDE_PLUGIN_ROOT}` appears literally in this file, it means the folder that contains
+`skills/`.
 
-1. `<project>/brief.yaml` and `<project>/gaps.json` (it lists the requirement ids, such as
+1. `<work>/brief.yaml` and `<work>/gaps.json` (it lists the requirement ids, such as
    `req-audience`, that your rationale cites).
 2. `${CLAUDE_PLUGIN_ROOT}/skills/web-design/styles/index.yaml`: one line per style. Read
    only this catalog first, then open the full file of each style you actually use.

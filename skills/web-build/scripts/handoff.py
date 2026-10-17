@@ -29,7 +29,7 @@ def build_api_contract(endpoints_data, mock_dir):
         "# Kontrak API (API Contract)",
         "",
         "Dokumen ini mendefinisikan bentuk data yang diharapkan oleh antarmuka situs.",
-        "Ganti file mock di `site/data/mock/` atau hubungkan backend sungguhan melalui `site/js/api/config.js`.",
+        "Ganti file mock di `data/mock/` atau hubungkan backend sungguhan melalui `js/api/config.js`.",
         "",
     ]
 
@@ -43,7 +43,7 @@ def build_api_contract(endpoints_data, mock_dir):
         mock_name = ep_info.get("mock", "")
         lines.append(f"## `{method} {path}`")
         lines.append(f"- **Endpoint Name**: `{ep_name}`")
-        lines.append(f"- **Mock File**: `site/data/mock/{mock_name}.mock.json`")
+        lines.append(f"- **Mock File**: `data/mock/{mock_name}.mock.json`")
 
         mock_file = mock_dir / f"{mock_name}.mock.json"
         if mock_file.is_file():
@@ -118,9 +118,9 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
         lines.append("")
         lines.append("## 5. Cara Pratinjau (Preview)")
         lines.append("Karena situs menggunakan ES Modules (`import`/`export`) dan `fetch()` lokal, halaman tidak dapat dibuka langsung sebagai `file://`.")
-        lines.append("Jalankan server HTTP lokal di dalam folder `site/`:")
+        lines.append("Jalankan server HTTP lokal di folder proyek (folder yang berisi `index.html`):")
         lines.append("```bash")
-        lines.append("cd site")
+        lines.append(f"cd {brief.get('slug', '<slug>')}")
         lines.append("python -m http.server 8000")
         lines.append("```")
         lines.append("Buka browser di `http://127.0.0.1:8000`.")
@@ -160,9 +160,9 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
         lines.append("")
         lines.append("## 5. Preview Instructions")
         lines.append("Because the site relies on ES Modules and local fetch, previewing as a raw `file://` URL is blocked by browser CORS.")
-        lines.append("Run a local HTTP server from the `site/` folder:")
+        lines.append("Run a local HTTP server from the project folder (the one with `index.html`):")
         lines.append("```bash")
-        lines.append("cd site")
+        lines.append(f"cd {brief.get('slug', '<slug>')}")
         lines.append("python -m http.server 8000")
         lines.append("```")
         lines.append("Open `http://127.0.0.1:8000` in your browser.")
@@ -251,13 +251,13 @@ def handoff(slug, no_provenance=False):
     """
     Eksekusi serah terima proyek: tulis HANDOFF.md, API_CONTRACT.md, provenance.json.
 
-    I.S. : Proyek memiliki brief, decisions, gaps, site/.
+    I.S. : Proyek memiliki brief, decisions, gaps, dan situs yang sudah di-scaffold.
     F.S. : Dokumen handoff tertulis; mencetak ringkasan dan 'NEXT: handoff complete'.
     """
     proj_dir = project.open_project(slug, need=["brief.yaml", "decisions.yaml", "gaps.json"])
-    site_dir = proj_dir / "site"
-    if not site_dir.is_dir():
-        fail(EXIT_INVALID, f"Folder {site_dir} belum ada.", f"run scaffold.py {slug} first")
+    site_dir = paths.site_dir(proj_dir)
+    if not paths.has_site_content(site_dir):
+        fail(EXIT_INVALID, f"Situs di {site_dir} belum ada.", f"run scaffold.py {slug} first")
 
     brief = io.read_yaml(proj_dir / "brief.yaml")
     decisions = io.read_yaml(proj_dir / "decisions.yaml")
@@ -300,8 +300,8 @@ def handoff(slug, no_provenance=False):
     if no_provenance:
         if prov_file.is_file():
             prov_file.unlink()
-        # Hapus meta generator dari semua file HTML di site/
-        for html_f in site_dir.rglob("*.html"):
+        # Hapus meta generator dari semua file HTML situs
+        for html_f in paths.site_files(site_dir, "*.html"):
             h_text = io.read_text(html_f)
             h_cleaned = re.sub(r'[ \t]*<meta name="generator" content="[^"]*"\s*/?>\n?', "", h_text)
             io.write_text(html_f, h_cleaned)

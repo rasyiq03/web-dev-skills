@@ -6,7 +6,7 @@ You are the main agent. You run the sitting; you do not vote.
 the outcome is one decision everyone can work with.
 
 **You do:**
-- Give every member the same packet (`deliberation/<sitting>.packet.md`) and their own
+- Give every member the same packet (`<work>/deliberation/<sitting>.packet.md`) and their own
   role card. In round 1 nobody sees another member's proposal.
 - Collect the answers word for word into the minutes; do not improve them.
 - In round 3, write the synthesis: the option no member still blocks. If one revision does

@@ -34,9 +34,9 @@ def seed_lint_violations(proj):
     I.S. : proj sudah di-scaffold.
     F.S. : main.js memuat if tanpa kurung kurawal; components.css memuat kelas non-BEM.
     """
-    main_file = proj / "site" / "js" / "main.js"
+    main_file = proj.parent / "js" / "main.js"
     io.write_text(main_file, io.read_text(main_file) + "\nif (true) alert(1);\n")
-    comp_file = proj / "site" / "css" / "components.css"
+    comp_file = proj.parent / "css" / "components.css"
     io.write_text(comp_file, io.read_text(comp_file) + "\n.Bad {\n\tmargin: 0;\n}\n")
 
 
@@ -95,7 +95,7 @@ def test_check_runs_linters_for_project_outside_repo(kopi_outside_repo):
 
 @pytest.mark.node
 def test_check_ignores_git_folder_in_site(kopi_scaffolded_check):
-    add_git_folder(kopi_scaffolded_check / "site")
+    add_git_folder(kopi_scaffolded_check.parent)
 
     result = run_script("check", "kopi-senja")
 
@@ -135,7 +135,7 @@ def test_check_clean_skeleton_passes(kopi_scaffolded_check):
 
 @pytest.mark.node
 def test_check_seeded_violations_and_round_recovery(kopi_scaffolded_check):
-    site_dir = kopi_scaffolded_check / "site"
+    site_dir = kopi_scaffolded_check.parent
 
     # 1. Tanam 4 pelanggaran yang disyaratkan spesifikasi:
     # a) hex color di components.css

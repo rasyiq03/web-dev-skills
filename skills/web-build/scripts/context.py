@@ -71,7 +71,7 @@ def get_page_context(slug, page):
         lines.append(f"placeholders | {' '.join(n['label'] for n in view['placeholders'])}")
 
     # Konten file
-    lines.append(f"content | content/{project.first_language(brief)}.yaml#{page}")
+    lines.append(f"content | {paths.WORK_DIR}/content/{project.first_language(brief)}.yaml#{page}")
 
     # Hitung perkiraan token (characters / 4)
     total_chars = sum(len(line) + 1 for line in lines)

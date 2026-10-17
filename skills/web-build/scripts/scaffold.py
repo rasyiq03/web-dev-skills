@@ -1,7 +1,7 @@
 # ============================================================
 # File      : scaffold.py
 # Proyek    : ScaffolDev
-# Deskripsi : Membuat struktur direktori site/, menyalin token & konfigurasi,
+# Deskripsi : Membuat struktur situs di folder proyek, menyalin token & konfigurasi,
 #             menyiapkan skeleton HTML per halaman, base.css, main.js,
 #             dan lapisan mock API.
 # ============================================================
@@ -217,20 +217,28 @@ def scaffold(slug, force=False):
     Eksekusi scaffolding proyek projects/<slug>/.
 
     I.S. : projects/<slug>/ memiliki tokens.css, decisions.yaml, dan brief.yaml.
-    F.S. : Folder site/ terisi lengkap, config tersalin, template mock terisi,
+    F.S. : Situs terisi lengkap di folder proyek, config tersalin ke .ScaffolDev, template mock terisi,
            state.yaml diperbarui; mencetak ringkasan dan baris NEXT.
     """
     proj_dir = project.open_project(slug, need=["brief.yaml", "decisions.yaml", "tokens.css", "fonts.html"])
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
 
-    if site_dir.exists() and any(site_dir.iterdir()):
+    if paths.has_site_content(site_dir):
         if not force:
             fail(
                 EXIT_INVALID,
-                f"Folder {site_dir} sudah berisi file. Gunakan --force untuk menimpa.",
-                f"run scaffold.py {slug} --force (this deletes site/; save endpoints.js and data/mock/ first)",
+                f"Folder {site_dir} sudah berisi situs. Gunakan --force untuk menimpa.",
+                f"run scaffold.py {slug} --force (this deletes the site files; save js/api/endpoints.js and data/mock/ first)",
             )
-        shutil.rmtree(site_dir)
+
+        # Hapus file situs saja; folder kerja .ScaffolDev dan .git tetap utuh
+        for entry in site_dir.iterdir():
+            if entry.name in paths.SITE_IGNORED_DIRS:
+                continue
+            if entry.is_dir():
+                shutil.rmtree(entry)
+            else:
+                entry.unlink()
 
     brief = io.read_yaml(proj_dir / "brief.yaml")
     decisions = io.read_yaml(proj_dir / "decisions.yaml")
@@ -349,7 +357,8 @@ def scaffold(slug, force=False):
 
     # 9. Format awal dengan Prettier agar skeleton langsung lolos prettier --check
     #    (kegagalan Prettier dilaporkan check.py sebagai tool-failed)
-    node_tools.run_tool("prettier", ["--write", "site/**/*.{html,css}"], proj_dir)
+    pretty = [p.relative_to(site_dir).as_posix() for pattern in ("*.html", "*.css") for p in paths.site_files(site_dir, pattern)]
+    node_tools.run_tool("prettier", ["--write", "--config", str(proj_dir / ".prettierrc.json"), *pretty], site_dir)
 
     io.save_state(
         proj_dir,
@@ -361,7 +370,7 @@ def scaffold(slug, force=False):
 
     lines = [
         f"Scaffolding berhasil untuk '{slug}':",
-        f"  - site/ ({len(pages_list)} halaman HTML: {', '.join(pages_list)})",
+        f"  - situs di {site_dir} ({len(pages_list)} halaman HTML: {', '.join(pages_list)})",
         "  - css/ (tokens.css, base.css, layout.css, components.css)",
         "  - js/ (main.js, mock API layer di js/api/)",
         f"  - {len(config_hashes)} file konfigurasi disalin dan di-hash",
@@ -369,7 +378,7 @@ def scaffold(slug, force=False):
     if is_dashboard:
         lines.append("  - File khusus dashboard (charts.js, table.js, filters.js, chart.umd.js) disiapkan")
 
-    return lines, f"write content/{first_lang}.yaml (web-build skill step 5)"
+    return lines, f"write {paths.WORK_DIR}/content/{first_lang}.yaml (web-build skill step 5)"
 
 
 def main():
@@ -381,7 +390,7 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Buat kerangka proyek web-build.")
     parser.add_argument("slug", help="Slug proyek")
-    parser.add_argument("--force", action="store_true", help="Timpa isi site/ jika sudah ada")
+    parser.add_argument("--force", action="store_true", help="Timpa file situs jika sudah ada (.ScaffolDev tetap)")
 
     args = parser.parse_args()
     return scaffold(args.slug, force=args.force)

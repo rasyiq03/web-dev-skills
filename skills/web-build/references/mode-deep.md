@@ -8,7 +8,7 @@ the user and never invents a fact.
 
 ## Setup
 
-- In step 1 write `mode: deep` in `brief.yaml` (and leave `interactive` false). Work
+- In step 1 write `mode: deep` in `<work>/brief.yaml` (and leave `interactive` false). Work
   through the web-build steps as usual; the sittings replace your own judgment at the
   decision points below.
 - The council: you are the **Pimpinan sidang** (chair); the five members are the
@@ -38,7 +38,7 @@ the user and never invents a fact.
    objection remains, give the objecting members one revision round; mark each objection
    `resolved: true` once it is met. If one still blocks, call a vote: one vote per member,
    the sitting's owner counts double, a tie goes to the owner's choice.
-5. Write `deliberation/<sitting>.yaml` (schema `schemas/deliberation.schema.json`): roles,
+5. Write `<work>/deliberation/<sitting>.yaml` (schema `schemas/deliberation.schema.json`): roles,
    rounds with every answer word for word, and the resolution (method, outcome, summary,
    votes, dissent, vetoes). Then run `run council <slug> <sitting> --record`. It checks the
    rules (everyone heard, evidence for every block, no open block under mufakat, the vote
@@ -70,5 +70,5 @@ or missing fact stays a `[[ISI: …]]` placeholder, listed in `resolution.vetoes
 Deep mode is done when all four sittings are recorded, `check` reports zero errors and zero
 warnings, and `handoff` prints "Siap pakai". Report to the user in a few plain sentences:
 what the council decided and why, whether any sitting was simulated or went to a vote,
-the placeholders still to fill, and that `EXPLAIN.html` and `deliberation/` show every
+the placeholders still to fill, and that `<work>/EXPLAIN.html` and `<work>/deliberation/` show every
 decision and the minutes.

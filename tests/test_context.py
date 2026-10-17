@@ -25,7 +25,7 @@ def test_context_kopi_senja_index(projects_dir):
     assert "component | button |" in out
     assert "signature |" in out
     assert "placeholders |" in out
-    assert "content | content/id.yaml#index" in out
+    assert "content | .ScaffolDev/content/id.yaml#index" in out
     assert "approx_tokens |" in out
 
     # Periksa batas token (< 1500)

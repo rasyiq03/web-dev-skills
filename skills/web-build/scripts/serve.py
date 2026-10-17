@@ -336,14 +336,18 @@ def run_server(slug, timeout_seconds=1800):
     I.S. : slug nama proyek, timeout_seconds batas waktu server berjalan.
     F.S. : Exit 0 bila tersimpan, exit 4 bila waktu habis, exit 1 bila input tidak valid.
     """
-    proj_dir = paths.project_dir(slug)
+    if paths.project_dir(slug).is_dir():
+        project.migrate_legacy(paths.project_dir(slug))
+
+    # File kerja (brief, gaps) ada di folder .ScaffolDev proyek
+    proj_dir = paths.work_dir(slug)
     if not proj_dir.is_dir():
-        print(f"Error: direktori proyek 'projects/{slug}' tidak ditemukan.", file=sys.stderr)
+        print(f"Error: folder kerja proyek '{proj_dir}' tidak ditemukan.", file=sys.stderr)
         sys.exit(1)
 
     brief_file = proj_dir / "brief.yaml"
     if not brief_file.is_file():
-        print(f"Error: 'brief.yaml' tidak ditemukan di 'projects/{slug}'.", file=sys.stderr)
+        print(f"Error: 'brief.yaml' tidak ditemukan di '{proj_dir}'.", file=sys.stderr)
         sys.exit(1)
 
     brief = io.read_yaml(brief_file)

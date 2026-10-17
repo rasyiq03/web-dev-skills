@@ -73,4 +73,4 @@ def test_missing_project_names_absolute_brief_path(projects_dir):
     result = run_script("validate_brief", "belum-ada")
 
     assert result.returncode == 1
-    assert next_line(result) == f"NEXT: write {projects_dir / 'belum-ada' / 'brief.yaml'} first"
+    assert next_line(result) == f"NEXT: write {projects_dir / 'belum-ada' / '.ScaffolDev' / 'brief.yaml'} first"

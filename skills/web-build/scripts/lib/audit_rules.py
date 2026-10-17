@@ -26,7 +26,7 @@ def check_file_headers(site_dir):
     F.S. : List finding galat dikembalikan.
     """
     findings = []
-    for file_path in site_dir.rglob("*"):
+    for file_path in paths.site_files(site_dir, "*"):
         if not file_path.is_file():
             continue
         rel = file_path.relative_to(site_dir).as_posix()
@@ -42,7 +42,7 @@ def check_file_headers(site_dir):
                 "rule": "file-header-missing",
                 "category": "lint",
                 "level": "error",
-                "file": f"site/{rel}",
+                "file": rel,
                 "line": 1,
                 "message": f"Header file standar tidak ditemukan pada 10 baris pertama file {rel}.",
                 "fix": "Tambahkan header file 7 baris sesuai konvensi.",
@@ -59,7 +59,7 @@ def check_html_banners_and_links(site_dir):
     F.S. : List finding dikembalikan.
     """
     findings = []
-    for html_file in site_dir.rglob("*.html"):
+    for html_file in paths.site_files(site_dir, "*.html"):
         rel = html_file.relative_to(site_dir).as_posix()
         content = io.read_text(html_file)
         lines = content.splitlines()
@@ -71,7 +71,7 @@ def check_html_banners_and_links(site_dir):
                     "rule": "empty-link",
                     "category": "design",
                     "level": "error",
-                    "file": f"site/{rel}",
+                    "file": rel,
                     "line": idx + 1,
                     "message": "Tautan kosong atau tautan jangkar tanpa target (#) ditemukan.",
                     "fix": "Point the link at a real page, a section anchor, a tel:/mailto:/wa.me URL, or use a button.",
@@ -86,7 +86,7 @@ def check_html_banners_and_links(site_dir):
                         "rule": "banner-missing",
                         "category": "lint",
                         "level": "error",
-                        "file": f"site/{rel}",
+                        "file": rel,
                         "line": idx + 1,
                         "message": "Komentar banner seksi 3 baris hilang sebelum tag <section>.",
                         "fix": "Tambahkan komentar banner 3 baris di atas tag <section>.",
@@ -120,7 +120,7 @@ def check_css_raw_color(site_dir):
                     "rule": "raw-color",
                     "category": "design",
                     "level": "error",
-                    "file": f"site/{rel}",
+                    "file": rel,
                     "line": idx + 1,
                     "message": f"{match.group(1)} di luar tokens.css.",
                     "fix": "Use the matching var(--pd-color-*) from tokens.css.",
@@ -159,7 +159,7 @@ def check_js_conventions(site_dir):
                         "rule": "jsdoc-missing-state",
                         "category": "lint",
                         "level": "error",
-                        "file": f"site/{rel}",
+                        "file": rel,
                         "line": idx + 1,
                         "message": f"Fungsi {fname} tidak memiliki I.S. atau F.S. pada JSDoc.",
                         "fix": "Lengkapi blok JSDoc di atas fungsi dengan baris I.S. dan F.S.",
@@ -180,7 +180,7 @@ def evaluate_constraints(proj_dir, decisions_data):
     I.S. : proj_dir dan decisions_data valid.
     F.S. : (findings, tfs_auto) dikembalikan.
     """
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
     constraints = decisions_data.get("constraints", [])
     if not constraints:
         return [], 1.0
@@ -282,7 +282,7 @@ def evaluate_constraints(proj_dir, decisions_data):
             target_word = "Anda" if pronoun == "kamu" else ("kamu" if pronoun == "Anda" else None)
             found_word = False
             if target_word:
-                for html_file in site_dir.rglob("*.html"):
+                for html_file in paths.site_files(site_dir, "*.html"):
                     soup = BeautifulSoup(io.read_text(html_file), "html.parser")
                     text = soup.get_text()
                     if re.search(rf"\b{re.escape(target_word)}\b", text, re.IGNORECASE):
@@ -346,10 +346,10 @@ def check_unsourced_number(proj_dir, rule, brief, decisions, site_type):
     F.S. : Satu temuan per angka yang tidak bersumber dikembalikan.
     """
     findings = []
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
     brief_numbers = _extract_all_numbers(brief)
 
-    for html_file in site_dir.rglob("*.html"):
+    for html_file in paths.site_files(site_dir, "*.html"):
         rel = html_file.relative_to(site_dir).as_posix()
         soup = BeautifulSoup(io.read_text(html_file), "html.parser")
 
@@ -376,7 +376,7 @@ def check_unsourced_number(proj_dir, rule, brief, decisions, site_type):
                 "rule": rule["id"],
                 "category": "design",
                 "level": rule.get("level", "error"),
-                "file": f"site/{rel}",
+                "file": rel,
                 "line": 1,
                 "message": f"Angka {val} pada teks tampak tidak ditemukan di brief.yaml.",
                 "fix": rule.get("fix", "Replace the number with [[ISI: <what it measures>]] or use the value from the brief."),
@@ -393,10 +393,10 @@ def check_unsourced_quote(proj_dir, rule, brief, decisions, site_type):
     F.S. : Satu temuan per <blockquote> yang teksnya tidak ada di facts dikembalikan.
     """
     findings = []
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
     brief_facts_text = json.dumps(brief.get("facts", {}))
 
-    for html_file in site_dir.rglob("*.html"):
+    for html_file in paths.site_files(site_dir, "*.html"):
         rel = html_file.relative_to(site_dir).as_posix()
         soup = BeautifulSoup(io.read_text(html_file), "html.parser")
         for bq in soup.find_all("blockquote"):
@@ -408,7 +408,7 @@ def check_unsourced_quote(proj_dir, rule, brief, decisions, site_type):
                     "rule": rule["id"],
                     "category": "design",
                     "level": rule.get("level", "error"),
-                    "file": f"site/{rel}",
+                    "file": rel,
                     "line": 1,
                     "message": "Kutipan <blockquote> tidak bersumber dari facts brief.yaml.",
                     "fix": rule.get("fix", "Use a quote from the brief or [[ISI: testimoni pelanggan]]."),
@@ -425,8 +425,8 @@ def check_animate_everything(proj_dir, rule, brief, decisions, site_type):
     F.S. : Satu temuan per halaman yang melewati ambang 30% dikembalikan.
     """
     findings = []
-    site_dir = proj_dir / "site"
-    for html_file in site_dir.rglob("*.html"):
+    site_dir = paths.site_dir(proj_dir)
+    for html_file in paths.site_files(site_dir, "*.html"):
         rel = html_file.relative_to(site_dir).as_posix()
         soup = BeautifulSoup(io.read_text(html_file), "html.parser")
         main_tag = soup.find("main")
@@ -442,7 +442,7 @@ def check_animate_everything(proj_dir, rule, brief, decisions, site_type):
                 "rule": rule["id"],
                 "category": "design",
                 "level": rule.get("level", "warning"),
-                "file": f"site/{rel}",
+                "file": rel,
                 "line": 1,
                 "message": f"{ratio * 100:.1f}% elemen di dalam <main> menggunakan animasi (>30%).",
                 "fix": rule.get("fix", "Keep motion for the hero entrance and direct feedback (hover, focus, open/close)."),
@@ -457,7 +457,7 @@ def check_raw_color(proj_dir, rule, brief, decisions, site_type):
     I.S. : site/css/ berisi file CSS.
     F.S. : List temuan warna mentah di luar tokens.css dikembalikan.
     """
-    return check_css_raw_color(proj_dir / "site")
+    return check_css_raw_color(paths.site_dir(proj_dir))
 
 
 def check_raw_font(proj_dir, rule, brief, decisions, site_type):
@@ -469,7 +469,7 @@ def check_raw_font(proj_dir, rule, brief, decisions, site_type):
     F.S. : Satu temuan per deklarasi font-family mentah, lengkap dengan nomor baris, dikembalikan.
     """
     findings = []
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
     for css_file in (site_dir / "css").rglob("*.css"):
         if css_file.name == "tokens.css":
             continue
@@ -484,7 +484,7 @@ def check_raw_font(proj_dir, rule, brief, decisions, site_type):
                         "rule": rule["id"],
                         "category": "design",
                         "level": rule.get("level", "error"),
-                        "file": f"site/{rel}",
+                        "file": rel,
                         "line": idx + 1,
                         "message": f"Nilai font-family '{val}' di luar tokens.css.",
                         "fix": rule.get("fix", "Use var(--pd-font-display), var(--pd-font-body), or var(--pd-font-mono)."),
@@ -500,7 +500,7 @@ def check_purple_blue_gradient(proj_dir, rule, brief, decisions, site_type):
     F.S. : Satu temuan per baris gradien yang cocok dikembalikan.
     """
     findings = []
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
     for css_file in (site_dir / "css").rglob("*.css"):
         rel = css_file.relative_to(site_dir).as_posix()
         lines = io.read_text(css_file).splitlines()
@@ -511,7 +511,7 @@ def check_purple_blue_gradient(proj_dir, rule, brief, decisions, site_type):
                         "rule": rule["id"],
                         "category": "design",
                         "level": rule.get("level", "warning"),
-                        "file": f"site/{rel}",
+                        "file": rel,
                         "line": idx + 1,
                         "message": "Gradien ungu-biru ditemukan di luar palet.",
                         "fix": rule.get("fix", "Use flat colors from the palette; a gradient only when the style file lists one."),
@@ -539,9 +539,9 @@ def check_emoji_in_heading(proj_dir, rule, brief, decisions, site_type):
     F.S. : Satu temuan per elemen yang memuat emoji dikembalikan.
     """
     findings = []
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
     emoji_pattern = re.compile(r"[\U0001F300-\U0001FAFF\u2600-\u26FF\u2700-\u27BF]")
-    for html_file in site_dir.rglob("*.html"):
+    for html_file in paths.site_files(site_dir, "*.html"):
         rel = html_file.relative_to(site_dir).as_posix()
         soup = BeautifulSoup(io.read_text(html_file), "html.parser")
         for tag in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "button"]):
@@ -551,7 +551,7 @@ def check_emoji_in_heading(proj_dir, rule, brief, decisions, site_type):
                     "rule": rule["id"],
                     "category": "design",
                     "level": rule.get("level", "warning"),
-                    "file": f"site/{rel}",
+                    "file": rel,
                     "line": 1,
                     "message": f"Emoji terdeteksi pada elemen <{tag.name}>.",
                     "fix": rule.get("fix", "Use words, or an SVG icon with an accessible name."),
@@ -568,8 +568,8 @@ def check_centered_everything(proj_dir, rule, brief, decisions, site_type):
     F.S. : Satu temuan per halaman yang melewati ambang 60% dikembalikan.
     """
     findings = []
-    site_dir = proj_dir / "site"
-    for html_file in site_dir.rglob("*.html"):
+    site_dir = paths.site_dir(proj_dir)
+    for html_file in paths.site_files(site_dir, "*.html"):
         rel = html_file.relative_to(site_dir).as_posix()
         soup = BeautifulSoup(io.read_text(html_file), "html.parser")
         sections = soup.find_all("section")
@@ -587,7 +587,7 @@ def check_centered_everything(proj_dir, rule, brief, decisions, site_type):
                 "rule": rule["id"],
                 "category": "design",
                 "level": rule.get("level", "warning"),
-                "file": f"site/{rel}",
+                "file": rel,
                 "line": 1,
                 "message": f"{ratio * 100:.1f}% seksi memiliki teks perataan tengah (>60%).",
                 "fix": rule.get("fix", "Follow the layout pattern recorded in decisions.yaml."),
@@ -616,12 +616,12 @@ def check_hardcoded_data(proj_dir, rule, brief, decisions, site_type):
     F.S. : List temuan dikembalikan; kosong untuk tipe situs selain dashboard.
     """
     findings = []
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
     if brief.get("site_type") != "dashboard":
         return findings
 
     # Periksa dashboard HTML teks tampak (angka selain copyright)
-    for html_file in site_dir.rglob("*.html"):
+    for html_file in paths.site_files(site_dir, "*.html"):
         rel = html_file.relative_to(site_dir).as_posix()
         soup = BeautifulSoup(io.read_text(html_file), "html.parser")
         main_tag = soup.find("main")
@@ -634,7 +634,7 @@ def check_hardcoded_data(proj_dir, rule, brief, decisions, site_type):
                     "rule": rule["id"],
                     "category": "design",
                     "level": rule.get("level", "error"),
-                    "file": f"site/{rel}",
+                    "file": rel,
                     "line": 1,
                     "message": f"Angka data hardcoded {val} ditemukan pada halaman dashboard.",
                     "fix": rule.get("fix", "Add an endpoint in js/api/endpoints.js, put the values in data/mock/<name>.mock.json, and render them from request()."),
@@ -673,11 +673,11 @@ def check_mock_people_quotes(proj_dir, rule, brief, decisions, site_type):
     F.S. : Satu temuan per file mock yang memuat kunci terlarang dikembalikan.
     """
     findings = []
-    mock_dir = proj_dir / "site" / "data" / "mock"
+    mock_dir = paths.site_dir(proj_dir) / "data" / "mock"
     forbidden_keys = {"quote", "testimonial", "review", "testimoni", "ulasan"}
     if mock_dir.is_dir():
         for mf in mock_dir.glob("*.mock.json"):
-            rel = mf.relative_to(proj_dir).as_posix()
+            rel = mf.relative_to(paths.site_dir(proj_dir)).as_posix()
             text = io.read_text(mf).lower()
             if any(f'"{k}"' in text for k in forbidden_keys):
                 findings.append({
@@ -711,8 +711,8 @@ def check_chart_without_text(proj_dir, rule, brief, decisions, site_type):
     F.S. : Satu temuan per canvas tanpa alternatif teks dikembalikan.
     """
     findings = []
-    site_dir = proj_dir / "site"
-    for html_file in site_dir.rglob("*.html"):
+    site_dir = paths.site_dir(proj_dir)
+    for html_file in paths.site_files(site_dir, "*.html"):
         rel = html_file.relative_to(site_dir).as_posix()
         soup = BeautifulSoup(io.read_text(html_file), "html.parser")
         for c in soup.find_all("canvas"):
@@ -723,7 +723,7 @@ def check_chart_without_text(proj_dir, rule, brief, decisions, site_type):
                     "rule": rule["id"],
                     "category": "design",
                     "level": rule.get("level", "error"),
-                    "file": f"site/{rel}",
+                    "file": rel,
                     "line": 1,
                     "message": "Canvas grafik tanpa aria-label dan tanpa tabel data penyerta.",
                     "fix": rule.get("fix", "Add an aria-label summary and the same data in a visually hidden <table>."),
@@ -750,7 +750,7 @@ def audit_anti_slop(proj_dir, brief, decisions, site_type):
     data = io.read_yaml(anti_slop_path)
     rules = data.get("rules", [])
     findings = []
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
 
     for r in rules:
         rid = r["id"]
@@ -771,7 +771,7 @@ def audit_anti_slop(proj_dir, brief, decisions, site_type):
                         target_files.append(f)
             else:
                 for ext in ("*.html", "*.css", "*.js"):
-                    for f in site_dir.rglob(ext):
+                    for f in paths.site_files(site_dir, ext):
                         rel = f.relative_to(site_dir).as_posix()
                         if "vendor" not in rel and "data/mock" not in rel:
                             target_files.append(f)
@@ -785,7 +785,7 @@ def audit_anti_slop(proj_dir, brief, decisions, site_type):
                             "rule": rid,
                             "category": "design",
                             "level": r.get("level", "error"),
-                            "file": f"site/{rel}",
+                            "file": rel,
                             "line": idx + 1,
                             "message": f"Pola '{rid}' terdeteksi pada baris {idx + 1}.",
                             "fix": r.get("fix", "Sesuaikan kode dengan konvensi."),
@@ -803,7 +803,7 @@ def audit_anti_slop(proj_dir, brief, decisions, site_type):
                         if line_clean and not line_clean.startswith("#"):
                             cliche_phrases.append(line_clean)
 
-            for html_file in site_dir.rglob("*.html"):
+            for html_file in paths.site_files(site_dir, "*.html"):
                 rel = html_file.relative_to(site_dir).as_posix()
                 soup = BeautifulSoup(io.read_text(html_file), "html.parser")
                 visible_text = soup.get_text().lower()
@@ -813,7 +813,7 @@ def audit_anti_slop(proj_dir, brief, decisions, site_type):
                             "rule": rid,
                             "category": "design",
                             "level": r.get("level", "warning"),
-                            "file": f"site/{rel}",
+                            "file": rel,
                             "line": 1,
                             "message": f"Frasa klise '{phrase}' ditemukan pada teks tampak.",
                             "fix": r.get("fix", "Ganti dengan kalimat yang memuat fakta konkret dari brief."),
@@ -847,7 +847,7 @@ def check_data_layer(proj_dir, site_type):
     F.S. : List finding data layer dikembalikan.
     """
     findings = []
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
     state = io.load_state(proj_dir)
 
     data_sections = [s for s in site_type.get("sections", []) if s.get("data") is True]
@@ -864,9 +864,9 @@ def check_data_layer(proj_dir, site_type):
                 "rule": "api-template-modified",
                 "category": "design",
                 "level": "error",
-                "file": "site/js/api/client.js",
+                "file": "js/api/client.js",
                 "line": 1,
-                "message": "File site/js/api/client.js telah diubah dari template bawaan.",
+                "message": "File js/api/client.js telah diubah dari template bawaan.",
                 "fix": "Pulihkan isi asli file template; letakkan perubahan hanya di endpoints.js.",
             })
 
@@ -876,9 +876,9 @@ def check_data_layer(proj_dir, site_type):
                 "rule": "api-template-modified",
                 "category": "design",
                 "level": "error",
-                "file": "site/js/api/mock-label.js",
+                "file": "js/api/mock-label.js",
                 "line": 1,
-                "message": "File site/js/api/mock-label.js telah diubah dari template bawaan.",
+                "message": "File js/api/mock-label.js telah diubah dari template bawaan.",
                 "fix": "Pulihkan isi asli template mock-label.js.",
             })
 
@@ -908,7 +908,7 @@ def check_data_layer(proj_dir, site_type):
                         "rule": "mock-file-invalid",
                         "category": "design",
                         "level": "error",
-                        "file": f"site/data/mock/{mf.name}",
+                        "file": f"data/mock/{mf.name}",
                         "line": 1,
                         "message": f"File mock {mf.name} melanggar skema: {'; '.join(errs)}",
                         "fix": "Sesuaikan file dengan schemas/mock.schema.json (butuh _mock: true dan data).",
@@ -918,7 +918,7 @@ def check_data_layer(proj_dir, site_type):
                     "rule": "mock-file-invalid",
                     "category": "design",
                     "level": "error",
-                    "file": f"site/data/mock/{mf.name}",
+                    "file": f"data/mock/{mf.name}",
                     "line": 1,
                     "message": f"File mock gagal di-parse: {e}",
                     "fix": "Pastikan file berupa JSON valid.",
@@ -930,10 +930,10 @@ def check_data_layer(proj_dir, site_type):
                 "rule": "mock-file-invalid",
                 "category": "design",
                 "level": "error",
-                "file": "site/js/api/endpoints.js",
+                "file": "js/api/endpoints.js",
                 "line": 1,
                 "message": f"Endpoint '{ep_name}' merujuk file mock '{mock_name}.mock.json' yang tidak ada.",
-                "fix": f"Buat file site/data/mock/{mock_name}.mock.json.",
+                "fix": f"Buat file data/mock/{mock_name}.mock.json.",
             })
 
     for mf_name in mock_files:
@@ -942,10 +942,10 @@ def check_data_layer(proj_dir, site_type):
                 "rule": "mock-file-invalid",
                 "category": "design",
                 "level": "error",
-                "file": f"site/data/mock/{mf_name}.mock.json",
+                "file": f"data/mock/{mf_name}.mock.json",
                 "line": 1,
                 "message": f"File mock '{mf_name}.mock.json' tidak didaftarkan di endpoints.js.",
-                "fix": f"Daftarkan endpoint untuk {mf_name} di site/js/api/endpoints.js.",
+                "fix": f"Daftarkan endpoint untuk {mf_name} di js/api/endpoints.js.",
             })
 
     for s in data_sections:
@@ -960,7 +960,7 @@ def check_data_layer(proj_dir, site_type):
                     "rule": "mock-label-missing",
                     "category": "design",
                     "level": "error",
-                    "file": f"site/{page_rel}",
+                    "file": page_rel,
                     "line": 1,
                     "message": f"Halaman data {page_rel} tidak memiliki elemen [data-pd-mock-label].",
                     "fix": "Sertakan <p class='pd-mock-label' data-pd-mock-label hidden>Data contoh</p>.",
