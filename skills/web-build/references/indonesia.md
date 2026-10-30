@@ -73,3 +73,10 @@ the time zone (WIB, WITA, WIT) whenever hours appear.
 - **Warm and friendly reads as trustworthy** for most small businesses; government,
   health, finance, and education lean formal ("Anda", fuller sentences, calmer colors).
   Let the brief's audience decide, as `copy-id.md` says for register.
+
+## What check.py verifies
+
+`check.py` reports these from the built pages, so fix them like any other finding:
+`page-lang` (each page's `lang`), `wa-number-format` (`https://wa.me/62…`), `wa-in-hero`
+(a WhatsApp button in the home page hero when the site type takes WhatsApp), `page-weight`
+(500 KB of local files per page), and `id-price-format` / `id-time-format` (the table above).

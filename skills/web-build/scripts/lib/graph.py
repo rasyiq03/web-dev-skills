@@ -21,7 +21,7 @@ GRAPH_FILE = "graph.json"
 GRAPH_VERSION = 1
 
 # Grup token yang dicetak context.py, sesuai urutan lamanya
-CONTEXT_TOKEN_GROUPS = ("color", "font", "size", "space", "border", "shadow", "motion")
+CONTEXT_TOKEN_GROUPS = ("color", "font", "weight", "size", "space", "border", "shadow", "motion")
 
 # Arah telusur dampak: ikuti edge maju untuk jenis ini, dan mundur untuk jenis itu
 IMPACT_FORWARD = {"realized_by", "verified_by", "located_in", "contains", "fills"}

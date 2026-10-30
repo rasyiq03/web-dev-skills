@@ -366,8 +366,9 @@ the same norms apply to the single agent in every mode:
 data, WhatsApp as the main call to action, landmark-based directions, trust signals that
 only appear when stated (NIB, P-IRT, BPOM, halal, QRIS), Indonesian formats (Rp25.000,
 08.00–21.00 WIB), and local identity taken from the brief rather than generic ornament.
-The council's Wakil klien checks these, and a future `check.py` rule can verify the
-measurable ones (a `wa.me` link in the hero, `lang="id"`, page weight).
+The council's Wakil klien checks these, and `check.py` verifies the measurable ones
+(a `wa.me` link in the hero, `lang="id"`, page weight, price and time formats; see
+`lib/locale_rules.py`).
 
 **Plain language everywhere a person reads.** Checkpoint questions, decision cards,
 `EXPLAIN.html`, `HANDOFF.md`, and council minutes use short sentences and everyday words.

@@ -200,7 +200,7 @@ def build_decisions(slug, chosen, source, seed, site_type, style_data):
         "based_on": based_on,
         "rationale": chosen["rationale"]["typography"],
         "source": source,
-        "realized_by": ["font.display", "font.body", "font.mono"],
+        "realized_by": ["font.display", "font.body", "font.mono", "weight.display"],
         "verified_by": [c["id"] for c in c_typo],
     }
 

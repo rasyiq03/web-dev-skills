@@ -372,6 +372,17 @@ One run = one round. Order of work:
 }
 ```
 
+**Locale rules (`lib/locale_rules.py`, 2026-10-30).** Measurable parts of
+`references/indonesia.md`, kept out of `audit/` because they read the brief:
+
+| Rule | Level | Applies to | Checks |
+| --- | --- | --- | --- |
+| `page-lang` | error | every page | `<html lang>` matches the page's language (first language at the root, others under `<lang>/`) |
+| `wa-number-format` | error | every page | `wa.me` links use `62…` with no 0, `+`, or dashes (a placeholder passes) |
+| `page-weight` | warning | every page | HTML plus local CSS, JS, and images stays under 500 KB |
+| `wa-in-hero` | warning | Indonesian home page, site types with a `whatsapp` fact | a built hero holds a WhatsApp link; an empty scaffold hero is skipped |
+| `id-price-format`, `id-time-format` | warning | Indonesian pages | visible text writes Rp25.000 and 08.00 WIB, not Rp 25,000 or 8:00 AM |
+
 **Rounds and stopping.** Copy `site/` to `rounds/<n>/` before writing the report.
 Limits: findings with `category: lint` may continue up to round 5; once only `design`
 findings remain, at most 2 further rounds. Stop when there are no errors and no warnings,

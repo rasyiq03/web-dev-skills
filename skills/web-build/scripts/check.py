@@ -13,7 +13,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import audit_rules, io, node_tools, paths, project, report, trace
+from lib import audit_rules, io, locale_rules, node_tools, paths, project, report, trace
 from lib.report import EXIT_CHECK_FAILED, EXIT_INVALID, fail
 
 
@@ -328,6 +328,9 @@ def run_check(slug):
 
     # 8. Paritas dwibahasa (Langkah 8)
     findings += audit_rules.check_bilingual_parity(proj_dir, brief)
+
+    # 8b. Lokal Indonesia: lang halaman, WhatsApp, berat halaman, format harga dan jam
+    findings += locale_rules.check_locale(proj_dir, brief, site_type)
 
     # Deduplikasi temuan
     seen_keys = set()
