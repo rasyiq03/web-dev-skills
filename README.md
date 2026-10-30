@@ -29,13 +29,28 @@ Or add it from the app: use `rasyiq03/web-dev-skills` (or
 **scaffoldev**. To try an unmerged branch, append it to the git URL:
 `https://github.com/rasyiq03/web-dev-skills.git#<branch>`.
 
-Update with `/plugin marketplace update scaffoldev`. Claude Code installs a new copy only
-when the version in `.claude-plugin/plugin.json` changes, so raise it with every release.
+Update with `/plugin marketplace update scaffoldev`. Claude Code and Codex install a new
+copy only when the version changes, so raise it with every release in both
+`.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` (a test keeps them equal).
+
+In Codex (0.166 or newer):
+
+```
+codex plugin marketplace add rasyiq03/web-dev-skills
+codex plugin add scaffoldev@scaffoldev
+```
+
+For an unmerged branch, use `rasyiq03/web-dev-skills@<branch>` as the source. Codex lists
+the skills as `scaffoldev:web-build` and `scaffoldev:web-design`. Older Codex versions can
+use `python tools/sync_adapters.py`, which links the skills into `.agents/skills/`.
+
+The first run installs Python packages and Node tools into a cache folder. When an update
+needs new versions, the new cache replaces the old one automatically.
 
 Installed it before the rename to ScaffolDev (as `web-skills@web-dev-skills`)? Remove the
 old one first with `/plugin uninstall web-skills@web-dev-skills` and
-`/plugin marketplace remove web-dev-skills`, then run the two commands above. The old
-dependency cache folder (`web-skills`) can be deleted.
+`/plugin marketplace remove web-dev-skills`, then run the two commands above. Its old
+dependency cache (`web-skills`) is deleted on the first run.
 
 ## Use
 

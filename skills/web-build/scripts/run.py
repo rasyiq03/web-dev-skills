@@ -76,6 +76,7 @@ def prepare_dependencies():
            node_modules yang dipakai.
     """
     cache = deps.cache_root()
+    deps.prune_legacy_cache(cache)
     target = deps.ensure_python_packages(paths.REPO_ROOT, cache)
 
     if target is not None:

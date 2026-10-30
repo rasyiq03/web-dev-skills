@@ -670,10 +670,15 @@ and headings used the browser's default 700, which makes a fake bold. Pairings n
 `fonts.html` asks only for the weights a family is used at. The network test
 `test_every_font_exists_on_google_fonts_with_the_weights_used` keeps this true.
 
-**Still to verify:**
+**Verified on 2026-10-30 (agents):**
 
-1. **Claude Code AGENTS.md support** (2.1.277+, used only when no CLAUDE.md exists) and the
-   **Codex skill path** `.agents/skills/`: both taken from third-party articles.
+- Claude Code 2.1.314 loads `AGENTS.md` when the folder has no `CLAUDE.md`, and ignores it
+  when a `CLAUDE.md` exists (tested with a codeword in a scratch repository).
+- Codex CLI 0.166.0 reads skills from `.agents/skills/` in the repository, and installs this
+  repository as a plugin: `codex plugin marketplace add` accepts `.claude-plugin/marketplace.json`,
+  and the plugin manifest it prefers is `.codex-plugin/plugin.json` (a test version 9.9.9
+  there was the version Codex installed). `codex debug prompt-input` lists
+  `scaffoldev:web-build` and `scaffoldev:web-design`.
 
 ## 6. Tests to write first (v0.1)
 
