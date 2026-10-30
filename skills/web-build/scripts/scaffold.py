@@ -115,6 +115,7 @@ def build_base_css(project_name, today_str):
         "h2,\n"
         "h3 {\n"
         "\tfont-family: var(--pd-font-display);\n"
+        "\tfont-weight: var(--pd-weight-display);\n"
         "\tline-height: 1.2;\n"
         "\tcolor: var(--pd-color-ink);\n"
         "}\n\n"

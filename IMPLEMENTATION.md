@@ -637,11 +637,17 @@ Pin these versions in `package.json` once v0.1 passes, so behaviour does not dri
 - A `site/` that the user turns into a git repo (for deployment) holds read-only object
   files on Windows; `check.py` and `handoff.py` skip `site/.git/`.
 
+**Verified on 2026-10-30 (Google Fonts):** every family in the style files exists. Three
+display families have only weight 400 (DM Serif Display, Archivo Black, Instrument Serif),
+and headings used the browser's default 700, which makes a fake bold. Pairings now carry
+`display_weight`, compiled into `--pd-weight-display` and used by `base.css` for `h1`–`h3`;
+`fonts.html` asks only for the weights a family is used at. The network test
+`test_every_font_exists_on_google_fonts_with_the_weights_used` keeps this true.
+
 **Still to verify:**
 
 1. **Claude Code AGENTS.md support** (2.1.277+, used only when no CLAUDE.md exists) and the
    **Codex skill path** `.agents/skills/`: both taken from third-party articles.
-2. **Google Fonts availability** of every family in the style files.
 
 ## 6. Tests to write first (v0.1)
 

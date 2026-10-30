@@ -28,6 +28,7 @@ palettes:
 pairings:
   - id: grotesk-mono
     display: Archivo Black
+    display_weight: 400        # the family has no bold; headings stay at 400
     body: Archivo
     mono: JetBrains Mono
   - id: wide-display

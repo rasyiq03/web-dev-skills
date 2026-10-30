@@ -113,6 +113,33 @@ def test_new_styles_compile_into_tokens(projects_dir, style_id):
 
     assert style["palettes"][0]["colors"]["accent"] in (work / "tokens.css").read_text(encoding="utf-8")
 
+    # Judul memakai ketebalan yang dimiliki font judul, dan hanya ketebalan itu yang diunduh
+    pairing = style["pairings"][0]
+    weight = pairing.get("display_weight", 700)
+    assert f"--pd-weight-display: {weight};" in (work / "tokens.css").read_text(encoding="utf-8")
+    fonts = (work / "fonts.html").read_text(encoding="utf-8")
+    expected = "400;600;700" if weight == 700 else "400"
+    assert f"family={pairing['display'].replace(' ', '+')}:wght@{expected}&" in fonts
+
+
+@pytest.mark.network
+def test_every_font_exists_on_google_fonts_with_the_weights_used():
+    import urllib.request
+
+    def served_weights(family):
+        url = f"https://fonts.googleapis.com/css2?family={family.replace(' ', '+')}:wght@400;600;700"
+        request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 Chrome/120"})
+        with urllib.request.urlopen(request, timeout=30) as response:
+            return {int(w) for w in re.findall(r"font-weight: (\d+)", response.read().decode())}
+
+    for entry in INDEX:
+        for pairing in load(entry)["pairings"]:
+            for role in ("body", "mono"):
+                assert 400 in served_weights(pairing[role]), f"{entry['id']}/{pairing['id']}: {pairing[role]}"
+            weight = pairing.get("display_weight", 700)
+            assert weight in served_weights(pairing["display"]), \
+                f"{entry['id']}/{pairing['id']}: {pairing['display']} has no weight {weight}; set display_weight"
+
 
 # ============================================================
 # ===================== HEURISTIK LAYOUT =====================

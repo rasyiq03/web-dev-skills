@@ -27,6 +27,7 @@ palettes:
 pairings:
   - id: dm-serif-sans
     display: DM Serif Display
+    display_weight: 400        # the family has no bold; headings stay at 400
     body: DM Sans
     mono: DM Mono
   - id: nunito-rounded

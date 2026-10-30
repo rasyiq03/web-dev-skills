@@ -161,6 +161,7 @@ def compile_tokens(slug):
             "display": pair_entry["display"],
             "body": pair_entry["body"],
             "mono": pair_entry["mono"],
+            "display_weight": pair_entry.get("display_weight", 700),
         }
 
     disp_family = raw_fonts["display"]
@@ -170,6 +171,11 @@ def compile_tokens(slug):
     disp_fallback = "serif" if is_serif(disp_family) else "sans-serif"
     body_fallback = "serif" if is_serif(body_family) else "sans-serif"
     mono_fallback = "monospace"
+
+    # Judul memakai ketebalan yang benar-benar dimiliki font judul; tanpa itu browser
+    # menebalkan huruf secara palsu (misalnya DM Serif Display hanya punya 400)
+    display_weight = int(raw_fonts.get("display_weight", 700))
+    weight_tokens = {"display": str(display_weight)}
 
     fonts_tokens = {
         "display": f"'{disp_family}', {disp_fallback}",
@@ -213,6 +219,7 @@ def compile_tokens(slug):
         "$schema": "https://design-tokens.github.io/community-group/format/",
         "color": dtcg_group(all_colors, "color"),
         "font": dtcg_group(fonts_tokens, "fontFamily"),
+        "weight": dtcg_group(weight_tokens, "fontWeight"),
         "size": dtcg_group(size_tokens, "dimension"),
         "space": dtcg_group(space_tokens, "dimension"),
         "radius": dtcg_group(radius_tokens, "dimension"),
@@ -253,6 +260,8 @@ def compile_tokens(slug):
     ]
     for k, v in fonts_tokens.items():
         css_lines.append(f"\t--pd-font-{k}: {v};")
+    for k, v in weight_tokens.items():
+        css_lines.append(f"\t--pd-weight-{k}: {v};")
 
     css_lines += [
         "",
@@ -316,9 +325,11 @@ def compile_tokens(slug):
     # 8. Susun fonts.html
     # Bangun parameter URL Google Fonts
     font_params = []
-    for fam in [disp_family, body_family, mono_family]:
+    # Font judul hanya diminta pada ketebalannya sendiri, supaya tidak mengunduh yang tak dipakai
+    disp_weights = "400;600;700" if display_weight == 700 else ";".join(sorted({"400", str(display_weight)}))
+    for fam, weights in ((disp_family, disp_weights), (body_family, "400;600;700"), (mono_family, "400;700")):
         safe_name = fam.replace(" ", "+")
-        font_params.append(f"family={safe_name}:wght@400;600;700")
+        font_params.append(f"family={safe_name}:wght@{weights}")
 
     query_str = "&".join(font_params) + "&display=swap"
     google_fonts_url = f"https://fonts.googleapis.com/css2?{query_str}"

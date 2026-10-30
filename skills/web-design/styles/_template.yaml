@@ -24,6 +24,7 @@ palettes:
 pairings:
   - id: pairing-one
     display: A Google Fonts family name
+    display_weight: 700        # optional; 400 when the family has no bold
     body: A Google Fonts family name
     mono: A Google Fonts family name
 
