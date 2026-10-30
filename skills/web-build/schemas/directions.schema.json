@@ -33,7 +33,8 @@
             "type": "object",
             "required": ["display", "body", "mono"],
             "additionalProperties": false,
-            "patternProperties": { ".*": { "type": "string" } }
+            "properties": { "display_weight": { "enum": [400, 500, 600, 700, 800, 900] } },
+            "patternProperties": { "^(display|body|mono)$": { "type": "string" } }
           },
           "layout": {
             "type": "object",

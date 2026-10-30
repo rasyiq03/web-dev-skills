@@ -1,0 +1,93 @@
+# Anchors: who = mahasiswa dan ibu rumah tangga (santai tapi sopan); where = Kediri, Jawa Timur
+# (pesan lewat WhatsApp, kirim se-Karesidenan); what = keripik dan camilan pedas buatan rumah.
+directions:
+  - id: dir-1
+    probability: 0.35
+    style: soft-organic
+    palette: kunyit
+    type_pairing: dm-serif-sans
+    layout: { hero: stacked-statement, featured: list-with-prices, catalog: price-list, how-to-order: numbered-steps }
+    motion: low
+    tone: hangat-akrab
+    register: { id: kamu }
+    summary: Warna kunyit dan sudut membulat, seperti toples keripik di dapur Bu Sari.
+    rationale:
+      style: Usaha rumahan di Kediri terasa paling jujur dengan tampilan hangat buatan tangan, bukan gaya pabrikan.
+      color: Kuning kunyit dan cokelat goreng mengingatkan pada bumbu balado dan keripik singkong yang dijual.
+      typography: Judul serif yang ramah cocok untuk ibu rumah tangga, teks sans tetap mudah dibaca mahasiswa di HP.
+      layout: Tanpa foto produk, hero berupa pernyataan teks dan daftar harga membuat tiga produk langsung terbaca.
+      motion: Gerak minimal supaya halaman cepat dibuka dengan kuota data mahasiswa.
+      tone: Mahasiswa dan ibu-ibu sama-sama terbiasa disapa akrab di chat WhatsApp.
+    based_on: [req-business.kind, req-business.location, req-audience, req-facts.products]
+  - id: dir-2
+    probability: 0.22
+    style: neobrutalism
+    palette: sun-block
+    type_pairing: wide-display
+    layout: { hero: full-bleed-type, featured: grid-staggered, catalog: product-grid-dense, how-to-order: checklist-card }
+    motion: low
+    tone: ceria-pedas
+    register: { id: kamu }
+    summary: Blok warna terang dan huruf lebar yang 'pedas', untuk pembeli muda.
+    rationale:
+      style: Garis tebal dan blok warna menarik perhatian mahasiswa yang menggulir cepat di HP.
+      color: Kuning terang dan merah cabai menegaskan bahwa yang dijual camilan pedas.
+      typography: Huruf judul lebar terasa berani, seperti label kemasan makaroni pedas.
+      layout: Kartu produk rapat menampilkan ketiga produk sekaligus tanpa perlu foto.
+      motion: Umpan balik saat tombol disentuh saja, supaya hemat data.
+      tone: Bahasa ceria cocok untuk mahasiswa yang membeli camilan untuk nongkrong.
+    based_on: [req-audience, req-facts.products, req-goal]
+  - id: dir-3
+    probability: 0.20
+    style: soft-organic
+    palette: gula-aren
+    type_pairing: nunito-rounded
+    layout: { hero: stacked-statement, featured: grid-staggered, catalog: price-list, how-to-order: checklist-card }
+    motion: none
+    tone: sopan-hangat
+    register: { id: Anda }
+    summary: Cokelat gula aren dan huruf bulat, sopan untuk ibu rumah tangga.
+    rationale:
+      style: Bentuk membulat terasa ramah bagi ibu rumah tangga yang memesan untuk keluarga.
+      color: Cokelat gula aren dekat dengan warna keripik tempe yang matang.
+      typography: Huruf bulat Nunito mudah dibaca di layar HP kecil oleh pembeli segala usia.
+      layout: Daftar harga sederhana dan langkah pesan bergaya checklist memudahkan pesanan pertama.
+      motion: Tanpa animasi agar ringan di HP kelas menengah.
+      tone: Sapaan "Anda" menghormati ibu rumah tangga yang menjadi pembeli tetap.
+    based_on: [req-audience, req-business.cultural_context, req-goal]
+  - id: dir-4
+    probability: 0.15
+    style: editorial
+    palette: forest-ledger
+    type_pairing: newsreader-public
+    layout: { hero: full-bleed-type, featured: list-with-prices, catalog: price-list, how-to-order: numbered-steps }
+    motion: none
+    tone: tenang-tradisional
+    register: { id: Anda }
+    summary: Seperti lembar menu toko oleh-oleh lama, tenang dan rapi.
+    rationale:
+      style: Gaya majalah memberi kesan toko oleh-oleh khas Kediri yang sudah dipercaya.
+      color: Hijau tua dan krem terasa seperti kertas pembungkus oleh-oleh tradisional.
+      typography: Serif Newsreader memberi kesan resep turun-temurun pada keripik tempe.
+      layout: Daftar harga bergaya menu membuat tiga produk mudah dibandingkan.
+      motion: Tanpa gerak, sesuai nada tenang dan halaman yang ringan.
+      tone: Nada tenang cocok bila pembeli memesan untuk oleh-oleh keluarga.
+    based_on: [req-business.location, req-business.cultural_context, req-facts.products]
+  - id: dir-5
+    probability: 0.08
+    style: neobrutalism
+    palette: warm-paper
+    type_pairing: bricolage-plex
+    layout: { hero: full-bleed-type, featured: list-with-prices, catalog: product-grid-dense, how-to-order: numbered-steps }
+    motion: medium
+    tone: jenaka-pedas
+    register: { id: kamu }
+    summary: Kertas cokelat dan cap tebal, jenaka seperti stiker level pedas.
+    rationale:
+      style: Gaya cap tebal di atas kertas cokelat meniru kemasan keripik kiloan yang dijual di Kediri.
+      color: Kertas cokelat dan tinta hitam terasa murah meriah, sesuai kantong mahasiswa.
+      typography: Bricolage Grotesque memberi kesan tulisan tangan di stiker kemasan.
+      layout: Kartu rapat untuk tiga produk dan langkah pesan bernomor menuju WhatsApp.
+      motion: Sedikit gerak jenaka saat kartu disentuh, karena pembelinya anak muda.
+      tone: Gaya bercanda soal level pedas cocok untuk mahasiswa.
+    based_on: [req-audience, req-business.location, req-facts.products]

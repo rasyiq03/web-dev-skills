@@ -1,0 +1,28 @@
+{
+  "name": "scaffoldev",
+  "version": "0.2.0",
+  "description": "Build a complete website from a short prompt (company profile, landing page, portfolio, small-business catalog, or dashboard), with every design decision recorded and every page checked.",
+  "author": {
+    "name": "Rasyiq03",
+    "url": "https://github.com/rasyiq03"
+  },
+  "homepage": "https://github.com/rasyiq03/web-dev-skills",
+  "repository": "https://github.com/rasyiq03/web-dev-skills",
+  "license": "MIT",
+  "keywords": ["website", "web-design", "landing-page", "dashboard", "indonesian"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ScaffolDev",
+    "shortDescription": "A short prompt in, a checked website out",
+    "longDescription": "Turns a short prompt into a finished static website. Every design decision is recorded with its reason, every page is linted and audited, and EXPLAIN.html shows who decided what. Guided mode teaches; deep mode lets a council of AI roles deliberate.",
+    "developerName": "Rasyiq03",
+    "category": "Coding",
+    "websiteURL": "https://github.com/rasyiq03/web-dev-skills",
+    "defaultPrompt": [
+      "buat company profile Kopi Senja, kedai kopi di Bandung, target mahasiswa"
+    ],
+    "brandColor": "#10213A",
+    "composerIcon": "./.claude-plugin/icon.png",
+    "logo": "./.claude-plugin/icon.png"
+  }
+}

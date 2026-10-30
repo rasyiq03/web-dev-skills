@@ -56,3 +56,15 @@ def test_derive_chart_and_state_colors():
     for hue in [145, 25, 80]:
         st_hex = color.derive_state_color(hue, paper)
         assert color.contrast_ratio(st_hex, paper) >= 4.5
+
+
+def test_state_colors_keep_their_hue_on_light_and_dark_paper():
+    # Warna status harus tetap terbaca sebagai hijau, merah, dan amber, bukan nyaris hitam
+    for paper in ("#FBF5EA", "#F7F8FA", "#121417"):
+        for hue in (145, 25, 80):
+            st_hex = color.derive_state_color(hue, paper)
+            lightness, chroma, _ = color.hex_to_oklch(st_hex)
+
+            assert color.contrast_ratio(st_hex, paper) >= 4.5
+            assert chroma >= 0.08, f"{st_hex} on {paper} lost its hue"
+            assert 0.35 <= lightness <= 0.8, f"{st_hex} on {paper} is too close to black or white"

@@ -5,6 +5,7 @@
 # ============================================================
 
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -71,13 +72,15 @@ def projects_dir(monkeypatch):
     Menyediakan folder projects/ sementara di dalam repo.
 
     I.S. : Belum ada folder proyek untuk tes ini.
-    F.S. : PD_PROJECTS_DIR menunjuk folder baru di .tmp-tests/; folder dihapus setelah tes.
+    F.S. : PD_PROJECTS_DIR menunjuk folder baru di .tmp-tests/ dan PD_PROFILE ke profil di
+           dalamnya, agar tes tidak menyentuh profil developer asli; folder dihapus setelah tes.
            Folder sengaja di dalam repo agar Node menemukan node_modules milik repo.
     """
     base = REPO / ".tmp-tests" / uuid.uuid4().hex[:10]
     base.mkdir(parents=True)
     monkeypatch.setenv("PD_PROJECTS_DIR", str(base))
     monkeypatch.setenv("PD_DATE", TEST_DATE)
+    monkeypatch.setenv("PD_PROFILE", str(base / "profile.yaml"))
     yield base
 
     # File read-only (misalnya objek git tiruan) tidak bisa dihapus rmtree di Windows
@@ -93,7 +96,7 @@ def kopi(projects_dir):
     Menyalin brief kopi-senja ke folder proyek sementara.
 
     I.S. : projects_dir kosong.
-    F.S. : projects_dir/kopi-senja/brief.yaml ada; path folder proyek dikembalikan.
+    F.S. : projects_dir/kopi-senja/.ScaffolDev/brief.yaml ada; path folder kerja dikembalikan.
     """
     return copy_fixture(projects_dir, "kopi-senja", ["brief.yaml"])
 
@@ -105,18 +108,51 @@ def kopi(projects_dir):
 
 def copy_fixture(projects_dir, name, files):
     """
-    Menyalin sebagian file fixture examples/<name>/ ke projects_dir/<name>/.
+    Menyalin sebagian file fixture examples/<name>/ ke folder kerja projects_dir/<name>/.ScaffolDev/.
 
     I.S. : examples/<name>/ berisi file yang diminta.
-    F.S. : File tersalin; path folder proyek dikembalikan.
+    F.S. : File tersalin; path folder kerja dikembalikan (situsnya ada di folder induknya).
     """
-    target = projects_dir / name
+    target = projects_dir / name / ".ScaffolDev"
     target.mkdir(parents=True, exist_ok=True)
 
     for file in files:
         shutil.copyfile(FIXTURES / name / file, target / file)
 
     return target
+
+
+def _filled_section(match):
+    """
+    Isi pengganti satu seksi kosong; hero mendapat tombol WhatsApp seperti halaman jadi.
+
+    I.S. : match menangkap tag pembuka dan penutup seksi.
+    F.S. : Teks HTML seksi yang sudah berisi dikembalikan.
+    """
+    body = '<p class="pd-section__text">Isi seksi ini.</p>'
+    if 'id="hero"' in match.group(1):
+        body += '\n\t\t\t\t<a href="https://wa.me/[[ISI: nomor WhatsApp]]">Chat via WhatsApp</a>'
+    return f"{match.group(1)}\n\t\t\t\t{body}\n\t\t\t{match.group(2)}"
+
+
+def fill_empty_sections(site_dir):
+    """
+    Mengisi setiap seksi kerangka yang masih kosong dengan satu paragraf, seperti halaman
+    yang sudah dibangun, supaya check tidak melaporkan section-empty.
+
+    I.S. : site_dir berisi halaman hasil scaffold.
+    F.S. : Tidak ada lagi <section ...></section> kosong; jumlah seksi yang diisi dikembalikan.
+    """
+    filled = 0
+    for page in Path(site_dir).rglob("*.html"):
+        if ".ScaffolDev" in page.parts:
+            continue
+        text = page.read_text(encoding="utf-8")
+        text, count = re.subn(r"(<section\b[^>]*>)\s*(</section>)", _filled_section, text)
+        if count:
+            page.write_text(text, encoding="utf-8")
+            filled += count
+    return filled
 
 
 def add_git_folder(site_dir):

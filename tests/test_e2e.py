@@ -7,7 +7,7 @@
 # ============================================================
 
 import pytest
-from conftest import copy_fixture, next_line, run_script
+from conftest import copy_fixture, fill_empty_sections, next_line, run_script
 from lib import io
 
 
@@ -80,7 +80,7 @@ def test_kopi_senja_end_to_end(projects_dir):
     io.write_text(content_dir / "id.yaml", content_yaml)
 
     # 8. Isi konten minimal ke section index.html (menjaga class, id, dan data-pd-pattern)
-    site_dir = proj / "site"
+    site_dir = proj.parent
     index_file = site_dir / "index.html"
     index_html = io.read_text(index_file)
 
@@ -118,6 +118,9 @@ def test_kopi_senja_end_to_end(projects_dir):
     )
 
     io.write_text(index_file, index_html)
+
+    # Halaman lain (dan seksi yang belum terganti) diisi satu paragraf
+    fill_empty_sections(index_file.parent)
 
     # 9. Jalankan check.py
     res_chk = run_script("check", "kopi-senja")

@@ -5,8 +5,12 @@ writing it right the first time saves fix rounds.
 
 ## Layout of a project
 
+The site lives in the project folder itself; everything ScaffolDev needs to work
+(brief, decisions, copy, reports) lives in `.ScaffolDev/` next to it and never ends up in a
+page. Deleting `.ScaffolDev/` leaves this tree:
+
 ```
-site/
+<project>/
 	index.html
 	pages/            other pages, e.g. tentang.html
 	css/
@@ -25,7 +29,8 @@ site/
 ```
 
 HTML holds content, CSS holds all styling, JavaScript holds only behaviour HTML and CSS
-cannot do. Every page stays readable and navigable with JavaScript off. Load CSS in the
+cannot do. Header, main content, and footer share one container width, so the brand name,
+the page heading, and the footer text start on the same left edge at every screen size. Every page stays readable and navigable with JavaScript off. Load CSS in the
 order tokens, base, layout, components, pages.
 
 ## Whitespace and density
@@ -69,7 +74,9 @@ position, box (`display`, flex/grid, `gap`, size, `margin`, `padding`), typograp
 (`font-*`, `line-height`, `letter-spacing`, `color`, `text-*`), visual (`background`,
 `border`, `border-radius`, `box-shadow`), motion (`transform`, `transition`, `animation`).
 Every color, font, size, and spacing value comes from `var(--pd-...)`. Style with classes;
-nest at most two levels.
+nest at most two levels. Text links use `var(--pd-color-link)` and keep an underline: it is
+the accent when the accent is readable on the paper, and the ink when it is not, so never
+set link text in `--pd-color-accent` directly.
 
 ## JavaScript
 
@@ -93,14 +100,14 @@ client supplies real ones.
 - **Components ask the API, never the file.** A component imports
   `request` from `js/api/client.js` and calls `await request('metrics', { from, to })`.
   `fetch()` appears only in `client.js`; HTML and components contain no data literals.
-- **Each endpoint has one mock file**: `site/data/mock/<mock>.mock.json`, shaped by
+- **Each endpoint has one mock file**: `data/mock/<mock>.mock.json`, shaped by
   `schemas/mock.schema.json`:
 
 ```json
 {
   "_mock": true,
   "endpoint": "GET /metrics",
-  "generated_by": "pd-web-skills 0.1",
+  "generated_by": "scaffoldev 0.1",
   "data": [{ "date": "2026-09-01", "revenue": 1250000, "orders": 42 }]
 }
 ```
@@ -117,22 +124,7 @@ client supplies real ones.
 
 ## Dashboards
 
-- Files: `js/charts.js` draws charts, `js/table.js` renders and sorts tables,
-  `js/filters.js` applies filters; `main.js` wires them together. One function per widget,
-  each fetching through `request()`.
-- Format numbers and dates with `Intl.NumberFormat` and `Intl.DateTimeFormat` in the page
-  language (`id-ID` or `en-US`).
-- Charts use Chart.js from `js/vendor/chart.umd.js` (copied there by the scaffold). Read
-  colors at runtime from the tokens, for example
-  `getComputedStyle(document.documentElement).getPropertyValue('--pd-color-chart-1')`;
-  series colors follow `--pd-color-chart-1` … `-6`, and states use `--pd-color-positive`,
-  `--pd-color-negative`, `--pd-color-warning`.
-- Every chart has a title, the unit, and the period in text, plus a text alternative: an
-  `aria-label` summary on the canvas and the same data in a visually hidden `<table>`.
-- Tables are real `<table>` elements with `<caption>`, `<th scope="col">`, and numbers
-  right-aligned through a class.
-- A KPI shows label, value, unit, period, and change as separate elements, so each can be
-  styled and read on its own.
+For the `dashboard` site type, also read `references/dashboard.md` (charts, tables, KPIs).
 
 ## Comments
 

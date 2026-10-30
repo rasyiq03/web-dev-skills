@@ -55,7 +55,7 @@ def test_cache_root_windows_default(monkeypatch, tmp_path):
     monkeypatch.delenv("PD_CACHE_DIR", raising=False)
     monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
 
-    assert deps.cache_root() == tmp_path / "web-skills"
+    assert deps.cache_root() == tmp_path / "scaffoldev"
 
 
 @pytest.mark.skipif(os.name == "nt", reason="aturan POSIX")
@@ -63,7 +63,7 @@ def test_cache_root_posix_default(monkeypatch, tmp_path):
     monkeypatch.delenv("PD_CACHE_DIR", raising=False)
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path))
 
-    assert deps.cache_root() == tmp_path / "web-skills"
+    assert deps.cache_root() == tmp_path / "scaffoldev"
 
 
 def test_python_packages_already_importable_need_no_cache(tmp_path):
@@ -187,3 +187,33 @@ def test_python_packages_install_into_cache_once(stand_in_repo, tmp_path):
     assert second.returncode == 0, second.stdout + second.stderr
     assert Path(second.stdout.strip().splitlines()[-1]) == target
     assert (target / "sentinel").is_file()
+
+
+def test_new_cache_removes_the_one_it_replaces(tmp_path):
+    cache = tmp_path / "cache"
+    for name in ("py-3.12-aaaaaaaaaaaa", "py-3.11-bbbbbbbbbbbb", "node-cccccccccccc",
+                 "node-dddddddddddd.tmp-123", "py-3.12-111111111111"):
+        (cache / name).mkdir(parents=True)
+
+    assert deps.prune_cache(cache / "py-3.12-111111111111") == ["py-3.12-aaaaaaaaaaaa"]
+    assert deps.prune_cache(cache / "node-cccccccccccc") == []
+
+    # Versi Python lain dan instalasi yang sedang berjalan tidak disentuh
+    assert sorted(p.name for p in cache.iterdir()) == [
+        "node-cccccccccccc", "node-dddddddddddd.tmp-123", "py-3.11-bbbbbbbbbbbb", "py-3.12-111111111111"]
+
+
+def test_cache_from_before_the_rename_is_removed_only_when_it_is_ours(tmp_path):
+    cache = tmp_path / "scaffoldev"
+    legacy = tmp_path / "web-skills"
+    (legacy / "py-3.12-aaaaaaaaaaaa").mkdir(parents=True)
+    (legacy / "node-bbbbbbbbbbbb").mkdir()
+
+    assert deps.prune_legacy_cache(cache) is True
+    assert not legacy.exists()
+
+    (legacy / "notes").mkdir(parents=True)
+    assert deps.prune_legacy_cache(cache) is False
+    assert legacy.exists()
+
+    assert deps.prune_legacy_cache(tmp_path / "custom") is False

@@ -1,0 +1,317 @@
+sitting: first-page
+simulated: false
+roles:
+- perancang
+- penulis
+- arsitek
+- penguji
+- wakil-klien
+rounds:
+- round: 1
+  kind: proposals
+  entries:
+  - role: perancang
+    text: '1) Warna kunyit dari d-palette-1 tidak muncul sama sekali; yang terlihat hanya cokelat dan
+      krem, jadi halaman mirip template toko kue biasa. Di layout.css, ganti latar .pd-section:nth-child(even
+      of .pd-section) menjadi rona kunyit yang nyata (mis. color-mix dengan kuning kunyit sekitar 25-30%
+      di atas paper, teks tetap ink). Lalu tambahkan satu ciri khas yang hemat, yaitu stabilo kunyit tipis
+      di bawah kata ''pedas'' pada .pd-hero__title (span di index.html, cukup satu per halaman). 2) Di
+      index.html dan id.yaml, .pd-hero__eyebrow mengulang ''Keripik Bu Sari'' padahal nama itu sudah ada
+      di header, sehingga di HP nama tampil tiga kali sebelum tombol. Ganti dengan catatan asal yang terasa
+      tulisan tangan, mis. ''Dari dapur Bu Sari di Kediri'', agar identitas lokal datang dari brief, bukan
+      dari ornamen. 3) Di HP 360px, grid .pd-price-list__item (1fr auto) membuat nama produk terlipat
+      tiga baris karena label harga yang lebar. Di components.css, susun nama, harga, lalu catatan ke
+      bawah bila layar di bawah 30em (grid-template-columns: 1fr; harga justify-self: start), supaya daftar
+      tetap rapi seperti papan menu, sesuai d-layout-1.'
+    evidence:
+    - d-palette-1
+    - d-style-1
+    - req-business.location
+    - req-business.cultural_context
+    - d-typo-1
+    - d-layout-1
+    - req-audience
+    - check:c-layout-featured
+    - ph:prices
+  - role: penulis
+    text: '1) index.html hero, eyebrow dan lead: eyebrow ''Keripik Bu Sari'' mengulang nama yang sudah
+      ada di header, jadi ganti dengan ''Kirim ke seluruh Karesidenan Kediri''. Lead dibuat menyapa ''kamu''
+      sesuai d-tone-1, misalnya ''Pilih keripik singkong balado, keripik tempe, atau makaroni pedas. Chat
+      kami di WhatsApp, pesananmu kami kirim ke seluruh Karesidenan Kediri.'' 2) index.html featured,
+      judul dan isi daftar: judul ''Tiga camilan Keripik Bu Sari'' diganti ''Camilan kami dan harganya''
+      supaya jelas isinya produk dan harga. Lead ''Semuanya buatan rumah, dari Kediri.'' cuma mengulang
+      hero, jadi hapus. Catatan per produk (''Keripik tempe buatan rumah.'', ''Makaroni berbumbu pedas.'')
+      hanya mengulang nama produk. Hapus saja, atau ganti dengan placeholder [[ISI: ukuran kemasan]],
+      karena brief tidak menyebut rasa atau ukuran. Ketiga [[ISI: harga produk]] tetap jadi placeholder
+      untuk klien. 3) index.html, tombol ganda: ''Lihat semua produk'' muncul dua kali dengan tujuan yang
+      sama. Tombol di featured diganti ''Lihat daftar harga lengkap'' supaya menyebut hasilnya, dan tautan
+      di hero dihapus agar hero hanya punya satu ajakan, yaitu Pesan lewat WhatsApp. Ubah juga content/id.yaml
+      supaya naskah dan halaman tetap sama.'
+    evidence:
+    - d-tone-1
+    - req-audience
+    - req-goal
+    - req-facts.products
+    - req-facts.shipping_area
+    - ph:prices
+    - finding:2
+    - finding:3
+    - finding:4
+    - check:c-register-id
+    - d-layout-1
+  - role: arsitek
+    text: '1) index.html dan css/tokens.css: font Google dipanggil dari luar dengan 3 keluarga dan 7 ketebalan,
+      dan pemanggilannya menahan tampilan halaman di jaringan seluler; simpan DM Serif Display 400, DM
+      Sans 400/600, dan DM Mono 400 sebagai woff2 latin di assets/fonts/ dengan @font-face font-display
+      swap, buang DM Sans 700 dan DM Mono 700 (ganti font-weight 700 di .pd-nav__link[aria-current=''page'']
+      menjadi 600), lalu preload hanya DM Serif Display. 2) css/components.css .pd-price-list__item: kolom
+      1fr auto memeras nama produk menjadi 3 baris di layar 360px; buat satu kolom sebagai bawaan (harga
+      di bawah nama) dan pakai 1fr auto mulai @media (min-width: 30em), lalu tambahkan white-space: nowrap
+      pada .pd-price-list__price; tetapkan pola ini sekarang karena halaman produk memakai komponen yang
+      sama dengan .pd-price-list__order. 3) Tautan WhatsApp: tulis satu bentuk URL baku https://wa.me/[[ISI:
+      nomor WhatsApp]]?text=... yang persis sama di hero, kaki situs, dan nanti di setiap .pd-price-list__order,
+      tanpa JavaScript, dan catat di HANDOFF.md bahwa nomor cukup diganti sekali dengan cari-dan-ganti,
+      supaya tombol pesan tetap jalan walau JavaScript mati.'
+    evidence:
+    - d-motion-1
+    - d-typo-1
+    - check:c-type-body
+    - check:c-layout-featured
+    - check:c-layout-catalog
+    - d-layout-1
+    - finding:2
+    - finding:3
+    - finding:4
+    - req-goal
+    - ph:whatsapp
+    - finding:1
+    - finding:5
+  - role: penguji
+    text: '1) Ukuran sentuh terlalu kecil: tautan menu (.pd-nav__link), "Lihat semua produk" di hero (.pd-hero__more)
+      dan "Pesan lewat WhatsApp" di kaki (.pd-footer__link) hanya setinggi baris teks (sekitar 20-24px),
+      dan .pd-button sekitar 40px. Di components.css beri min-height 2.75rem (44px) dengan display inline-flex,
+      align-items center, dan padding-block, supaya jempol di HP murah mudah mengetuknya. Lakukan ini
+      sebelum halaman produk dan cara-pesan memakai komponen yang sama. 2) Kedua tautan WhatsApp (index.html
+      baris 72 dan 119) mengarah ke wa.me/[[ISI: nomor WhatsApp]], jadi untuk sekarang rusak. Tulis tautan
+      itu sekali saja di satu tempat yang sama (bukan disalin per halaman) agar nomor cukup diisi satu
+      kali, dan pastikan HANDOFF menandainya wajib diisi sebelum situs tayang, karena ini tujuan utama
+      situs. 3) Di lebar 360px label harga yang panjang memeras nama produk jadi tiga baris ("Keripik
+      / singkong / balado"). Di .pd-price-list__item beri grid-template-columns 1fr untuk layar sempit
+      dan pindahkan harga ke bawah nama, lalu kembalikan ke 1fr auto mulai 30em, supaya nama dan harga
+      tetap terbaca utuh saat harga asli diisi.'
+    evidence:
+    - check:c-layout-hero
+    - ph:whatsapp
+    - finding:1
+    - finding:5
+    - req-goal
+    - check:c-layout-featured
+    - ph:prices
+    - finding:2
+    - finding:3
+    - finding:4
+  - role: wakil-klien
+    text: 'Saya sudah cek kata demi kata, dan tidak ada fakta karangan. Nama, produk, Kediri, buatan rumah,
+      pesan lewat WhatsApp, dan kirim ke seluruh Karesidenan Kediri semuanya ada di brief. Harga dan nomor
+      WA masih [[ISI: ...]], jadi tidak ada yang perlu saya veto. Ada 3 perbaikan supaya pembeli di HP
+      bisa langsung pesan: (1) Di bawah daftar tiga camilan, ganti tombol utama ''Lihat semua produk''
+      dengan tombol ''Pesan lewat WhatsApp''. Kalau bisa, tiap produk juga diberi tombol pesan sendiri
+      seperti di halaman produk. Sekarang pembeli yang sudah melihat daftar harus menggulir lagi ke atas
+      untuk memesan. (2) Tulisan ''Lihat semua produk'' menyesatkan, karena halaman produk berisi tiga
+      camilan yang sama. Ganti dengan ''Lihat harga dan cara pesan'', dan cukup satu tautan saja, jangan
+      diulang. (3) Sebelum diserahkan, Bu Sari wajib mengisi nomor WhatsApp dan harga. Tanpa nomor itu,
+      semua tombol pesan di beranda tidak berfungsi, dan label [[ISI: harga produk]] tidak boleh terlihat
+      pembeli.'
+    evidence:
+    - req-goal
+    - req-audience
+    - req-facts.products
+    - req-facts.shipping_area
+    - req-business.kind
+    - ph:whatsapp
+    - ph:prices
+    - d-layout-1
+    - finding:1
+    - finding:2
+    - finding:3
+    - finding:4
+    - finding:5
+- round: 2
+  kind: critique
+  entries:
+  - role: perancang
+    text: 'Perbaikan untuk usulan Wakil klien. Label ''Lihat harga dan cara pesan'' juga menyesatkan,
+      karena halaman produk tidak berisi cara pesan. Usulku begini: di bawah daftar featured cukup satu
+      tombol utama ''Pesan lewat WhatsApp'' (pembeli tidak perlu menggulir ke atas), lalu satu tautan
+      teks ''Lihat daftar harga lengkap'' ke pages/produk.html, dan tautan ''Lihat semua produk'' di hero
+      dihapus. Tombol per produk tidak dipasang di beranda, supaya featured tetap daftar harga yang ringkas
+      sesuai d-layout-1 dan tombol WhatsApp per produk tetap jadi ciri halaman produk. Usulku sendiri
+      di Putaran 1 juga kuralat. Eyebrow ''Dari dapur Bu Sari di Kediri'' melanggar veto di notulen naskah
+      (''dibuat sendiri di dapur rumah Bu Sari''), jadi aku ikut usulan Penulis, ''Kirim ke seluruh Karesidenan
+      Kediri''.'
+    target_role: wakil-klien
+    objection: 'd-palette-1 belum diterapkan. Token di css/tokens.css hanya berisi cokelat dan krem (ink
+      #2b1e12, paper #fbf5ea, accent #8f4410) dan tidak ada kuning kunyit sama sekali, padahal alasan
+      keputusan itu adalah ''kuning kunyit dan cokelat goreng''. Akibatnya beranda bisa jadi milik usaha
+      camilan mana pun. Perbaikannya kecil: tambahkan token --pd-color-kunyit, pakai sebagai latar tipis
+      seksi selang-seling (color-mix sekitar 25-30% di atas paper, teks tetap ink), dan pakai sebagai
+      satu stabilo di bawah kata ''pedas'' pada .pd-hero__title. Setelah itu c-contrast-body dan c-palette-paper
+      dicek ulang.'
+    blocking: true
+    resolved: true
+    evidence:
+    - d-palette-1
+    - d-style-1
+    - d-layout-1
+    - req-goal
+    - req-facts.shipping_area
+    - req-business.kind
+    - check:c-palette-paper
+    - check:c-contrast-body
+    - check:c-layout-featured
+    - check:c-layout-hero
+  - role: penulis
+    text: 'Perbaikan untuk Perancang. Ganti eyebrow usulanmu ''Dari dapur Bu Sari di Kediri'' dengan ''Kirim
+      ke seluruh Karesidenan Kediri'' di index.html baris 62 dan di content/id.yaml. Usulan stabilo kunyit
+      di bawah kata ''pedas'' dan susunan harga satu kolom di bawah 30em tetap dipakai. Kalimat ''Dari
+      dapur Bu Sari'' menghidupkan lagi fakta yang sudah diveto di sidang naskah, yaitu Bu Sari sendiri
+      yang memasak di dapurnya. Eyebrow baru tetap menghapus nama yang tampil tiga kali dan memberi identitas
+      lokal dari fakta brief. Tambahan untuk Wakil klien: label ''Lihat harga dan cara pesan'' menjanjikan
+      isi yang tidak ada di halaman produk, karena cara pesan punya halaman sendiri. Jadi tombol featured
+      cukup ''Lihat daftar harga lengkap''. Saya setuju tombol utama di bawah daftar diganti ''Pesan lewat
+      WhatsApp''.'
+    target_role: perancang
+    objection: Memblokir. Eyebrow 'Dari dapur Bu Sari di Kediri' memuat lagi fakta karangan yang sudah
+      diveto Wakil klien di sidang naskah, yaitu 'dibuat sendiri di dapur rumah Bu Sari' (resolution copy.yaml,
+      veto 3). Brief hanya menyebut usaha rumahan bernama Keripik Bu Sari di Kediri, tanpa menyebut siapa
+      yang memasak atau di mana. Pakai 'Kirim ke seluruh Karesidenan Kediri' (req-facts.shipping_area)
+      atau 'Buatan rumah, dari Kediri' (req-business.kind, req-business.location).
+    blocking: true
+    resolved: true
+    evidence:
+    - req-business.name
+    - req-business.kind
+    - req-business.location
+    - req-facts.shipping_area
+    - d-tone-1
+    - req-goal
+    - d-layout-1
+    - finding:2
+    - finding:3
+    - finding:4
+  - role: arsitek
+    text: 'Perbaikan untuk usulan Perancang. (1) Eyebrow hero jangan diganti ''Dari dapur Bu Sari di Kediri'',
+      karena frasa itu memunculkan lagi fakta ''dapur Bu Sari'' yang sudah diveto di sidang naskah. Pakai
+      usulan Penulis, ''Kirim ke seluruh Karesidenan Kediri'', yang bersumber dari brief. Ubah index.html
+      baris 62 dan content/id.yaml bersamaan. (2) Rona kunyit jangan ditulis sebagai warna mentah di layout.css.
+      tokens.css dibuat otomatis, dan sekarang tidak punya token kuning, hanya --pd-color-accent #8f4410
+      (cokelat), jadi warna mentah melanggar aturan hanya-token. Kalau kunyit memang harus tampil, tambahkan
+      token seperti --pd-color-accent-soft lewat d-palette-1 dan compile_tokens, lalu jalankan check kontras
+      teks ink di atasnya. Stabilo pada kata ''pedas'' cukup memakai CSS biasa (background linear-gradient
+      di span), tanpa JavaScript, sesuai d-motion-1. (3) Usul daftar harga satu kolom di bawah 30em sama
+      dengan usulku dan usul Penguji, jadi kita sepakat. Usulku nomor 1 (font diunduh ke assets/fonts)
+      aku tarik, karena tautan Google Fonts dibuat otomatis oleh compile_tokens dan ScaffolDev tidak mengunduh
+      berkas font ke situs.'
+    target_role: perancang
+    objection: Eyebrow 'Dari dapur Bu Sari di Kediri' mengulang fakta yang sudah diveto Wakil klien di
+      sidang naskah, yaitu Bu Sari sendiri yang memasak di dapurnya. Brief hanya menyebut usaha rumahan
+      bernama Keripik Bu Sari di Kediri. Keberatan ini memblokir sampai eyebrow memakai fakta dari brief.
+      Soal warna kunyit yang ditulis mentah, keberatanku tidak memblokir, asalkan warnanya masuk lewat
+      token.
+    blocking: true
+    resolved: true
+    evidence:
+    - req-business.kind
+    - req-business.name
+    - req-business.location
+    - req-facts.shipping_area
+    - d-palette-1
+    - d-motion-1
+    - check:c-contrast-body
+    - check:c-layout-featured
+    - check:c-layout-hero
+  - role: penguji
+    text: 'Perbaikan untuk usulan Perancang: rona kunyit boleh dipakai, karena hasil ukurku menunjukkan
+      semua teks lolos. Sebagai kuning kunyit kuambil #E3A008, dicampur 30% di atas paper menjadi #F4DCA6.
+      Di atas warna itu, ink #2B1E12 mendapat 12,05:1, muted #6A5847 5,04:1, dan aksen/tautan #8F4410
+      5,21:1. Kuning yang lebih gelap seperti #C8900A menurunkan muted menjadi 4,79:1, jadi batasi campurannya
+      paling banyak 30% dengan kuning setidaknya secerah #E3A008, dan simpan hasilnya sebagai token (mis.
+      --pd-color-band) di tokens.css, bukan color-mix lepas di layout.css, supaya check:c-contrast-body
+      dan check:c-contrast-accent bisa mengukurnya. Stabilo di bawah ''pedas'' dibuat dengan background
+      linear-gradient pada span biasa di dalam h1 (jangan <mark>, karena sebagian pembaca layar mengumumkannya),
+      teks tetap ink, dan h1 tetap satu-satunya h1. Eyebrow ''Dari dapur Bu Sari di Kediri'' diganti ''Kirim
+      ke seluruh Karesidenan Kediri'' sesuai usulan Penulis.'
+    target_role: perancang
+    objection: Eyebrow usulan Perancang, 'Dari dapur Bu Sari di Kediri', menghidupkan lagi fakta yang
+      sudah diveto di sidang naskah, yaitu bahwa Bu Sari sendiri yang memasak di dapurnya. Brief hanya
+      menyebut usaha rumahan bernama Keripik Bu Sari. Keberatan ini memblokir sampai teks itu diganti
+      dengan teks dari brief, misalnya 'Kirim ke seluruh Karesidenan Kediri' atau 'Buatan rumah, dari
+      Kediri'. Soal warna tidak memblokir karena kontrasnya lolos, asalkan token dan batas campuran di
+      atas dipakai.
+    blocking: true
+    resolved: true
+    evidence:
+    - req-business.name
+    - req-business.kind
+    - req-facts.shipping_area
+    - check:c-contrast-body
+    - check:c-contrast-accent
+    - d-palette-1
+    - check:c-layout-hero
+  - role: wakil-klien
+    text: 'Perbaikan untuk usulan Perancang butir 2: eyebrow hero jangan diganti ''Dari dapur Bu Sari
+      di Kediri''. Pakai usulan Penulis, ''Kirim ke seluruh Karesidenan Kediri''. Isinya diambil langsung
+      dari brief, tidak mengulang nama di header, dan memberi pembeli informasi yang berguna sebelum tombol.
+      Butir 1 (rona kunyit dan stabilo pada kata ''pedas'') serta butir 3 (daftar harga satu kolom di
+      bawah 30em) saya setujui, karena tidak menambah kata baru.'
+    target_role: perancang
+    objection: 'Saya memveto ''Dari dapur Bu Sari di Kediri''. Kalimat ini memunculkan lagi fakta yang
+      sudah diveto di sidang naskah, yaitu bahwa Bu Sari sendiri yang memasak di dapurnya. Brief hanya
+      menyebut usaha rumahan bernama Keripik Bu Sari di Kediri (req-business.name, req-business.kind).
+      Eyebrow tidak memakai placeholder dan diganti dengan teks dari req-facts.shipping_area. Ada dua
+      catatan untuk Penulis, keduanya tidak memblokir. (a) Jangan tambah placeholder [[ISI: ukuran kemasan]].
+      Ukuran kemasan tidak ada di brief dan placeholder itu belum terdaftar di graf, jadi cukup hapus
+      catatan per produk yang hanya mengulang nama. (b) Pakai label ''Lihat daftar harga'', jangan ''Lihat
+      daftar harga lengkap''. Kata ''lengkap'' memberi kesan ada produk lain, padahal brief hanya menyebut
+      tiga produk (req-facts.products).'
+    blocking: true
+    resolved: true
+    evidence:
+    - req-business.name
+    - req-business.kind
+    - req-business.location
+    - req-facts.shipping_area
+    - req-facts.products
+    - ph:prices
+    - d-layout-1
+- round: 3
+  kind: revision
+  entries:
+  - role: perancang
+    text: 'Keberatan saya sudah terpenuhi. Palet kunyit di soft-organic.yaml sekarang punya tint #F4DCA6,
+      yaitu kuning kunyit pucat, dan tokens.css proyek sudah berisi --pd-color-tint: #F4DCA6. compile_tokens
+      menolak palet bila teks di atas tint kurang dari 4,5:1. Hasil ukurnya: teks utama 12,05, teks sekunder
+      5,04, tautan 5,21, jadi semuanya aman dibaca. Kuning kunyit sekarang tampil lewat token, bukan warna
+      mentah, sehingga palet, nama, dan suasana dapur rumahan jadi selaras. Stabilo di bawah kata "pedas"
+      bisa menjadi ciri khas situs ini. Syaratnya, stabilo itu hanya dipakai sekali di h1 beranda dan
+      tidak diulang di tempat lain, supaya tetap hemat.'
+    objection: 'Bukan pemblokir: stabilo pada span biasa tidak boleh memakai hex mentah. Gradien harus
+      memakai var(--pd-color-tint), dan seksi selang-seling cukup memakai tint sebagai latar, bukan sebagai
+      warna teks.'
+    blocking: false
+    resolved: true
+    evidence:
+    - d-palette-1
+    - token:color.tint
+resolution:
+  method: mufakat
+  outcome: tujuh perbaikan beranda
+  summary: 'Disepakati: eyebrow ''Kirim ke seluruh Karesidenan Kediri'' (usul ''Dari dapur Bu Sari'' ditolak
+    karena menghidupkan veto sidang naskah); hero hanya satu ajakan; judul daftar ''Camilan kami dan harganya''
+    tanpa catatan yang mengulang nama; di bawah daftar tombol ''Pesan lewat WhatsApp'' dan tautan ''Lihat
+    daftar harga''; daftar harga satu kolom di HP; area sentuh 44px; palet kunyit mendapat token tint
+    #F4DCA6 untuk seksi selang-seling dan satu stabilo pada kata ''pedas''. Usul Arsitek menyimpan font
+    sendiri ditarik.'
+  votes: []
+  dissent: []
+  vetoes: []

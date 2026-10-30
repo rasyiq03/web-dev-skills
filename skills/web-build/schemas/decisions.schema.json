@@ -9,6 +9,20 @@
     "project": { "type": "string" },
     "direction": { "type": "string", "pattern": "^dir-[0-9]+$" },
     "seed": { "type": "integer" },
+    "overrides": {
+      "description": "Changes made with decide.py on top of the chosen direction; same field names as a direction.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "palette": { "type": "string" },
+        "type_pairing": { "type": "string" },
+        "motion": { "enum": ["none", "low", "medium"] },
+        "tone": { "type": "string", "minLength": 1 },
+        "register": { "type": "object", "additionalProperties": { "enum": ["kamu", "Anda", "you"] } },
+        "layout": { "type": "object", "additionalProperties": { "type": "string" } },
+        "rationale": { "type": "object", "additionalProperties": { "type": "string", "minLength": 10 } }
+      }
+    },
     "decisions": {
       "type": "array",
       "minItems": 1,
@@ -26,7 +40,7 @@
             "items": { "type": "string", "pattern": "^req-[a-z0-9_.-]+$" }
           },
           "rationale": { "type": "string", "minLength": 10 },
-          "source": { "enum": ["stated", "sampled", "client-picked"] },
+          "source": { "enum": ["stated", "sampled", "client-picked", "overridden", "council"] },
           "realized_by": {
             "description": "Token paths in tokens.json, or layout pattern ids.",
             "type": "array",

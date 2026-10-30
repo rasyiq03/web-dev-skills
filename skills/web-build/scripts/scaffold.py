@@ -1,12 +1,13 @@
 # ============================================================
 # File      : scaffold.py
-# Proyek    : web-skills
-# Deskripsi : Membuat struktur direktori site/, menyalin token & konfigurasi,
+# Proyek    : ScaffolDev
+# Deskripsi : Membuat struktur situs di folder proyek, menyalin token & konfigurasi,
 #             menyiapkan skeleton HTML per halaman, base.css, main.js,
 #             dan lapisan mock API.
 # ============================================================
 
 import argparse
+import html
 import shutil
 import sys
 from pathlib import Path
@@ -14,7 +15,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import io, node_tools, paths, project, report
+from lib import io, node_tools, paths, project, report, trace
 from lib.report import EXIT_INVALID, fail
 
 
@@ -114,18 +115,41 @@ def build_base_css(project_name, today_str):
         "h2,\n"
         "h3 {\n"
         "\tfont-family: var(--pd-font-display);\n"
+        "\tfont-weight: var(--pd-weight-display);\n"
         "\tline-height: 1.2;\n"
         "\tcolor: var(--pd-color-ink);\n"
         "}\n\n"
         "a {\n"
-        "\tcolor: inherit;\n"
+        "\tcolor: var(--pd-color-link);\n"
         "}\n\n"
         ":focus-visible {\n"
-        "\toutline: var(--pd-border-width) solid var(--pd-color-accent);\n"
+        "\toutline: max(2px, var(--pd-border-width)) solid var(--pd-color-link);\n"
         "\toutline-offset: var(--pd-space-xs);\n"
         "}\n"
     )
     return header + "\n" + body
+
+
+FAVICON_FILE = "assets/img/favicon.svg"
+
+
+def build_favicon_svg(project_name, colors):
+    """
+    Menyusun ikon situs sementara: huruf pertama nama usaha di atas warna aksen.
+
+    I.S. : colors berisi accent dan accent-ink dari tokens.json (boleh kosong).
+    F.S. : Teks SVG dikembalikan; menghindari 404 favicon.ico sampai klien memberi logo.
+    """
+    letter = html.escape((project_name.strip()[:1] or "S").upper())
+    accent = colors.get("accent", "#1C1C1E")
+    ink = colors.get("accent-ink", "#FFFFFF")
+
+    return (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+        f'<rect width="64" height="64" rx="14" fill="{accent}"/>'
+        f'<text x="32" y="44" font-family="sans-serif" font-size="36" font-weight="700" '
+        f'text-anchor="middle" fill="{ink}">{letter}</text></svg>\n'
+    )
 
 
 def build_skeleton_html(page_id, site_type, chosen_layout, project_name, today_str, lang, fonts_links, has_data_sections, file_rel=None):
@@ -163,7 +187,8 @@ def build_skeleton_html(page_id, site_type, chosen_layout, project_name, today_s
     for fl in fonts_links.strip().splitlines():
         lines.append(f"\t{fl}")
 
-    # CSS links in order: tokens, base, layout, components
+    # Ikon situs sementara, lalu CSS: tokens, base, layout, components
+    lines.append(f'\t<link rel="icon" href="{prefix}{FAVICON_FILE}" type="image/svg+xml">')
     lines.append(f'\t<link rel="stylesheet" href="{prefix}css/tokens.css">')
     lines.append(f'\t<link rel="stylesheet" href="{prefix}css/base.css">')
     lines.append(f'\t<link rel="stylesheet" href="{prefix}css/layout.css">')
@@ -217,20 +242,28 @@ def scaffold(slug, force=False):
     Eksekusi scaffolding proyek projects/<slug>/.
 
     I.S. : projects/<slug>/ memiliki tokens.css, decisions.yaml, dan brief.yaml.
-    F.S. : Folder site/ terisi lengkap, config tersalin, template mock terisi,
+    F.S. : Situs terisi lengkap di folder proyek, config tersalin ke .ScaffolDev, template mock terisi,
            state.yaml diperbarui; mencetak ringkasan dan baris NEXT.
     """
     proj_dir = project.open_project(slug, need=["brief.yaml", "decisions.yaml", "tokens.css", "fonts.html"])
-    site_dir = proj_dir / "site"
+    site_dir = paths.site_dir(proj_dir)
 
-    if site_dir.exists() and any(site_dir.iterdir()):
+    if paths.has_site_content(site_dir):
         if not force:
             fail(
                 EXIT_INVALID,
-                f"Folder {site_dir} sudah berisi file. Gunakan --force untuk menimpa.",
-                f"run python skills/web-build/scripts/scaffold.py {slug} --force",
+                f"Folder {site_dir} sudah berisi situs. Gunakan --force untuk menimpa.",
+                f"run scaffold.py {slug} --force (this deletes the site files; save js/api/endpoints.js and data/mock/ first)",
             )
-        shutil.rmtree(site_dir)
+
+        # Hapus file situs saja; folder kerja .ScaffolDev dan .git tetap utuh
+        for entry in site_dir.iterdir():
+            if entry.name in paths.SITE_IGNORED_DIRS:
+                continue
+            if entry.is_dir():
+                shutil.rmtree(entry)
+            else:
+                entry.unlink()
 
     brief = io.read_yaml(proj_dir / "brief.yaml")
     decisions = io.read_yaml(proj_dir / "decisions.yaml")
@@ -267,8 +300,11 @@ def scaffold(slug, force=False):
     for d in dirs_to_create:
         d.mkdir(parents=True, exist_ok=True)
 
-    # 2. Salin tokens.css
+    # 2. Salin tokens.css, dan buat ikon situs sementara dari warna proyek
     shutil.copyfile(proj_dir / "tokens.css", site_dir / "css" / "tokens.css")
+    token_colors = io.read_json(proj_dir / "tokens.json").get("color", {}) if (proj_dir / "tokens.json").is_file() else {}
+    colors = {k: (v.get("$value") if isinstance(v, dict) else v) for k, v in token_colors.items()}
+    io.write_text(site_dir / FAVICON_FILE, build_favicon_svg(project_name, colors))
 
     # 3. Tulis css/base.css, css/layout.css, css/components.css
     base_css_content = build_base_css(project_name, today_str)
@@ -349,7 +385,8 @@ def scaffold(slug, force=False):
 
     # 9. Format awal dengan Prettier agar skeleton langsung lolos prettier --check
     #    (kegagalan Prettier dilaporkan check.py sebagai tool-failed)
-    node_tools.run_tool("prettier", ["--write", "site/**/*.{html,css}"], proj_dir)
+    pretty = [p.relative_to(site_dir).as_posix() for pattern in ("*.html", "*.css") for p in paths.site_files(site_dir, pattern)]
+    node_tools.run_tool("prettier", ["--write", "--config", str(proj_dir / ".prettierrc.json"), *pretty], site_dir)
 
     io.save_state(
         proj_dir,
@@ -357,10 +394,11 @@ def scaffold(slug, force=False):
         config_hashes=config_hashes,
         api_template_hashes=api_template_hashes,
     )
+    trace.finish(proj_dir, "scaffold")
 
     lines = [
         f"Scaffolding berhasil untuk '{slug}':",
-        f"  - site/ ({len(pages_list)} halaman HTML: {', '.join(pages_list)})",
+        f"  - situs di {site_dir} ({len(pages_list)} halaman HTML: {', '.join(pages_list)})",
         "  - css/ (tokens.css, base.css, layout.css, components.css)",
         "  - js/ (main.js, mock API layer di js/api/)",
         f"  - {len(config_hashes)} file konfigurasi disalin dan di-hash",
@@ -368,7 +406,7 @@ def scaffold(slug, force=False):
     if is_dashboard:
         lines.append("  - File khusus dashboard (charts.js, table.js, filters.js, chart.umd.js) disiapkan")
 
-    return lines, f"write content/{first_lang}.yaml (web-build skill step 5)"
+    return lines, f"write {paths.WORK_DIR}/content/{first_lang}.yaml (web-build skill step 5)"
 
 
 def main():
@@ -380,7 +418,7 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Buat kerangka proyek web-build.")
     parser.add_argument("slug", help="Slug proyek")
-    parser.add_argument("--force", action="store_true", help="Timpa isi site/ jika sudah ada")
+    parser.add_argument("--force", action="store_true", help="Timpa file situs jika sudah ada (.ScaffolDev tetap)")
 
     args = parser.parse_args()
     return scaffold(args.slug, force=args.force)

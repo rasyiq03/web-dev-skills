@@ -1,6 +1,6 @@
 # ============================================================
 # File      : run.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Satu pintu untuk semua skrip web-build. Memastikan paket Python
 #             dan alat Node tersedia (memasangnya sekali ke cache bila perlu),
 #             lalu menjalankan skrip yang diminta di proses yang sama.
@@ -31,6 +31,11 @@ SCRIPTS = (
     "compile_tokens",
     "scaffold",
     "context",
+    "graph",
+    "explain",
+    "decide",
+    "checkpoint",
+    "council",
     "check",
     "handoff",
 )
@@ -57,7 +62,8 @@ def project_path(args):
 
     folder = paths.project_dir(args[0]).resolve()
 
-    return [f"PROJECT: {folder}"], "write the project files in that folder"
+    return [f"PROJECT: {folder}", f"WORK: {folder / paths.WORK_DIR}"], \
+        "write brief.yaml and every other ScaffolDev file in WORK; the site goes in PROJECT"
 
 
 def prepare_dependencies():
@@ -70,6 +76,7 @@ def prepare_dependencies():
            node_modules yang dipakai.
     """
     cache = deps.cache_root()
+    deps.prune_legacy_cache(cache)
     target = deps.ensure_python_packages(paths.REPO_ROOT, cache)
 
     if target is not None:
@@ -96,7 +103,7 @@ def main():
     """
     if sys.version_info < MIN_PYTHON:
         fail(EXIT_INVALID,
-             f"Python {platform.python_version()} terlalu lama; web-skills butuh Python 3.11 atau lebih baru.",
+             f"Python {platform.python_version()} terlalu lama; ScaffolDev butuh Python 3.11 atau lebih baru.",
              "tell the user to install Python 3.11 or newer, then run the same command again")
 
     commands = ("path", *SCRIPTS)

@@ -1,6 +1,6 @@
 # ============================================================
 # File      : sync_adapters.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Sinkronisasi skill ke .agents/skills/ untuk Codex. Claude Code
 #             memuat skill lewat plugin, jadi .claude/skills/ tidak ditulis lagi.
 # ============================================================
