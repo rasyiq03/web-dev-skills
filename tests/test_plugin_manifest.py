@@ -70,3 +70,14 @@ def test_lockfile_root_matches_package_json():
 
     for field in ("dependencies", "devDependencies"):
         assert lock_root.get(field, {}) == package.get(field, {}), f"jalankan npm install --package-lock-only ({field})"
+
+
+def test_plugin_icon_is_a_square_png_of_listing_size():
+    plugin = json.loads((MANIFEST_DIR / "plugin.json").read_text(encoding="utf-8"))
+    icon = (REPO / plugin["icon"]).read_bytes()
+
+    # Kepala PNG: tanda tangan 8 bita lalu chunk IHDR berisi lebar dan tinggi
+    assert icon[:8] == b"\x89PNG\r\n\x1a\n"
+    width, height = int.from_bytes(icon[16:20], "big"), int.from_bytes(icon[20:24], "big")
+    assert width == height and 512 <= width <= 2048
+    assert len(icon) < 2 * 1024 * 1024

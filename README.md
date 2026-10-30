@@ -24,6 +24,14 @@ In Claude Code:
 
 The skills appear as `scaffoldev:web-build` and `scaffoldev:web-design`.
 
+Or add it from the app: use `rasyiq03/web-dev-skills` (or
+`https://github.com/rasyiq03/web-dev-skills.git`) as the marketplace source, then install
+**scaffoldev**. To try an unmerged branch, append it to the git URL:
+`https://github.com/rasyiq03/web-dev-skills.git#<branch>`.
+
+Update with `/plugin marketplace update scaffoldev`. Claude Code installs a new copy only
+when the version in `.claude-plugin/plugin.json` changes, so raise it with every release.
+
 Installed it before the rename to ScaffolDev (as `web-skills@web-dev-skills`)? Remove the
 old one first with `/plugin uninstall web-skills@web-dev-skills` and
 `/plugin marketplace remove web-dev-skills`, then run the two commands above. The old
