@@ -1,0 +1,26 @@
+pages:
+  index:
+    title: Sekar Jagad hand-drawn batik workshop in Yogyakarta
+    description: Try hand-drawn batik yourself at Sekar Jagad in Yogyakarta. Sign up on WhatsApp.
+    sections:
+      hero:
+        eyebrow: Hand-drawn batik workshop in Yogyakarta
+        heading: Draw your own batik at Sekar Jagad
+        body: [Join a hand-drawn batik workshop while you are in Yogyakarta. Sign up on WhatsApp.]
+        actions: [{ label: Sign up on WhatsApp, href: "https://wa.me/[[ISI: nomor WhatsApp]]?text=Hello%20Sekar%20Jagad%2C%20I%20would%20like%20to%20join%20the%20batik%20workshop." }]
+      problem:
+        heading: Want to take home an experience, not just a souvenir?
+        body: [In Yogyakarta you see batik everywhere. At Sekar Jagad you can try drawing it yourself.]
+      offer:
+        heading: What you get
+        items: [{ name: Hand-drawn batik workshop, price: "[[ISI: harga]]", note: "[[ISI: fitur utama]]" }]
+      proof:
+        heading: About Sekar Jagad
+        items:
+          - { label: Place, value: Yogyakarta }
+          - { label: Activity, value: Hand-drawn batik workshop }
+      action:
+        heading: Ready to try?
+        body: ["Sign up on WhatsApp before [[ISI: batas waktu]]."]
+        actions: [{ label: Sign up on WhatsApp, href: same as hero }]
+        links: [{ label: Sign-up form, href: "[[ISI: tautan pendaftaran]]" }]

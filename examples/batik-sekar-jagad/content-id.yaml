@@ -1,0 +1,27 @@
+pages:
+  index:
+    title: Workshop batik tulis Sekar Jagad di Yogyakarta
+    description: Coba membatik tulis sendiri di Sekar Jagad, Yogyakarta. Daftar workshop lewat WhatsApp.
+    sections:
+      hero:
+        eyebrow: Workshop batik tulis di Yogyakarta
+        heading: Membatik tulis sendiri di Sekar Jagad
+        body: [Ikuti workshop batik tulis selama Anda di Yogyakarta. Daftar cukup lewat WhatsApp.]
+        actions: [{ label: Daftar lewat WhatsApp, href: "https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Sekar%20Jagad%2C%20saya%20mau%20daftar%20workshop%20batik%20tulis." }]
+      problem:
+        heading: Ingin membawa pulang pengalaman, bukan hanya oleh-oleh?
+        body:
+          - "Di Yogyakarta, Anda bisa melihat batik di mana-mana. Di Sekar Jagad, Anda bisa mencoba membatik tulis sendiri."
+      offer:
+        heading: Yang Anda dapat
+        items: [{ name: Workshop batik tulis, price: "[[ISI: harga]]", note: "[[ISI: fitur utama]]" }]
+      proof:
+        heading: Tentang Sekar Jagad
+        items:
+          - { label: Tempat, value: Yogyakarta }
+          - { label: Jenis kegiatan, value: Workshop batik tulis }
+      action:
+        heading: Siap mencoba?
+        body: ["Daftar lewat WhatsApp sebelum [[ISI: batas waktu]]."]
+        actions: [{ label: Daftar lewat WhatsApp, href: same as hero }]
+        links: [{ label: Formulir pendaftaran, href: "[[ISI: tautan pendaftaran]]" }]

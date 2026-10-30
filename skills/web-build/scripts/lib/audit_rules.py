@@ -1006,6 +1006,31 @@ def check_data_layer(proj_dir, site_type):
 # ============================================================
 
 
+def _shape_differences(first, second, where):
+    """
+    Membandingkan bentuk dua naskah: kunci kamus dan panjang list, bukan isi teksnya.
+
+    I.S. : first dan second hasil YAML; where adalah jalur saat ini (mis. pages.index).
+    F.S. : List jalur tempat bentuk keduanya berbeda dikembalikan.
+    """
+    if isinstance(first, dict) and isinstance(second, dict):
+        diffs = [f"{where}.{key}".lstrip(".") for key in sorted(set(first) ^ set(second), key=str)]
+        for key in first:
+            if key in second:
+                diffs += _shape_differences(first[key], second[key], f"{where}.{key}".lstrip("."))
+        return diffs
+
+    if isinstance(first, list) and isinstance(second, list):
+        if len(first) != len(second):
+            return [f"{where} ({len(first)} lawan {len(second)} butir)"]
+        diffs = []
+        for index, (a_item, b_item) in enumerate(zip(first, second)):
+            diffs += _shape_differences(a_item, b_item, f"{where}[{index}]")
+        return diffs
+
+    return []
+
+
 def check_bilingual_parity(proj_dir, brief):
     """
     Memeriksa paritas angka dan placeholder antara content/<lang>.yaml jika terdapat 2 bahasa.
@@ -1032,6 +1057,19 @@ def check_bilingual_parity(proj_dir, brief):
 
     n1 = set(re.findall(r"\b\d+(?:[.,]\d+)?\b", c1_text))
     n2 = set(re.findall(r"\b\d+(?:[.,]\d+)?\b", c2_text))
+
+    # Struktur kedua naskah harus sama: kunci yang sama dan jumlah butir yang sama. Selisih
+    # jumlah biasanya berarti kalimat terpecah oleh koma di list satu baris [a, b].
+    for where in _shape_differences(io.read_yaml(c1_path), io.read_yaml(c2_path), ""):
+        findings.append({
+            "rule": "bilingual-structure-mismatch",
+            "category": "design",
+            "level": "warning",
+            "file": f"content/{langs[1]}.yaml",
+            "line": 1,
+            "message": f"Struktur naskah {langs[0]} dan {langs[1]} berbeda di {where}.",
+            "fix": "Give both languages the same keys and the same number of items; write sentences as block list items, not inside [a, b].",
+        })
 
     if n1 != n2:
         diff = (n1 - n2) | (n2 - n1)

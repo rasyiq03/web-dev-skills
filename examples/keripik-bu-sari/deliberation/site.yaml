@@ -1,0 +1,314 @@
+sitting: site
+simulated: false
+roles:
+- perancang
+- penulis
+- arsitek
+- penguji
+- wakil-klien
+rounds:
+- round: 1
+  kind: proposals
+  entries:
+  - role: perancang
+    text: '1) pages/produk.html, a.pd-price-list__order: tombol pesan per produk saat ini berupa pil cokelat
+      penuh yang di layar 360 px pecah jadi dua baris, sehingga daftar harga tenggelam. Ubah menjadi tautan
+      teks pendek "Pesan" (pd-text-link) atau tombol kecil bergaris tepi, lalu letakkan harga sebaris
+      dengan nama, supaya bentuknya sama dengan daftar harga di beranda. 2) pages/cara-pesan.html, .pd-ledger__value
+      dan langkah ke-4 di .pd-steps__item: placeholder [[ISI: jam buka]], [[ISI: nomor WhatsApp]], dan
+      [[ISI: cara pembayaran]] tampil sebagai teks biasa, padahal di beranda dan halaman produk tampil
+      sebagai lencana mono pd-label. Bungkus semuanya dengan span.pd-label agar ketiga halaman konsisten
+      dan pemilik mudah melihat bagian yang masih harus diisi. Catatan: cara pembayaran tidak ada di daftar
+      placeholder, jadi perlu dikonfirmasi ke klien. 3) pages/produk.html dan pages/cara-pesan.html, section
+      utama: berikan panel tint berujung membulat yang sama seperti seksi featured di beranda, atau beri
+      pembuka kecil "Kirim ke seluruh Karesidenan Kediri" di atas judul seperti di hero, supaya ciri hangat
+      kunyit tidak hanya muncul di beranda.'
+    evidence:
+    - d-layout-1
+    - check:c-layout-catalog
+    - req-goal
+    - ph:prices
+    - ph:hours
+    - ph:whatsapp
+    - d-style-1
+    - d-palette-1
+    - token:color.tint
+    - req-facts.shipping_area
+  - role: penulis
+    text: '1) Di halaman Produk, tombol "Pesan keripik singkong balado lewat WhatsApp" dan dua tombol
+      lainnya terpecah jadi dua baris di HP 360px. Samakan teks yang terlihat dengan halaman lain jadi
+      "Pesan lewat WhatsApp", lalu taruh nama produk di aria-label. Pesan WhatsApp-nya tetap menyebut
+      produknya. 2) Di halaman Cara pesan, [[ISI: cara pembayaran]] muncul dua kali, di langkah 4 dan
+      di baris Cara bayar. Ubah langkah 4 jadi "Bayar pesananmu. Cara bayarnya ada di bawah." supaya placeholder
+      cukup diisi sekali dan kalimatnya tidak berakhir dengan titik dua. 3) Naskah dan halaman tidak sama.
+      id.yaml punya catatan per produk ("Keripik tempe buatan rumah." dan lainnya) yang tidak tampil di
+      produk.html. Catatan itu hanya mengulang nama produk, jadi hapus dari id.yaml. Di Beranda, ganti
+      "Lihat daftar harga" jadi "Lihat semua produk", karena harga sudah tampil tepat di atasnya dan teks
+      ini cocok dengan menu Produk. Selain itu nada sudah sesuai d-tone-1 (kamu, hangat, kalimat pendek)
+      dan tidak ada fakta karangan.'
+    evidence:
+    - d-tone-1
+    - req-goal
+    - req-facts.products
+    - ph:whatsapp
+    - ph:prices
+    - check:c-register-id
+  - role: arsitek
+    text: '1) Font lebih ringan untuk kuota mahasiswa. Di ketiga halaman (index.html, pages/produk.html,
+      pages/cara-pesan.html), ubah URL Google Fonts dari DM+Mono:wght@400;700 menjadi DM+Mono:wght@400
+      saja. Harga hanya memakai DM Mono 400, dan di CSS tidak ada aturan yang memakai DM Mono 700. 2)
+      Jarak tepi ganda di HP. Di layar 360px, .pd-main (padding md) ditambah .pd-section (padding md)
+      membuat isi menjorok 32px, sedangkan kepala dan kaki hanya 16px (lihat k2-_index_html-360.png).
+      Di layout.css, ubah .pd-main menjadi padding-inline: 0 di bawah 48em, dan pindahkan padding-inline
+      var(--pd-space-lg) ke dalam @media (min-width: 48em) yang sudah ada. Dengan begitu teks sejajar
+      dengan kepala dan kotak tint featured penuh selebar layar. 3) Pakai token, bukan angka mentah. Di
+      components.css, ganti .pd-button:hover transform: translateY(-2px) dengan translateY(calc(-1 * var(--pd-space-xs))).
+      Placeholder [[ISI: cara pembayaran]] di cara-pesan.html (langkah 4 dan ledger) belum ada di daftar
+      ph: paket, jadi perlu didaftarkan sebagai placeholder resmi supaya ikut diserahkan ke klien. Tetap
+      biarkan sebagai placeholder, jangan diisi karangan.'
+    evidence:
+    - d-motion-1
+    - d-typo-1
+    - token:space.md
+    - token:space.lg
+    - token:space.xs
+    - check:c-layout-featured
+    - req-audience
+    - file:index.html
+    - file:pages/produk.html
+    - file:pages/cara-pesan.html
+  - role: penguji
+    text: '1) Di halaman cara-pesan, tautan nomor WhatsApp di baris ledger (dd) hanya teks biasa, sehingga
+      area ketuknya jauh di bawah 44px. Ini tautan pesan utama, jadi beri kelas pd-text-link atau min-height
+      2.75rem. 2) Tautan nama usaha "Keripik Bu Sari" di kepala situs pada ketiga halaman juga tidak punya
+      min-height, area ketuknya kira-kira 32px. Samakan dengan pd-nav__link (inline-flex, min-height 2.75rem).
+      3) Placeholder [[ISI: cara pembayaran]] (cara-pesan langkah 4 dan baris Cara bayar) tidak tercatat
+      sebagai ph di graf. Nomor baris di report.json juga tidak cocok dengan berkas sekarang: finding:6
+      menunjuk baris 118, padahal index.html hanya 116 baris. Jadi laporan itu basi. Daftarkan placeholder
+      pembayaran lalu jalankan check ulang sebelum dinyatakan siap. Struktur judul (h1 lalu h2 lalu h3),
+      fokus terlihat (:focus-visible), kontras, dan tombol 44px sudah lulus.'
+    evidence:
+    - ph:whatsapp
+    - req-goal
+    - req-audience
+    - check:c-layout-how-to-order
+    - finding:6
+  - role: wakil-klien
+    text: 'Saya sudah memeriksa ketiga halaman kata demi kata. Tidak ada fakta karangan. Nama usaha, Kediri,
+      buatan rumah, tiga produk, area kirim seluruh Karesidenan Kediri, dan pesan lewat WhatsApp semuanya
+      ada di brief. Harga, nomor WhatsApp, jam buka, dan cara bayar tetap [[ISI: ...]], dan tidak ada
+      QRIS, halal, P-IRT, testimoni, maupun kata goreng atau andalan. Ada tiga perbaikan. (1) Placeholder
+      [[ISI: cara pembayaran]] ada di cara-pesan.html (langkah 4 dan baris Cara bayar), tetapi belum terdaftar
+      di graf sebagai ph:payment. Graf baru memuat 4 placeholder, jadi check yang hasilnya 0 error tidak
+      memeriksanya. Placeholder ini harus didaftarkan sebelum serah terima, sesuai veto di copy.yaml.
+      (2) Brief tidak menyebut apakah Bu Sari punya toko di marketplace, tetapi tautan ''Belanja di marketplace''
+      di produk.html dan cara-pesan.html tampil sebagai fakta pasti. Placeholdernya hanya ada di href,
+      jadi pembeli tidak melihatnya. Tulis teksnya ''Belanja di [[ISI: nama marketplace]]'' supaya pemilik
+      melihat bahwa bagian ini perlu diisi, atau dihapus bila tidak punya toko. (3) Di cara-pesan.html,
+      ''Chat kami di WhatsApp pada jam buka.'' menyiratkan chat hanya dibalas pada jam tertentu, padahal
+      jam buka belum diketahui. Ubah menjadi ''Chat kami di WhatsApp.'' karena jam buka sudah ada di baris
+      Jam buka.'
+    evidence:
+    - ph:marketplace_links
+    - ph:hours
+    - ph:whatsapp
+    - ph:prices
+    - req-business.name
+    - req-business.kind
+    - req-business.location
+    - req-facts.products
+    - req-facts.shipping_area
+    - req-goal
+- round: 2
+  kind: critique
+  entries:
+  - role: perancang
+    text: 'Saya perbaiki usulan Penulis no. 1 dan menyatukannya dengan usulan saya no. 1, karena keduanya
+      bertentangan soal bentuk tombol per produk di pages/produk.html. Teks yang terlihat dipakai dari
+      Penulis, yaitu "Pesan lewat WhatsApp", dengan aria-label "Pesan <nama produk> lewat WhatsApp" dan
+      isi pesan wa.me yang tetap menyebut produknya. Bentuknya dipakai dari saya: a.pd-price-list__order
+      ganti dari pd-button penuh menjadi pd-button pd-button--quiet bergaris tepi, ditaruh di baris sendiri
+      di bawah nama dan harga. Nama dan harga tetap sebaris, sama seperti daftar harga di beranda, dan
+      tombolnya tetap 44px sesuai catatan Penguji. Usulan saya sebelumnya untuk membuat tautan teks "Pesan"
+      saja saya tarik. Karena ph:site:cara-pembayaran sudah terdaftar, catatan "perlu dikonfirmasi" di
+      usulan saya no. 2 tidak berlaku lagi. Yang tetap: pada pages/cara-pesan.html, ketiga placeholder
+      (jam buka, nomor WhatsApp, cara pembayaran) dibungkus span.pd-label seperti di halaman lain. Ini
+      sejalan dengan usulan Penulis no. 2 agar cara pembayaran cukup muncul sekali, di baris Cara bayar.'
+    target_role: penulis
+    objection: 'Tidak memblokir. Usulan Wakil klien "Belanja di [[ISI: nama marketplace]]" sebaiknya juga
+      memakai span.pd-label di dalam tautan, supaya tanda placeholder tampil sama di ketiga halaman. Tanda
+      ini tidak boleh tampil sebagai teks tautan biasa. Panel tint di produk dan cara-pesan (usulan saya
+      no. 3) baru dikerjakan setelah lebar tepi dari usulan Arsitek no. 2 diterapkan, supaya kotak tint
+      di ketiga halaman sama lebarnya.'
+    blocking: false
+    evidence:
+    - d-layout-1
+    - check:c-layout-catalog
+    - d-style-1
+    - d-tone-1
+    - req-goal
+    - ph:prices
+    - ph:whatsapp
+    - ph:hours
+    - ph:marketplace_links
+    - token:color.tint
+  - role: penulis
+    text: 'Perbaikan untuk Wakil klien butir 2 dan 1. Jangan pakai ''Belanja di [[ISI: nama marketplace]]''.
+      Placeholder itu belum terdaftar di graf, sama seperti [[ISI: ukuran kemasan]] yang kamu tolak di
+      sidang halaman pertama. Pakai placeholder yang sudah ada: teks tautan tetap ''Belanja di marketplace'',
+      lalu tepat sesudahnya tampilkan span.pd-label berisi [[ISI: tautan marketplace]] (ph:marketplace_links)
+      di produk.html baris 79 dan cara-pesan.html baris 85. Dengan begitu pemilik melihat bagian yang
+      perlu diisi, dan di HANDOFF dicatat bahwa baris itu dihapus kalau Bu Sari tidak punya toko marketplace.
+      Placeholder cara bayar sekarang bernama ph:site:cara-pembayaran, bukan ph:payment. Usulku sendiri
+      di Putaran 1 untuk mengganti ''Lihat daftar harga'' menjadi ''Lihat semua produk'' kutarik, karena
+      label itu sudah diputuskan di sidang halaman pertama. Usul ''Chat kami di WhatsApp.'' kusetujui.'
+    target_role: wakil-klien
+    objection: Tidak memblokir, untuk Perancang. Tombol per produk jangan dipendekkan jadi 'Pesan' saja.
+      Tombol harus menyebut tindakannya. Pakai 'Pesan lewat WhatsApp' seperti di beranda dan kaki situs,
+      dan taruh nama produk di aria-label. Kalau perlu, bentuknya boleh tombol kecil bergaris tepi supaya
+      muat satu baris di 360px. Eyebrow 'Kirim ke seluruh Karesidenan Kediri' cukup ada di hero beranda.
+      Di cara-pesan, area kirim sudah ada di ledger, jadi jangan diulang di atas judul.
+    blocking: false
+    evidence:
+    - ph:marketplace_links
+    - ph:site:cara-pembayaran
+    - ph:hours
+    - ph:whatsapp
+    - d-tone-1
+    - req-goal
+    - req-facts.products
+    - req-facts.shipping_area
+    - d-layout-1
+  - role: arsitek
+    text: 'Usulan Perancang saya rinci supaya bisa dikerjakan tanpa CSS baru dan sekaligus menjawab Penulis
+      dan Penguji. (1) Di pages/produk.html, ubah ketiga a.pd-button.pd-price-list__order menjadi a.pd-text-link.pd-price-list__order.
+      Teks yang terlihat cukup ''Pesan lewat WhatsApp'', lalu tambahkan aria-label=''Pesan keripik tempe
+      lewat WhatsApp'' dan seterusnya untuk tiap produk. aria-label itu diawali teks yang terlihat supaya
+      pengguna kontrol suara tetap bisa memanggilnya. .pd-text-link sudah punya min-height 2.75rem dan
+      .pd-price-list__order tetap grid-column 1 / -1, jadi area ketuk 44px aman. Harga otomatis sebaris
+      dengan nama mulai 30em lewat media query yang sudah ada. (2) Di pages/cara-pesan.html, bungkus [[ISI:
+      jam buka]], [[ISI: cara pembayaran]] (sekarang ph:site:cara-pembayaran), dan teks nomor di tautan
+      WhatsApp baris ledger dengan span.pd-label. Pembungkus ini hanya untuk teks yang terlihat, href
+      jangan diubah. Tambahkan kelas pd-text-link pada a di dd itu supaya temuan area ketuk dari Penguji
+      ikut selesai. Langkah 4 mengikuti usulan Penulis sehingga placeholder pembayaran hanya muncul sekali.
+      (3) Untuk panel tint di produk dan cara-pesan, pakai ulang kelas modifier yang sudah dipakai seksi
+      featured di beranda (token:color.tint, token:radius.sm). Jangan buat aturan baru, dan cukup HTML/CSS
+      tanpa JS.'
+    target_role: perancang
+    objection: Usulan saya sendiri di Putaran 1 nomor 1 saya tarik dalam bentuk aslinya. URL Google Fonts
+      dibuat oleh compile_tokens (fonts.html), jadi kalau ketiga halaman diubah dengan tangan, perubahan
+      itu akan tertimpa saat build berikutnya. Bila bobot DM Mono 700 memang tidak terpakai, perbaikannya
+      ada di compile_tokens, dan itu di luar proyek ini. Perlu diingat juga bahwa .pd-label di dalam tautan
+      tidak boleh menimpa warna fokus. Lalu, sesuai catatan Penguji, report.json harus dibuat ulang lewat
+      check setelah semua perubahan ini, karena nomor barisnya sudah basi.
+    blocking: false
+    evidence:
+    - d-layout-1
+    - d-motion-1
+    - check:c-layout-catalog
+    - check:c-layout-how-to-order
+    - ph:whatsapp
+    - ph:hours
+    - ph:prices
+    - token:color.tint
+    - token:radius.sm
+    - finding:6
+    - file:pages/produk.html
+    - file:pages/cara-pesan.html
+  - role: penguji
+    text: 'Perbaikan untuk usulan Penulis no. 1 (tombol pesan per produk di pages/produk.html baris 64,
+      69, 74). Saya setuju teks yang terlihat dibuat pendek dan seragam, tetapi jangan pakai aria-label
+      yang mengganti nama tombol. Aria-label yang tidak memuat teks terlihat secara utuh di awal (misalnya
+      aria-label="Keripik tempe" atau "Pesan keripik tempe lewat WhatsApp" untuk tombol bertuliskan "Pesan
+      lewat WhatsApp") gagal WCAG 2.5.3 Label in Name, sehingga pengguna kontrol suara yang mengucapkan
+      "klik Pesan lewat WhatsApp" tidak bisa mengenai tombolnya. Pakai cara ini: beri id pada nama produk
+      (misalnya <span id="produk-tempe">Keripik tempe</span>) dan pada tautan (id="pesan-tempe"), lalu
+      tulis aria-labelledby="pesan-tempe produk-tempe". Nama aksesibelnya menjadi "Pesan lewat WhatsApp
+      Keripik tempe": diawali teks yang terlihat dan tetap jelas di luar konteks, karena di daftar tautan
+      pembaca layar ada tiga tombol yang tujuannya berbeda. Untuk usulan Perancang (tautan teks "Pesan"
+      atau tombol bergaris tepi), pola aria-labelledby yang sama tetap berlaku, dan area ketuknya wajib
+      tetap min-height 2.75rem (inline-flex). Jangan kembali ke tautan teks biasa yang tingginya kurang
+      dari 44px, karena tombol ini adalah jalur pesan utama.'
+    target_role: penulis
+    objection: 'Memblokir sampai dua hal selesai. (a) Tombol pesan per produk tidak boleh memakai aria-label
+      yang menyimpang dari teks terlihat, dan setelah dibuat pendek, ketiganya tidak boleh punya nama
+      aksesibel yang identik. Kedua hal ini menyangkut tombol pesan yang menjadi tujuan utama situs (req-goal,
+      check:c-layout-catalog, ph:whatsapp). (b) Situs belum boleh dinyatakan siap dengan dasar "0 error,
+      0 peringatan". Nomor baris finding:1 sampai finding:22 tidak cocok dengan berkas sekarang (finding:6
+      menunjuk baris 118, padahal index.html hanya 116 baris), jadi laporan itu basi. Selain itu ph:site:cara-pembayaran
+      baru didaftarkan setelah check terakhir berjalan. Check harus dijalankan ulang setelah semua perbaikan
+      diterapkan: perubahan tombol, pd-label pada placeholder di cara-pesan dari usulan Perancang, padding
+      .pd-main dari usulan Arsitek, serta tautan WhatsApp di ledger dan tautan nama usaha di kepala situs
+      yang dibuat 44px. Hasilnya harus 0 error dan 0 peringatan, dan check:c-contrast-body serta check:c-contrast-accent
+      tetap lulus. Catatan tambahan yang tidak memblokir: usulan Penulis no. 2 (placeholder cara pembayaran
+      cukup tampil sekali) saya dukung, karena placeholder ganda membingungkan pembaca layar dan pemilik.'
+    blocking: true
+    resolved: true
+    evidence:
+    - req-goal
+    - check:c-layout-catalog
+    - ph:whatsapp
+    - check:c-layout-how-to-order
+    - check:c-contrast-body
+    - check:c-contrast-accent
+    - finding:6
+    - d-layout-1
+  - role: wakil-klien
+    text: 'Perbaikan untuk usulan Penulis. Langkah 4 di cara-pesan.html saya terima: ''Bayar pesananmu.
+      Cara bayarnya ada di bawah.'' Dengan begitu [[ISI: cara pembayaran]] (sekarang ph:site:cara-pembayaran)
+      cukup diisi sekali, di baris Cara bayar. Saya tambahkan satu hal yang terlewat: langkah 1 ''Chat
+      kami di WhatsApp pada jam buka.'' diubah menjadi ''Chat kami di WhatsApp.'', karena jam buka belum
+      diketahui (ph:hours) dan sudah punya baris sendiri. ''Lihat semua produk'' dan penghapusan catatan
+      produk di id.yaml juga saya setujui. Kata-kata baru dari Perancang (''Kirim ke seluruh Karesidenan
+      Kediri'') dan dari Penulis sudah saya cocokkan dengan brief, dan tidak ada fakta karangan.'
+    target_role: penulis
+    objection: 'Brief tidak menyebut apakah Bu Sari punya toko di marketplace. Tautan ''Belanja di marketplace''
+      di produk.html dan cara-pesan.html tetap tampil seperti fakta pasti, padahal placeholdernya hanya
+      ada di href (ph:marketplace_links). Usul saya: tandai label itu dengan lencana pd-label [[ISI: tautan
+      marketplace]], lalu tulis di HANDOFF.md bahwa tautan ini dihapus bila tidak ada toko marketplace.
+      Saya tidak memblokir karena placeholdernya sudah terdaftar di graf. Tidak ada veto baru.'
+    blocking: false
+    evidence:
+    - ph:site:cara-pembayaran
+    - ph:hours
+    - ph:marketplace_links
+    - ph:whatsapp
+    - req-facts.shipping_area
+    - req-facts.products
+    - req-goal
+    - d-tone-1
+- round: 3
+  kind: revision
+  entries:
+  - role: penguji
+    text: Keberatan saya sudah terpenuhi. Tiga tombol pesan di halaman produk sekarang memakai aria-labelledby
+      yang menunjuk ke tombol itu sendiri lalu ke judul produknya. Jadi pembaca layar menyebut "Pesan
+      lewat WhatsApp Keripik singkong balado", "... Keripik tempe", dan "... Makaroni pedas". Namanya
+      diawali teks yang terlihat dan berbeda di tiap tombol. Tidak ada lagi aria-label yang menyimpang.
+      Hanya nav "Menu utama" yang masih memakai aria-label, dan itu wajar. Laporan check ronde 6 berisi
+      0 error, 0 peringatan, dan 23 info. Semua info itu placeholder [[ISI]] yang memang harus diisi klien.
+      Saya mencocokkan ke-23 nomor baris di laporan dengan berkasnya, dan semuanya tepat menunjuk baris
+      placeholder. Contohnya produk.html baris 70, 74, 85 dan cara-pesan.html baris 78, 85. Laporan ditulis
+      pukul 09:42:44, sesudah perubahan terakhir pada HTML dan CSS. Snapshot di rounds/6 juga sama persis
+      dengan berkas sekarang. Tangkapan layar k4 di lebar 360 dan 1280 menunjukkan tombol cukup besar
+      dan tidak terpotong. Susunan nama, harga, lalu tombol juga rapi.
+    blocking: false
+    resolved: true
+    evidence:
+    - req-goal
+    - check:c-layout-catalog
+    - ph:whatsapp
+resolution:
+  method: mufakat
+  outcome: sembilan perbaikan seluruh situs
+  summary: 'Disepakati: tombol pesan per produk menjadi tombol bergaris tepi ''Pesan lewat WhatsApp''
+    dengan aria-labelledby ke nama produk (WCAG 2.5.3); placeholder di cara-pesan dibungkus lencana pd-label;
+    cara bayar cukup tampil sekali; langkah 1 ''Chat kami di WhatsApp.''; tautan marketplace diberi lencana
+    [[ISI: tautan marketplace]] dan dihapus bila tidak ada toko; tepi isi di HP sejajar kepala situs;
+    tautan nama usaha dan nomor WhatsApp 44px; panel tint di halaman produk dan cara-pesan; gerak hover
+    memakai token. Check diulang: 0 error, 0 peringatan, nomor baris laporan cocok (check.py diperbaiki
+    agar snapshot diambil sesudah format). Usul font Arsitek ditarik. Id bukti karangan di jawaban Penguji
+    putaran 3 dipangkas ke id graf yang ada.'
+  votes: []
+  dissent: []
+  vetoes: []

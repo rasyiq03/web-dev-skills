@@ -254,6 +254,10 @@ sans-serif;` exist; a custom palette with ink `#777777` on paper `#888888` exits
 - Size steps are named `step-<n>` and `step-neg-<n>` in both `tokens.json` and `tokens.css`
   (never `step--1`, which stylelint's custom-property-pattern rejects). When the site already
   exists, `tokens.css` is copied into `css/` and NEXT is `run check.py`.
+- (2026-10-30) `color.tint`: the palette's `tint`, or 6% accent on paper when the palette has
+  none; ink, muted, and link must reach 4.5:1 on it. `weight.display`: the pairing's
+  `display_weight` (default 700), used by `base.css` for headings. State colors take the
+  lightness nearest the paper that still reaches 4.5:1, so they keep their hue.
 
 ### 3.6 `scaffold.py <slug>` (v0.1)
 
@@ -371,6 +375,13 @@ One run = one round. Order of work:
   ]
 }
 ```
+
+**Build-completeness and copy rules (2026-10-30).** `section-empty` (warning): a scaffold
+section shell still empty, so an unbuilt page cannot pass. `bilingual-structure-mismatch`
+(warning): the two copy files differ in keys or list lengths. `banner-missing` requires the
+banner on the line right above the section. The round snapshot is taken after formatting,
+so a restored round matches the report's line numbers. The sample-data label is required
+only when `endpoints.js` defines an endpoint (comments are ignored).
 
 **Locale rules (`lib/locale_rules.py`, 2026-10-30).** Measurable parts of
 `references/indonesia.md`, kept out of `audit/` because they read the brief:
@@ -574,6 +585,10 @@ Agent instructions: `skills/web-build/references/mode-deep.md` and
 - `handoff.py` in deep mode lists the recorded sittings, says when any was simulated, and
   prints "Siap pakai" only when all four sittings are recorded and check reports zero
   errors and zero warnings; otherwise it names what is missing.
+- (2026-10-30) Packets for copy and review sittings list every page's sections with
+  purpose and facts, the absolute paths of the pages, copy, guides, report, and CSS, and
+  every token id; the evidence list includes placeholders written on pages
+  (`ph:site:<text>`). Dogfood: `docs/superpowers/dogfood/2026-10-30-deep-and-guided.md`.
 
 ### 3.18 Learning signals and `tools/eval/collect.py`
 

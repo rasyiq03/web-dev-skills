@@ -3,6 +3,7 @@
 # Deskripsi : Pengujian unit dan CLI untuk context.py.
 # ============================================================
 
+import yaml
 from conftest import copy_fixture, next_line, run_script
 
 
@@ -58,3 +59,19 @@ def test_context_separates_page_and_site_placeholders(projects_dir):
     assert "[[ISI: alamat]]" in own["kontak"] and "[[ISI: alamat]]" not in own["index"]
     assert "[[ISI: nomor WhatsApp]]" in site["index"]
     assert "[[ISI: daftar layanan atau menu]]" in own["index"]
+
+
+def test_context_points_to_the_translated_page(projects_dir):
+    work = copy_fixture(projects_dir, "kopi-senja", ["brief.yaml", "directions.yaml"])
+    brief = (work / "brief.yaml").read_text(encoding="utf-8").replace("languages: [id]", "languages: [id, en]")
+    (work / "brief.yaml").write_text(brief, encoding="utf-8")
+    directions = yaml.safe_load((work / "directions.yaml").read_text(encoding="utf-8"))
+    for direction in directions["directions"]:
+        direction["register"]["en"] = "you"
+    (work / "directions.yaml").write_text(yaml.safe_dump(directions, allow_unicode=True), encoding="utf-8")
+    for args in (("gaps",), ("pick_direction", "--pick", "dir-2"), ("compile_tokens",)):
+        assert run_script(args[0], "kopi-senja", *args[1:]).returncode == 0
+
+    out = run_script("context", "kopi-senja", "kontak").stdout
+
+    assert "translation | en/pages/kontak.html | .ScaffolDev/content/en.yaml#kontak" in out

@@ -81,8 +81,11 @@ def get_page_context(slug, page):
     if rest:
         lines.append(f"placeholders-site | {' '.join(n['label'] for n in rest)} | for header, footer, and calls to action")
 
-    # Konten file
+    # Konten file; bahasa berikutnya punya halaman sendiri di folder <lang>/ dengan placeholder
+    # yang sama persis, supaya satu fakta cukup diisi dengan satu teks
     lines.append(f"content | {paths.WORK_DIR}/content/{project.first_language(brief)}.yaml#{page}")
+    for lang in (brief.get("languages") or [])[1:]:
+        lines.append(f"translation | {lang}/{page_file_rel} | {paths.WORK_DIR}/content/{lang}.yaml#{page} | same structure and the same [[ISI: ...]] texts")
 
     # Hitung perkiraan token (characters / 4)
     total_chars = sum(len(line) + 1 for line in lines)

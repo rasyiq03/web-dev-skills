@@ -97,6 +97,8 @@ plugin support), it means the folder that contains `skills/`.
    `${CLAUDE_PLUGIN_ROOT}/skills/web-build/site-types/<site_type>.yaml`. Write
    `<work>/content/<lang>.yaml` with one entry per section of the site type: headings, body
    text, button labels.
+   - Write each sentence as a block list item (`- "…"`), not in a one-line `[…]` list: a
+     comma inside a one-line list silently splits the sentence in two.
    - Collections the brief gives (a product list, projects) are content: write them in.
    - Collections it lacks, and every dashboard figure, are data: one endpoint each in
      `<project>/js/api/endpoints.js` plus its response in `<project>/data/mock/<name>.mock.json`

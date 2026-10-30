@@ -1,0 +1,184 @@
+sitting: direction
+simulated: false
+roles:
+- perancang
+- penulis
+- arsitek
+- penguji
+- wakil-klien
+rounds:
+- round: 1
+  kind: proposals
+  entries:
+  - role: perancang
+    text: Saya mengusulkan dir-1 karena warna kunyit dan cokelat goreng diambil langsung dari produknya
+      sendiri, yaitu keripik singkong balado dan keripik tempe, jadi tampilannya tidak terasa seperti
+      template camilan biasa. Rasa toples di dapur Bu Sari cocok dengan usaha rumahan di Kediri, dan sapaan
+      yang akrab bisa menjangkau mahasiswa sekaligus ibu rumah tangga. Gaya, warna, huruf, dan gerak yang
+      minim saling cocok, dengan satu ciri khas, yaitu sudut membulat seperti toples, yang dipakai secukupnya.
+    choice: dir-1
+    evidence:
+    - req-business.kind
+    - req-business.location
+    - req-facts.products
+    - req-audience
+  - role: penulis
+    text: Saya pilih dir-1 karena nada hangat-akrab cocok untuk mahasiswa dan ibu rumah tangga, yang sama-sama
+      biasa disapa santai di chat WhatsApp. Hero berupa kalimat jelas yang langsung menyebut tiga keripik
+      Bu Sari dan tombol "Pesan lewat WhatsApp" mudah dipahami di HP. Harga dan nomor WhatsApp belum ada,
+      jadi tetap ditulis sebagai placeholder dan tidak dikarang.
+    choice: dir-1
+    evidence:
+    - req-audience
+    - req-goal
+    - req-facts.products
+    - req-business.kind
+    - ph:prices
+    - ph:whatsapp
+  - role: arsitek
+    text: Saya mengusulkan dir-3 karena tanpa animasi dan hanya memakai satu keluarga huruf (Nunito),
+      sehingga halaman paling ringan dibuka di HP kelas menengah dengan kuota data mahasiswa dan ibu rumah
+      tangga. Daftar harga sederhana dan langkah pesan bergaya checklist cukup dibuat dengan HTML dan
+      CSS biasa, dan tombol WhatsApp tetap jalan walau JavaScript mati. Tiga produk bisa ditampilkan sebagai
+      daftar ringkas tanpa foto berat atau carousel.
+    choice: dir-3
+    evidence:
+    - req-audience
+    - req-goal
+    - req-facts.products
+    - ph:prices
+    - ph:whatsapp
+  - role: penguji
+    text: Saya mengusulkan dir-3 karena tanpa animasi, huruf Nunito yang bulat mudah dibaca di HP kecil,
+      dan langkah pesan bergaya checklist memudahkan mahasiswa maupun ibu rumah tangga sampai ke tombol
+      WhatsApp. Kuning kunyit (dir-1) dan kuning terang (dir-2) lebih sering gagal kontras untuk teks,
+      sedangkan cokelat gula aren di atas latar terang lebih mudah dibuat lolos. Tombol WhatsApp harus
+      tetap jelas walau nomornya masih placeholder.
+    choice: dir-3
+    evidence:
+    - req-audience
+    - req-goal
+    - ph:whatsapp
+  - role: wakil-klien
+    text: 'Saya pilih dir-1 karena warna kunyit dan sapaan akrab ala chat WhatsApp cocok untuk mahasiswa
+      sekaligus ibu rumah tangga, dan Bu Sari akan merasa ini memang dapurnya sendiri. Tombol utama harus
+      "Pesan lewat WhatsApp". Daftar harga hanya boleh berisi [[ISI: harga produk]] dan nomornya [[ISI:
+      nomor WhatsApp]], karena keduanya belum disebut di brief.'
+    choice: dir-1
+    evidence:
+    - req-audience
+    - req-goal
+    - req-business.kind
+    - req-facts.products
+    - ph:prices
+    - ph:whatsapp
+- round: 2
+  kind: critique
+  entries:
+  - role: perancang
+    text: Saya bantu memperbaiki usulan Penguji. Hasil ukur Pimpinan menunjukkan kunyit tidak gagal kontras
+      (aksen 6,45, teks tombol 6,99), jadi alasan yang lebih kuat untuk dir-3 adalah selisih kontrasnya
+      yang lebih lebar (7,81 dan 8,87) untuk tombol "Pesan lewat WhatsApp". Saya tetap memilih dir-1,
+      karena warna kunyit dan cokelat goreng berasal dari keripik balado dan tempe Bu Sari sendiri, dan
+      langkah pesan bergaya checklist dari dir-3 bisa dipinjam ke dir-1.
+    choice: dir-1
+    target_role: penguji
+    objection: Usulan Arsitek menyebut dir-3 hanya memakai satu keluarga huruf, padahal dir-3 memakai
+      Nunito, Nunito Sans, dan Ubuntu Mono, sama banyaknya dengan dir-1 (DM Serif Display, DM Sans, DM
+      Mono). Jadi soal ringan halaman, kedua arah setara dari sisi huruf, dan perbedaannya hanya gerak
+      (low dibanding none).
+    blocking: false
+    evidence:
+    - req-facts.products
+    - req-business.kind
+    - req-business.location
+    - req-audience
+    - req-goal
+    - ph:whatsapp
+  - role: penulis
+    text: Usulan Penguji lebih kuat bila disebut dengan angka yang sudah diukur. Kunyit (dir-1) tidak
+      gagal kontras; semua lolos WCAG AA. Yang benar, gula aren (dir-3) punya jarak aman lebih besar untuk
+      aksen (7,81 lawan 6,45) dan teks tombol (8,87 lawan 6,99). Langkah pesan bergaya checklist menuju
+      tombol "Pesan lewat WhatsApp" juga bisa dibawa ke arah mana pun, jadi tidak perlu jadi alasan memilih
+      satu arah. Saya tetap memilih dir-1.
+    choice: dir-1
+    target_role: penguji
+    objection: Sapaan "Anda" dengan nada sopan-hangat di dir-3 terasa kaku bagi mahasiswa, padahal mereka
+      setengah dari pembeli dan biasa memesan lewat chat WhatsApp yang santai. Nada akrab di dir-1 cocok
+      untuk mahasiswa dan juga ibu rumah tangga. Ini soal suara, bukan fakta yang salah, jadi tidak memblokir.
+    blocking: false
+    evidence:
+    - req-audience
+    - req-goal
+    - req-facts.products
+  - role: arsitek
+    text: Saya perbaiki usulan perancang untuk dir-1, dan saya juga meralat klaim saya sendiri di Putaran
+      1. Hasil ukur Pimpinan menunjukkan palet kunyit lolos kontras (14,92 / 6,45 / 6,99), jadi warna
+      kuning tidak membuatnya kalah dari dir-3. Beban hurufnya juga setara, karena dir-3 ternyata memakai
+      tiga keluarga huruf (Nunito, Nunito Sans, Ubuntu Mono), bukan satu, sedangkan DM Serif Display di
+      dir-1 cukup satu ketebalan. Karena itu saya pindah ke dir-1, dan gerak "low" cukup dibuat dengan
+      CSS saja sehingga halaman tetap ringan di HP mahasiswa dan ibu rumah tangga.
+    choice: dir-1
+    target_role: perancang
+    objection: Gerak harus memakai CSS saja, tanpa pustaka JavaScript, dan mati saat prefers-reduced-motion.
+      Huruf dibatasi ke ketebalan yang benar-benar dipakai, dengan font-display swap, dan DM Mono hanya
+      dipakai bila ada isinya. Tombol "Pesan lewat WhatsApp" harus berupa tautan biasa yang tetap jalan
+      walau JavaScript mati.
+    blocking: false
+    evidence:
+    - req-audience
+    - req-goal
+    - req-facts.products
+    - ph:whatsapp
+  - role: penguji
+    text: Saya perbaiki usulan Perancang. Alasan kontras yang saya pakai di Putaran 1 ternyata keliru,
+      karena palet kunyit lolos WCAG AA (teks 14,92; aksen 6,45; teks tombol 6,99), jadi dir-1 aman untuk
+      mahasiswa dan ibu rumah tangga yang membaca di HP. Klaim Arsitek bahwa dir-3 hanya memakai satu
+      keluarga huruf juga keliru, sebab dir-3 memakai Nunito, Nunito Sans, dan Ubuntu Mono, jadi soal
+      ringan halaman kedua arah ini setara, dan saya pindah ke dir-1.
+    choice: dir-1
+    target_role: perancang
+    objection: 'Ada tiga syarat yang tidak memblokir. Pertama, DM Serif Display hanya punya ketebalan
+      400, jadi judul jangan diberi bold palsu. Kedua, tombol "Pesan lewat WhatsApp" harus besar dan fokusnya
+      terlihat, dan tidak boleh berupa tautan kosong selama nomornya masih [[ISI: nomor WhatsApp]]. Ketiga,
+      teks tombol harus tetap muat di HP sempit walaupun kata bahasa Indonesianya panjang.'
+    blocking: false
+    evidence:
+    - req-audience
+    - req-goal
+    - ph:whatsapp
+  - role: wakil-klien
+    text: 'Saya bantu menguatkan usulan Penguji. Hasil ukur Pimpinan menunjukkan palet kunyit (dir-1)
+      juga lolos WCAG AA, dengan aksen/kertas 6,45 dan teks tombol/aksen 6,99, jadi soal kontras dir-1
+      dan dir-3 sama-sama aman, dan tugas Penguji tinggal memastikan tombol "Pesan lewat WhatsApp" tetap
+      jelas walau nomornya masih [[ISI: nomor WhatsApp]]. Saya tetap memilih dir-1 karena Bu Sari akan
+      merasa ini dapurnya sendiri, dan sapaan akrab cocok untuk mahasiswa sekaligus ibu rumah tangga.'
+    choice: dir-1
+    target_role: penguji
+    objection: 'Klaim Arsitek bahwa dir-3 hanya memakai satu keluarga huruf tidak sesuai hasil ukur, karena
+      dir-3 memakai Nunito, Nunito Sans, dan Ubuntu Mono, sama banyak dengan dir-1. Jadi alasan "lebih
+      ringan" tidak membedakan keduanya. Arah mana pun yang dipilih, daftar harga hanya boleh berisi [[ISI:
+      harga produk]], tautan marketplace dan jam buka tetap placeholder, dan area kirim ditulis persis
+      "seluruh Karesidenan Kediri". Belum ada usulan yang mengarang fakta, jadi ini bukan veto.'
+    blocking: false
+    evidence:
+    - req-goal
+    - req-audience
+    - req-facts.products
+    - req-facts.shipping_area
+    - ph:prices
+    - ph:whatsapp
+    - ph:marketplace_links
+    - ph:hours
+resolution:
+  method: mufakat
+  outcome: dir-1
+  summary: 'Putaran 1 terbelah 3-2 (dir-1 lawan dir-3). Setelah Pimpinan membagikan hasil ukur kontras
+    dan daftar font, Arsitek dan Penguji meralat alasan mereka sendiri dan pindah ke dir-1; tidak ada
+    keberatan yang memblokir. Syarat yang disepakati: gerak hanya CSS dan mati saat prefers-reduced-motion,
+    judul DM Serif Display tanpa bold palsu, tombol ''Pesan lewat WhatsApp'' besar dengan fokus terlihat,
+    langkah pesan bergaya checklist dari dir-3 boleh dipinjam, dan harga, nomor WhatsApp, tautan marketplace,
+    serta jam buka tetap placeholder.'
+  votes: []
+  dissent: []
+  vetoes: []

@@ -105,3 +105,19 @@ def test_mock_label_is_needed_only_when_endpoints_exist(projects_dir):
         encoding="utf-8")
     rules_found = {f["rule"] for f in audit_rules.check_data_layer(work, catalog)}
     assert {"mock-file-invalid", "mock-label-missing"} <= rules_found
+
+
+def test_bilingual_copy_with_a_split_sentence_is_flagged(tmp_path):
+    from lib import audit_rules
+
+    work = tmp_path / ".ScaffolDev"
+    (work / "content").mkdir(parents=True)
+    (work / "content" / "id.yaml").write_text(
+        "pages:\n  index:\n    sections:\n      story:\n        body: [Di Yogyakarta, Anda bisa membatik.]\n", encoding="utf-8")
+    (work / "content" / "en.yaml").write_text(
+        "pages:\n  index:\n    sections:\n      story:\n        body: [In Yogyakarta you can draw batik.]\n", encoding="utf-8")
+
+    findings = audit_rules.check_bilingual_parity(work, {"languages": ["id", "en"]})
+
+    assert [f["message"] for f in findings if f["rule"] == "bilingual-structure-mismatch"] == [
+        "Struktur naskah id dan en berbeda di pages.index.sections.story.body (2 lawan 1 butir)."]
