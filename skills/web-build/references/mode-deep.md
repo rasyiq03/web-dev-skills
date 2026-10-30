@@ -30,7 +30,9 @@ the user and never invents a fact.
    count as evidence, and the material (the five directions, or the pages and last check).
 2. **Round 1, usulan mandiri.** Start one subagent per member, in parallel. Give each the
    packet and its own role card, and ask for one answer in the packet's format. Members
-   must not see each other's proposals.
+   must not see each other's proposals. For a review sitting, also give the paths of
+   screenshots at 360 px and 1280 px if you can take them. Save each round's answers as you
+   receive them; the packet asks for quoted text so they stay valid YAML.
 3. **Round 2, saling menanggapi (gotong royong).** Give every member all five proposals.
    Each improves one other member's proposal first (`target_role`), then may object.
    An objection that must be solved first is `blocking: true` and cites graph ids.
@@ -41,9 +43,11 @@ the user and never invents a fact.
 5. Write `<work>/deliberation/<sitting>.yaml` (schema `schemas/deliberation.schema.json`): roles,
    rounds with every answer word for word, and the resolution (method, outcome, summary,
    votes, dissent, vetoes). Then run `run council <slug> <sitting> --record`. It checks the
-   rules (everyone heard, evidence for every block, no open block under mufakat, the vote
-   count) and applies the result; for `direction` it writes `decisions.yaml`. Fix the
-   minutes or hold another round if it refuses.
+   rules (everyone heard, evidence ids that exist in the graph, no open block under
+   mufakat, the vote count) and applies the result; for `direction` it writes `decisions.yaml`. Fix the
+   minutes or hold another round if it refuses. Keep every answer word for word; when a
+   member cited an id that is not in the graph, keep only the real ids and say so in the
+   summary.
 6. Apply what was agreed. A council change to one decision goes through
    `run decide <slug> <decision> --choice <value> --by council --reason "<the council's reason>"`.
 

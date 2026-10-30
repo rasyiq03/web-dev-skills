@@ -165,3 +165,18 @@ def test_graph_works_with_brief_only(kopi):
 
     assert result.returncode == 0, result.stdout
     assert "page:index" in graph.index(load(kopi))
+
+
+def test_placeholders_written_on_pages_join_the_graph(kopi_tokens):
+    assert run_script("scaffold", "kopi-senja").returncode == 0
+    index = kopi_tokens.parent / "index.html"
+    index.write_text(index.read_text(encoding="utf-8").replace(
+        "</main>", "<p>[[ISI: cara pembayaran]] [[ISI: jam buka]]</p></main>"), encoding="utf-8")
+
+    context_graph = graph.refresh(kopi_tokens)
+    nodes = {node["id"]: node for node in context_graph["nodes"]}
+
+    # Placeholder baru dari halaman terdaftar; yang sudah ada dari gaps tidak digandakan
+    assert nodes["ph:site:cara-pembayaran"]["label"] == "[[ISI: cara pembayaran]]"
+    assert ("ph:site:cara-pembayaran", "file:index.html", "located_in") in edge_set(context_graph)
+    assert not any(node_id.startswith("ph:site:jam") for node_id in nodes)

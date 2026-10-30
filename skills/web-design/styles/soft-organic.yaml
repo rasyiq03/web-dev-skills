@@ -15,8 +15,8 @@ base:
 
 palettes:
   - id: kunyit
-    mood: Cream and turmeric-brown; warm kitchen, homemade, generous.
-    colors: { ink: "#2B1E12", paper: "#FBF5EA", accent: "#8F4410", muted: "#6A5847", accent-ink: "#FFFFFF" }
+    mood: Cream, turmeric yellow, and fried-brown; warm kitchen, homemade, generous.
+    colors: { ink: "#2B1E12", paper: "#FBF5EA", accent: "#8F4410", muted: "#6A5847", accent-ink: "#FFFFFF", tint: "#F4DCA6" }
   - id: daun-pisang
     mood: Pale leaf and deep banana-leaf green; fresh, natural, wrapped by hand.
     colors: { ink: "#1D291B", paper: "#F3F6EC", accent: "#3B6527", muted: "#55614E", accent-ink: "#FFFFFF" }
@@ -43,7 +43,7 @@ components:
   button: Pill shape (radius sm on both ends), accent fill, accent-ink text, soft shadow; on hover
     the shadow grows a little and the button lifts 2px.
   card: Paper background, rounded corners, soft shadow, photo on top filling the card width.
-  section: Gently alternating paper and a 6% tint of the accent; rounded section corners on wide screens only.
+  section: Gently alternating paper and the palette tint (`--pd-color-tint`); rounded section corners on wide screens only.
   label: Small rounded tag with a muted border, body font, used for prices, sizes, and "pre-order".
   image: Rounded corners, warm natural light, hands and products rather than stock people.
 

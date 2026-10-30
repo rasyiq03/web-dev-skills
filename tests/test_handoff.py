@@ -132,5 +132,10 @@ def test_handoff_reports_the_a11y_review_as_it_happened(projects_dir):
     (work / "a11y-review.json").write_text(json.dumps(review), encoding="utf-8")
     line = handoff_line()
     assert "agen yang sama (kurang independen): 1 temuan di 1 dari" in line
+    assert "(0 sudah diperbaiki)" in line
+
+    review["pages"][0]["findings"][0]["applied"] = "alt ditulis ulang"
+    (work / "a11y-review.json").write_text(json.dumps(review), encoding="utf-8")
+    assert "(1 sudah diperbaiki)" in handoff_line()
     if len(pages) > 1:
         assert "belum ditinjau:" in line

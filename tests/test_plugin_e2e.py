@@ -12,7 +12,7 @@ import subprocess
 import sys
 
 import pytest
-from conftest import REPO, next_line
+from conftest import REPO, fill_empty_sections, next_line
 
 PLUGIN_DIRS = ("skills", "audit", "config", ".claude-plugin")
 PLUGIN_FILES = ("package.json", "package-lock.json", "requirements.txt", "LICENSE")
@@ -47,6 +47,8 @@ def test_fresh_plugin_install_builds_site(tmp_path):
     run_py = plugin / "skills" / "web-build" / "scripts" / "run.py"
 
     for args, expected in STEPS:
+        if args[0] == "check":
+            fill_empty_sections(work / "kopi-senja")
         result = subprocess.run(
             [sys.executable, "-S", str(run_py), *args],
             cwd=work,

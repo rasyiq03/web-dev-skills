@@ -8,6 +8,7 @@
 # ============================================================
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -15,10 +16,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import pick_direction
-from lib import council, explain, graph, io, project, report, trace
+from lib import council, explain, graph, io, paths, project, report, trace
 from lib.report import EXIT_INVALID, fail
 
 ROLE_CARDS = "skills/web-build/references/council"
+EMPTY_SECTION = re.compile(r"<section\b[^>]*>\s*</section>")
 
 NEXT_AFTER = {
     "direction": "run compile_tokens.py",
@@ -76,6 +78,11 @@ def _brief_lines(context_graph):
         if node["type"] in ("requirement", "placeholder", "decision", "check", "finding"):
             lines.append(f"- `{node['id']}`: {node['label']}" + (f" ({node['why']})" if node.get("why") else ""))
 
+    # Token cukup satu baris; anggota mengutip id-nya, bukan nama variabel CSS
+    tokens = [node["id"] for node in context_graph["nodes"] if node["type"] == "token"]
+    if tokens:
+        lines.append(f"- Token (kutip id-nya, misalnya `{tokens[0]}`): {', '.join(tokens)}")
+
     return lines + [""]
 
 
@@ -99,6 +106,47 @@ def _directions_lines(proj_dir):
         lines.append("")
 
     return lines
+
+
+def _material_lines(proj_dir, sitting):
+    """
+    Menulis bahan sidang selain arah: seksi tiap halaman dengan tujuan dan faktanya, serta
+    path lengkap berkas yang perlu dibaca, supaya anggota cukup membaca paket ini.
+
+    I.S. : brief.yaml ada; situs dan content/<lang>.yaml boleh belum ada.
+    F.S. : Daftar baris markdown dikembalikan.
+    """
+    brief = io.read_yaml(proj_dir / "brief.yaml")
+    site_type = project.load_site_type(brief.get("site_type"))
+    site_dir = paths.site_dir(proj_dir)
+    lang = project.first_language(brief)
+    refs = paths.REPO_ROOT / "skills" / "web-build" / "references"
+    lines = ["## Bahan", ""]
+
+    for page in project.site_pages(brief, site_type):
+        page_file = site_dir / paths.page_file(page)
+        # Kerangka scaffold berisi seksi kosong; halaman dianggap dibangun bila tak ada lagi yang kosong
+        built = " (sudah dibangun)" if page_file.is_file() and not EMPTY_SECTION.search(io.read_text(page_file)) else ""
+        lines.append(f"### Halaman `{page}`: {page_file}{built}")
+
+        for section in site_type.get("sections", []):
+            if section.get("page") == page:
+                facts = f" Fakta: {', '.join(section['facts'])}." if section.get("facts") else ""
+                lines.append(f"- `{section['id']}`: {section.get('purpose', '')}{facts}")
+
+        lines.append("")
+
+    content = proj_dir / "content" / f"{lang}.yaml"
+    lines.append("Baca juga:")
+    lines.append(f"- Naskah: {content}" + ("" if content.is_file() else " (belum ada)"))
+    lines.append(f"- Pedoman naskah: {refs / f'copy-{lang}.md'}")
+    if lang == "id":
+        lines.append(f"- Pedoman Indonesia: {refs / 'indonesia.md'}")
+    if sitting in ("first-page", "site"):
+        lines.append(f"- Laporan check: {proj_dir / 'report.json'}")
+        lines.append(f"- CSS situs: {site_dir / 'css'} (tokens.css, base.css, layout.css, components.css)")
+
+    return lines + [""]
 
 
 def _report_lines(proj_dir):
@@ -132,7 +180,7 @@ def write_packet(proj_dir, sitting):
     if sitting == "direction":
         lines += _directions_lines(proj_dir)
     else:
-        lines += ["## Bahan", "", "Baca `run context <slug> <page>` untuk tiap halaman dan `.ScaffolDev/content/<lang>.yaml` bila sudah ada.", ""]
+        lines += _material_lines(proj_dir, sitting)
         lines += _report_lines(proj_dir)
 
     lines += [
@@ -140,13 +188,15 @@ def write_packet(proj_dir, sitting):
         "",
         "```yaml",
         "role: <perancang|penulis|arsitek|penguji|wakil-klien>",
-        "text: <usulan atau tanggapan, satu sampai tiga kalimat>",
+        "text: '<usulan atau tanggapan, satu sampai tiga kalimat; di sidang isi teks Penulis boleh menulis draf per seksi>'",
         "choice: <untuk sidang arah: dir-K>",
         "target_role: <putaran 2: anggota yang usulannya kamu perbaiki>",
         "objection: <opsional>",
         "blocking: <true bila keberatan ini harus diselesaikan dulu>",
         "evidence: [<id simpul graf>]",
         "```",
+        "",
+        "Apit nilai teks dengan tanda kutip tunggal (tulis '' untuk kutip di dalamnya), supaya titik dua di kalimat tidak merusak YAML.",
         "",
     ]
 

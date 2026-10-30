@@ -92,7 +92,9 @@ directions:
 When no library palette or pairing fits (for example, the client's brand colors):
 
 - `palette: custom` plus a `colors` map with `ink`, `paper`, `accent`, `muted`, and
-  `accent-ink` as hex values. The compile step rejects pairs below WCAG AA contrast.
+  `accent-ink` as hex values, and optionally `tint` (the palette's signature surface, such
+  as a pale brand color; defaults to 6% accent on paper). The compile step rejects pairs
+  below WCAG AA contrast, including ink, muted, and link text on the tint.
 - `type_pairing: custom` plus a `fonts` map with `display`, `body`, and `mono` family names
   from Google Fonts. Add `display_weight: 400` when the display family has no bold (many
   display serifs and poster faces); headings default to 700.

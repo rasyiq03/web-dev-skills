@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 import pytest
-from conftest import REPO, add_git_folder, copy_fixture, next_line, run_script
+from conftest import REPO, add_git_folder, copy_fixture, fill_empty_sections, next_line, run_script
 from lib import io
 
 
@@ -24,6 +24,7 @@ def scaffold_kopi(projects_dir):
     run_script("pick_direction", "kopi-senja", "--pick", "dir-2")
     run_script("compile_tokens", "kopi-senja")
     run_script("scaffold", "kopi-senja")
+    fill_empty_sections(proj.parent)
     return proj
 
 
@@ -122,7 +123,21 @@ def test_check_reports_failed_tools_as_errors(kopi_scaffolded_check, monkeypatch
 
 
 @pytest.mark.node
-def test_check_clean_skeleton_passes(kopi_scaffolded_check):
+def test_check_flags_unbuilt_sections(projects_dir):
+    proj = copy_fixture(projects_dir, "kopi-senja", ["brief.yaml", "directions.yaml"])
+    for args in (("gaps",), ("pick_direction", "--pick", "dir-2"), ("compile_tokens",), ("scaffold",)):
+        run_script(args[0], "kopi-senja", *args[1:])
+
+    run_script("check", "kopi-senja")
+
+    # Kerangka yang belum diisi tidak boleh lolos tanpa peringatan
+    report = io.read_json(proj / "report.json")
+    assert report["summary"]["warnings"] > 0
+    assert "section-empty" in {f["rule"] for f in report["findings"]}
+
+
+@pytest.mark.node
+def test_check_filled_skeleton_passes(kopi_scaffolded_check):
     result = run_script("check", "kopi-senja")
     assert result.returncode == 0, result.stderr
     assert next_line(result) == "NEXT: run handoff.py"
@@ -199,3 +214,22 @@ def test_check_seeded_violations_and_round_recovery(kopi_scaffolded_check):
     report_data2 = io.read_json(kopi_scaffolded_check / "report.json")
     assert report_data2["summary"]["errors"] == 0
     assert "Ronde terbaik yang dipulihkan" in res2.stdout
+
+
+@pytest.mark.node
+def test_report_lines_match_the_restored_files(kopi_scaffolded_check):
+    site_dir = kopi_scaffolded_check.parent
+    index = site_dir / "index.html"
+    # Satu baris panjang yang pasti dipecah Prettier, lalu placeholder sesudahnya
+    index.write_text(index.read_text(encoding="utf-8").replace(
+        "</main>", '<p class="pd-section__text"><a href="pages/kontak.html">Kontak</a> <a href="pages/tentang.html">Tentang</a> <span>Kopi</span></p>\n<p>[[ISI: jam buka]]</p></main>'),
+        encoding="utf-8")
+
+    run_script("check", "kopi-senja")
+
+    lines = index.read_text(encoding="utf-8").splitlines()
+    report = io.read_json(kopi_scaffolded_check / "report.json")
+    hits = [f for f in report["findings"] if f["rule"] == "placeholder-left" and f["file"] == "index.html"]
+    assert hits
+    for finding in hits:
+        assert "[[ISI:" in lines[finding["line"] - 1]

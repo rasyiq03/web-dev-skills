@@ -86,3 +86,22 @@ def test_heavy_page_is_flagged(projects_dir):
     photo.write_bytes(b"\0" * (locale_rules.PAGE_BUDGET_KB + 50) * 1024)
     fill_hero(index, '<img src="assets/img/hero.jpg" alt="Kopi" width="800" height="600">')
     assert ("page-weight", "index.html") in rules(work, brief, site_type)
+
+
+def test_mock_label_is_needed_only_when_endpoints_exist(projects_dir):
+    from lib import audit_rules
+
+    work, index, brief, site_type = built_kopi(projects_dir)
+    catalog = project.load_site_type("umkm-catalog")  # beranda punya seksi data "featured"
+    index.write_text(index.read_text(encoding="utf-8").replace("data-pd-mock-label", "data-x"), encoding="utf-8")
+
+    # Template endpoints.js hanya berisi contoh di komentar: bukan endpoint, tak perlu label
+    rules_found = {f["rule"] for f in audit_rules.check_data_layer(work, catalog)}
+    assert not rules_found & {"mock-file-invalid", "mock-label-missing"}
+
+    endpoints = index.parent / "js" / "api" / "endpoints.js"
+    endpoints.write_text(endpoints.read_text(encoding="utf-8").replace(
+        "export const ENDPOINTS = {", "export const ENDPOINTS = {\n\tproducts: { method: 'GET', path: '/products', mock: 'products' },"),
+        encoding="utf-8")
+    rules_found = {f["rule"] for f in audit_rules.check_data_layer(work, catalog)}
+    assert {"mock-file-invalid", "mock-label-missing"} <= rules_found

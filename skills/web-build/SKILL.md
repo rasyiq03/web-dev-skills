@@ -138,7 +138,8 @@ plugin support), it means the folder that contains `skills/`.
    `${CLAUDE_PLUGIN_ROOT}/skills/web-build/references/a11y-judge.md` and the built pages, and
    apply its findings as one extra round. Save its answer as `<work>/a11y-review.json`:
    `{"reviewer": "subagent", "pages": [<its objects>]}` (`"self"` if you reviewed without a
-   subagent). Without that file the handoff reports the review as skipped.
+   subagent), and add `"applied": "<what you changed>"` to each finding you fixed. Without
+   that file the handoff reports the review as skipped.
 
 8. **Handoff.** Run `run handoff <slug>` and show its summary to the user exactly as
    printed: assumptions taken, placeholders to fill, and check scores. It also writes

@@ -20,6 +20,7 @@ palettes:
   - id: palette-one
     mood: What this palette feels like, in a few words.
     colors: { ink: "#000000", paper: "#FFFFFF", accent: "#0000EE", muted: "#555555", accent-ink: "#FFFFFF" }
+    # optional: tint: "#F2F2F2"  (signature surface for alternating sections; ink, muted, and link must read on it)
 
 pairings:
   - id: pairing-one

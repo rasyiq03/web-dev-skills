@@ -47,6 +47,12 @@ def test_every_palette_passes_contrast(entry):
         assert color.contrast_ratio(c["muted"], c["paper"]) >= 4.5, palette["id"]
         assert color.contrast_ratio(c["accent-ink"], c["accent"]) >= 4.5, palette["id"]
 
+        # Teks juga terbaca di atas latar bidang khas palet (tint)
+        tint = c.get("tint") or color.mix(c["accent"], c["paper"], 0.06)
+        link = c["accent"] if color.contrast_ratio(c["accent"], c["paper"]) >= 4.5 else c["ink"]
+        for text in (c["ink"], c["muted"], link):
+            assert color.contrast_ratio(text, tint) >= 4.5, palette["id"]
+
 
 @pytest.mark.parametrize("style_id", ["clean-swiss", "soft-organic", "data-utility"])
 def test_new_styles_keep_the_accent_visible_on_paper(style_id):

@@ -8,6 +8,7 @@
 # ============================================================
 
 import json
+import re
 from collections import deque
 from pathlib import Path
 
@@ -21,7 +22,7 @@ GRAPH_FILE = "graph.json"
 GRAPH_VERSION = 1
 
 # Grup token yang dicetak context.py, sesuai urutan lamanya
-CONTEXT_TOKEN_GROUPS = ("color", "font", "weight", "size", "space", "border", "shadow", "motion")
+CONTEXT_TOKEN_GROUPS = ("color", "font", "weight", "size", "space", "radius", "border", "shadow", "motion")
 
 # Arah telusur dampak: ikuti edge maju untuk jenis ini, dan mundur untuk jenis itu
 IMPACT_FORWARD = {"realized_by", "verified_by", "located_in", "contains", "fills"}
@@ -160,6 +161,28 @@ def _add_requirements(builder, gaps):
 
     for fact, text in gaps.get("placeholders", {}).items():
         builder.node(f"ph:{fact}", "placeholder", text, "script", fact=fact)
+
+
+def _add_site_placeholders(builder, site_dir):
+    """
+    Menambah placeholder yang ditulis langsung di halaman tetapi tidak berasal dari gaps.json
+    (misalnya [[ISI: cara pembayaran]]), supaya ikut menjadi bukti dan diserahkan ke klien.
+
+    I.S. : Simpul placeholder dari gaps dan simpul file halaman sudah ada.
+    F.S. : Satu simpul ph:site:<teks> per placeholder baru, located_in ke file tempatnya.
+    """
+    known = {node["label"] for node in builder.nodes if node["type"] == "placeholder"}
+
+    for text, files in project.site_placeholders(site_dir).items():
+        if text in known:
+            continue
+
+        inner = text[len("[[ISI: "):-2].strip().lower()
+        node_id = f"ph:site:{re.sub(r'[^a-z0-9]+', '-', inner).strip('-')}"
+        builder.node(node_id, "placeholder", text, "ai", why="ditulis di halaman; fakta ini tidak ada di brief")
+
+        for rel in files:
+            builder.edge(node_id, f"file:{rel}", "located_in")
 
 
 def _add_pages_and_sections(builder, brief, site_type, decisions, has_site):
@@ -406,6 +429,9 @@ def build(proj_dir):
     if brief.get("site_type"):
         site_type = project.load_site_type(brief["site_type"])
         _add_pages_and_sections(builder, brief, site_type, decisions, has_site)
+
+    if has_site:
+        _add_site_placeholders(builder, paths.site_dir(proj_dir))
 
     _add_tokens(builder, tokens, has_site)
     _add_decisions(builder, decisions, _judgements(proj_dir))

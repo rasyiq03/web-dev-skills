@@ -283,11 +283,12 @@ def run_check(slug):
     round_dir = proj_dir / "rounds" / str(current_round)
     round_dir.mkdir(parents=True, exist_ok=True)
 
-    # Buat snapshot situs (tanpa .ScaffolDev dan .git) ke rounds/<round>/site SEBELUM menulis laporan
-    shutil.copytree(site_dir, round_dir / "site", dirs_exist_ok=True, ignore=SITE_IGNORE)
-
     # 1. Format (auto-fix)
     findings = run_formatters(proj_dir)
+
+    # Snapshot situs (tanpa .ScaffolDev dan .git) ke rounds/<round>/site sesudah format dan
+    # sebelum laporan: memulihkan ronde ini mengembalikan berkas yang nomor barisnya ada di laporan
+    shutil.copytree(site_dir, round_dir / "site", dirs_exist_ok=True, ignore=SITE_IGNORE)
 
     # 2. Lint (report)
     findings += run_linters(proj_dir)
@@ -313,6 +314,7 @@ def run_check(slug):
     # 4. Konvensi kode (headers, banners, links, raw colors, JSDoc)
     findings += audit_rules.check_file_headers(site_dir)
     findings += audit_rules.check_html_banners_and_links(site_dir)
+    findings += audit_rules.check_empty_sections(site_dir)
     findings += audit_rules.check_css_raw_color(site_dir)
     findings += audit_rules.check_js_conventions(site_dir)
 

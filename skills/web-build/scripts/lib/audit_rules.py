@@ -79,8 +79,10 @@ def check_html_banners_and_links(site_dir):
 
             # 2. Cek banner sebelum <section
             if "<section" in line:
-                prev_lines = lines[max(0, idx - 4):idx]
-                has_banner = any("<!-- ====" in pl for pl in prev_lines)
+                # Banner harus tepat di atas seksi (baris tak kosong terakhir), bukan banner
+                # seksi sebelumnya yang kebetulan masih dekat
+                prev_lines = [pl for pl in lines[:idx] if pl.strip()]
+                has_banner = bool(prev_lines) and "<!-- ====" in prev_lines[-1]
                 if not has_banner:
                     findings.append({
                         "rule": "banner-missing",
@@ -91,6 +93,33 @@ def check_html_banners_and_links(site_dir):
                         "message": "Komentar banner seksi 3 baris hilang sebelum tag <section>.",
                         "fix": "Tambahkan komentar banner 3 baris di atas tag <section>.",
                     })
+
+    return findings
+
+
+def check_empty_sections(site_dir):
+    """
+    Menandai seksi kerangka scaffold yang belum diisi, supaya check tidak menyatakan situs
+    selesai sementara ada halaman yang belum dibangun.
+
+    I.S. : site_dir folder situs.
+    F.S. : List finding dikembalikan; satu per seksi kosong.
+    """
+    findings = []
+    for html_file in paths.site_files(site_dir, "*.html"):
+        rel = html_file.relative_to(site_dir).as_posix()
+        content = io.read_text(html_file)
+
+        for match in re.finditer(r"<section\b[^>]*\bid=\"([^\"]+)\"[^>]*>\s*</section>", content):
+            findings.append({
+                "rule": "section-empty",
+                "category": "design",
+                "level": "warning",
+                "file": rel,
+                "line": content.count("\n", 0, match.start()) + 1,
+                "message": f"Seksi {match.group(1)!r} masih kosong; halaman ini belum dibangun.",
+                "fix": "Run context for this page and fill the section from content/<lang>.yaml (web-build step 6).",
+            })
 
     return findings
 
@@ -885,7 +914,8 @@ def check_data_layer(proj_dir, site_type):
     endpoints_path = site_dir / "js" / "api" / "endpoints.js"
     endpoints_map = {}
     if endpoints_path.is_file():
-        text = io.read_text(endpoints_path)
+        # Contoh entri di komentar template bukan endpoint sungguhan
+        text = re.sub(r"/\*.*?\*/|//[^\n]*", "", io.read_text(endpoints_path), flags=re.DOTALL)
         pattern = re.compile(r"([a-zA-Z0-9_]+)\s*:\s*\{([^}]+)\}")
         for match in pattern.finditer(text):
             ep_name = match.group(1)
@@ -948,7 +978,9 @@ def check_data_layer(proj_dir, site_type):
                 "fix": f"Daftarkan endpoint untuk {mf_name} di js/api/endpoints.js.",
             })
 
-    for s in data_sections:
+    # Tanpa endpoint, tidak ada data contoh yang bisa tampil: koleksi dari brief ditulis
+    # langsung sebagai konten, jadi label "Data contoh" tidak diperlukan
+    for s in data_sections if endpoints_map else []:
         page_id = s.get("page")
         page_rel = paths.page_file(page_id)
         page_path = site_dir / page_rel

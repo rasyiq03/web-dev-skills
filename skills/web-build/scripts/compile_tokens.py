@@ -93,6 +93,9 @@ def compile_tokens(slug):
     muted = raw_colors["muted"]
     accent_ink = raw_colors["accent-ink"]
 
+    # Latar bidang khas palet (seksi selang-seling, kotak catatan); bawaannya 6% aksen di atas paper
+    tint = raw_colors.get("tint") or color.mix(accent, paper, 0.06)
+
     # 2. Uji kontras WCAG 2.x (harus >= 4.5:1)
     ratio_ink_paper = color.contrast_ratio(ink, paper)
     if ratio_ink_paper < 4.5:
@@ -138,6 +141,16 @@ def compile_tokens(slug):
     # Aksen boleh lebih lembut untuk blok dan tombol bergaris, tetapi teks harus terbaca.
     link = accent if color.contrast_ratio(accent, paper) >= 4.5 else ink
 
+    # Teks utama, teks sekunder, dan tautan harus tetap terbaca di atas tint
+    for name, value in (("ink", ink), ("muted", muted), ("link", link)):
+        ratio = color.contrast_ratio(value, tint)
+        if ratio < 4.5:
+            fail(
+                EXIT_CHECK_FAILED,
+                f"Kontras {name} ({value}) di atas tint ({tint}) = {ratio:.2f}:1 (minimal 4.5:1).",
+                "use a lighter tint in the palette",
+            )
+
     all_colors = {
         "ink": ink,
         "paper": paper,
@@ -145,6 +158,7 @@ def compile_tokens(slug):
         "muted": muted,
         "accent-ink": accent_ink,
         "link": link,
+        "tint": tint,
         **chart_colors,
         **state_colors,
     }

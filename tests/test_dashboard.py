@@ -7,7 +7,7 @@
 
 import re
 import pytest
-from conftest import next_line, run_script
+from conftest import fill_empty_sections, next_line, run_script
 from lib import io
 
 
@@ -228,6 +228,8 @@ export const ENDPOINTS = {
             continue
         text = io.read_text(js_path)
         assert not re.search(r"\bfetch\(", text), f"fetch() ditemukan di {js_path}"
+
+    fill_empty_sections(projects_dir / "analytics-demo")
 
     # 7. Jalankan check.py -> harus 0 error
     res_chk = run_script("check", "analytics-demo")

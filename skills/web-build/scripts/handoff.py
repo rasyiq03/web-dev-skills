@@ -89,16 +89,20 @@ def a11y_line(proj_dir, lang):
         return "dilewati (tidak ada a11y-review.json)" if lang == "id" else "skipped (no a11y-review.json)"
 
     count = sum(len(f) for f in reviewed.values())
+    # Temuan yang sudah diterapkan ditandai "applied" (lihat SKILL.md langkah 7)
+    applied = sum(1 for f in reviewed.values() for item in f if isinstance(item, dict) and item.get("applied"))
     missing = [p for p in pages if p not in reviewed]
     independent = data.get("reviewer") == "subagent"
 
     if lang == "id":
         who = "subagent independen" if independent else "agen yang sama (kurang independen)"
         text = f"dilakukan oleh {who}: {count} temuan di {len(pages) - len(missing)} dari {len(pages)} halaman"
+        text += f" ({applied} sudah diperbaiki)" if count else ""
         return text + (f"; belum ditinjau: {', '.join(missing)}" if missing else "")
 
     who = "an independent subagent" if independent else "the same agent (less independent)"
     text = f"done by {who}: {count} findings on {len(pages) - len(missing)} of {len(pages)} pages"
+    text += f" ({applied} fixed)" if count else ""
     return text + (f"; not reviewed: {', '.join(missing)}" if missing else "")
 
 
