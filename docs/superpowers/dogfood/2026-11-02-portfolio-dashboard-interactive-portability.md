@@ -11,8 +11,10 @@ outside Claude Code.
 
 The client in the question form, and the agent of the Codex run, were simulated: the form
 was filled through a browser at 360 px, and the Codex run fed the scripts the same steps a
-Codex agent would. A build driven by a Codex model needs an OpenAI login; Antigravity's
-installer was not allowed in this session, so its paths follow Google's codelab.
+Codex agent would. A build driven by a Codex model needs an OpenAI login. Antigravity CLI 1.4.12 was installed
+afterwards with the user's permission: the plugin validates, installs (from a clone or with
+`agy plugin import claude`), and the pipeline runs from the installed copy; running its
+model needs a Google sign-in or a `GEMINI_API_KEY`.
 
 ## Found and fixed
 
@@ -27,9 +29,9 @@ installer was not allowed in this session, so its paths follow Google's codelab.
 | Dashboard navigation only on `index` | the data page was a dead end | `dashboard.md`: repeat the tabs in every other page's header |
 | Work patterns promised thumbnails | `case-list` and `index-table` assumed photos the brief did not have | images only when photos are stated |
 | `${CLAUDE_PLUGIN_ROOT}` explained late and for Claude only | other agents met the variable before the rule | one rule near the top of each SKILL.md, for any agent |
-| No way to install the skills globally for Antigravity | only `.agents/skills/` inside the repository | `sync_adapters.py --target ~/.gemini/config/skills` (links, never copies, outside the repo) |
+| No Antigravity manifest; icon inside a dot folder | `agy plugin validate` failed; the Marketplace bundle would drop the icon | `.antigravity-plugin/plugin.json`; icon moved to `assets/icon.png` for all three manifests; `sync_adapters.py --target` as a fallback |
 
 ## Still not tried
 
-- A build driven by a Codex model, and anything inside Antigravity.
+- A build driven by a Codex or Antigravity model (both need the user's account).
 - Guided mode with a real developer.

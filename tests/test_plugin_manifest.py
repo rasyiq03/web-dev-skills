@@ -5,6 +5,7 @@
 # ============================================================
 
 import json
+from pathlib import Path
 import shutil
 import subprocess
 
@@ -94,3 +95,16 @@ def test_codex_manifest_matches_the_claude_manifest():
     assert (REPO / codex["skills"] / "web-build" / "SKILL.md").is_file()
     assert (REPO / codex["interface"]["composerIcon"]).is_file()
     assert codex["interface"]["displayName"] == "ScaffolDev"
+
+
+def test_antigravity_manifest_matches_and_its_logo_survives_packaging():
+    claude = json.loads((MANIFEST_DIR / "plugin.json").read_text(encoding="utf-8"))
+    antigravity = json.loads((REPO / ".antigravity-plugin" / "plugin.json").read_text(encoding="utf-8"))
+
+    for key in ("name", "version", "description"):
+        assert antigravity[key] == claude[key], key
+
+    # Paket Marketplace Antigravity membuang path yang diawali titik, jadi logo di luar folder titik
+    logo = antigravity["logo"]
+    assert (REPO / logo).is_file()
+    assert not any(part.startswith(".") for part in Path(logo).parts)

@@ -30,8 +30,8 @@ Or add it from the app: use `rasyiq03/web-dev-skills` (or
 `https://github.com/rasyiq03/web-dev-skills.git#<branch>`.
 
 Update with `/plugin marketplace update scaffoldev`. Claude Code and Codex install a new
-copy only when the version changes, so raise it with every release in both
-`.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` (a test keeps them equal).
+copy only when the version changes, so raise it with every release in
+`.claude-plugin/`, `.codex-plugin/`, and `.antigravity-plugin/plugin.json` (a test keeps them equal).
 
 In Codex (0.166 or newer):
 
@@ -44,21 +44,18 @@ For an unmerged branch, use `rasyiq03/web-dev-skills@<branch>` as the source. Co
 the skills as `scaffoldev:web-build` and `scaffoldev:web-design`. Older Codex versions can
 use `python tools/sync_adapters.py`, which links the skills into `.agents/skills/`.
 
-In Google Antigravity, clone this repository, then link the skills where Antigravity looks
-for them:
+In Google Antigravity (CLI `agy` 1.4 or newer), install it from a clone of this repository:
 
 ```
 git clone https://github.com/rasyiq03/web-dev-skills.git
-cd web-dev-skills
-python tools/sync_adapters.py --target ~/.gemini/config/skills
+agy plugin install web-dev-skills
 ```
 
-The skills become `web-build` and `web-design` in every workspace. To keep them to one
-workspace, run `python tools/sync_adapters.py` instead, which links them into this
-repository's `.agents/skills/`. The links must point back into the clone, because the
-scripts need its `audit/` and `config/` folders; keep the clone and run `git pull` to update.
-These paths follow Google's Antigravity skills codelab and have not yet been tried in the
-Antigravity app itself.
+Already have it in Claude Code? `agy plugin import claude` copies it over. Antigravity lists
+the skills as `web-build` and `web-design`. To update, run `git pull` in the clone and
+install again. Without the plugin system, `python tools/sync_adapters.py --target
+~/.gemini/config/skills` links the skills instead; links, not copies, because the scripts
+need the clone's `audit/` and `config/` folders.
 
 The first run installs Python packages and Node tools into a cache folder. When an update
 needs new versions, the new cache replaces the old one automatically.

@@ -9,7 +9,13 @@
   "homepage": "https://github.com/rasyiq03/web-dev-skills",
   "repository": "https://github.com/rasyiq03/web-dev-skills",
   "license": "MIT",
-  "keywords": ["website", "web-design", "landing-page", "dashboard", "indonesian"],
+  "keywords": [
+    "website",
+    "web-design",
+    "landing-page",
+    "dashboard",
+    "indonesian"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "ScaffolDev",
@@ -22,7 +28,7 @@
       "buat company profile Kopi Senja, kedai kopi di Bandung, target mahasiswa"
     ],
     "brandColor": "#10213A",
-    "composerIcon": "./.claude-plugin/icon.png",
-    "logo": "./.claude-plugin/icon.png"
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png"
   }
 }
