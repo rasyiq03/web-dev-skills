@@ -1,8 +1,9 @@
 # ============================================================
 # File      : sync_adapters.py
 # Proyek    : ScaffolDev
-# Deskripsi : Sinkronisasi skill ke .agents/skills/ untuk Codex. Claude Code
-#             memuat skill lewat plugin, jadi .claude/skills/ tidak ditulis lagi.
+# Deskripsi : Sinkronisasi skill ke .agents/skills/ untuk Codex dan Antigravity,
+#             atau ke folder skill global lewat --target. Claude Code memuat skill
+#             lewat plugin, jadi .claude/skills/ tidak ditulis lagi.
 # ============================================================
 
 import argparse
@@ -36,12 +37,14 @@ def parse_frontmatter(skill_md_path):
     return yaml.safe_load(parts[1]) or {}
 
 
-def sync_adapters(copy_mode=False):
+def sync_adapters(copy_mode=False, target=None):
     """
-    Memeriksa validitas SKILL.md dan membuat tautan/salinan skill di .agents/skills/ (Codex).
+    Memeriksa validitas SKILL.md dan membuat tautan/salinan skill di .agents/skills/ (Codex,
+    Antigravity) atau di folder target (misalnya ~/.gemini/config/skills untuk Antigravity).
 
-    I.S. : Folder skills/ ada di root repo.
-    F.S. : .agents/skills/ tersinkronisasi. Peringatan dicetak bila CLAUDE.md ada, dan untuk
+    I.S. : Folder skills/ ada di root repo; target boleh None.
+    F.S. : Folder skill tujuan tersinkronisasi. Di luar repo hanya tautan yang dibuat, karena
+           skrip butuh audit/ dan config/ dari repo; salinan di sana tidak akan berjalan. Peringatan dicetak bila CLAUDE.md ada, dan untuk
            setiap salinan lama di .claude/skills/ yang akan membuat skill muncul dua kali di
            samping plugin.
     """
@@ -56,7 +59,12 @@ def sync_adapters(copy_mode=False):
     if claude_md.is_file():
         lines.append("PERINGATAN: CLAUDE.md ditemukan! Claude Code akan mengabaikan AGENTS.md bila file ini ada.")
 
-    agents_skills_dir = REPO_ROOT / ".agents" / "skills"
+    agents_skills_dir = Path(target).expanduser().resolve() if target else REPO_ROOT / ".agents" / "skills"
+    inside_repo = agents_skills_dir.is_relative_to(REPO_ROOT)
+
+    if copy_mode and not inside_repo:
+        fail(EXIT_INVALID, f"--copy ke luar repo ({agents_skills_dir}) menghasilkan skill yang tidak bisa menjalankan skripnya.",
+             "drop --copy so the skills are linked, or use a target inside the repository")
 
     agents_skills_dir.mkdir(parents=True, exist_ok=True)
 
@@ -94,8 +102,8 @@ def sync_adapters(copy_mode=False):
                 "Code kini memuat skill lewat plugin dan skill akan muncul dua kali."
             )
 
-        # Buat adapter untuk Codex
-        adapter_label = "Codex (.agents/skills)"
+        # Buat adapter untuk Codex dan Antigravity
+        adapter_label = ".agents/skills" if not target else str(agents_skills_dir)
         target_link = agents_skills_dir / s_name
         if target_link.is_symlink() or target_link.is_file():
             target_link.unlink()
@@ -112,6 +120,9 @@ def sync_adapters(copy_mode=False):
                 target_link.symlink_to(rel_src, target_is_directory=True)
                 lines.append(f"  - [{s_name}] Symlink dibuat untuk {adapter_label}")
             except OSError:
+                if not inside_repo:
+                    fail(EXIT_INVALID, f"Tautan ke {target_link} tidak bisa dibuat (izin symlink).",
+                         "enable symlinks (Windows: Developer Mode) and run again")
                 # Fallback ke copy jika izin symlink Windows tidak tersedia
                 shutil.copytree(s_dir, target_link)
                 lines.append(f"  - [{s_name}] Disalin (fallback tanpa hak symlink) ke {adapter_label}")
@@ -131,11 +142,12 @@ def main():
     I.S. : sys.argv berisi opsi baris perintah.
     F.S. : Hasil sync_adapters() dikembalikan.
     """
-    parser = argparse.ArgumentParser(description="Sinkronisasi skill ke .agents/skills/ untuk Codex.")
+    parser = argparse.ArgumentParser(description="Sinkronisasi skill ke .agents/skills/ untuk Codex dan Antigravity.")
     parser.add_argument("--copy", action="store_true", help="Salin folder sebagai ganti relative symlink")
+    parser.add_argument("--target", help="Folder skill lain, misalnya ~/.gemini/config/skills (Antigravity)")
 
     args = parser.parse_args()
-    return sync_adapters(copy_mode=args.copy)
+    return sync_adapters(copy_mode=args.copy, target=args.target)
 
 
 if __name__ == "__main__":

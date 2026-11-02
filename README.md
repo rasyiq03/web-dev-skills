@@ -44,6 +44,22 @@ For an unmerged branch, use `rasyiq03/web-dev-skills@<branch>` as the source. Co
 the skills as `scaffoldev:web-build` and `scaffoldev:web-design`. Older Codex versions can
 use `python tools/sync_adapters.py`, which links the skills into `.agents/skills/`.
 
+In Google Antigravity, clone this repository, then link the skills where Antigravity looks
+for them:
+
+```
+git clone https://github.com/rasyiq03/web-dev-skills.git
+cd web-dev-skills
+python tools/sync_adapters.py --target ~/.gemini/config/skills
+```
+
+The skills become `web-build` and `web-design` in every workspace. To keep them to one
+workspace, run `python tools/sync_adapters.py` instead, which links them into this
+repository's `.agents/skills/`. The links must point back into the clone, because the
+scripts need its `audit/` and `config/` folders; keep the clone and run `git pull` to update.
+These paths follow Google's Antigravity skills codelab and have not yet been tried in the
+Antigravity app itself.
+
 The first run installs Python packages and Node tools into a cache folder. When an update
 needs new versions, the new cache replaces the old one automatically.
 

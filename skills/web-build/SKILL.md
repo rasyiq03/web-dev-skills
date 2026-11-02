@@ -15,6 +15,11 @@ other file ScaffolDev reads or writes: brief, decisions, copy, graph, trace, rep
 `HANDOFF.md`, `EXPLAIN.html`. Deleting `<work>` leaves a clean site. Never put a ScaffolDev
 file in `<project>`, and never make a site file depend on `<work>`.
 
+**Paths.** Claude Code fills in `${CLAUDE_PLUGIN_ROOT}`. Where it stays literal (Codex,
+Antigravity, or a copy in `.agents/skills/`), `${CLAUDE_PLUGIN_ROOT}/skills` is the folder
+that holds this skill's folder, so `${CLAUDE_PLUGIN_ROOT}/skills/web-build/scripts/run.py`
+is `scripts/run.py` next to this file.
+
 ## At a glance
 
 | Step | You | Script (`run …`) | Result |
@@ -41,13 +46,11 @@ file in `<project>`, and never make a site file depend on `<work>`.
 
 ## Running scripts
 
-Every script runs through one command, from the folder Claude Code was opened in:
+Every script runs through one command, from the folder the agent was opened in:
 
 `python "${CLAUDE_PLUGIN_ROOT}/skills/web-build/scripts/run.py" <script> <slug>`
 
 In this file `run <script> <slug>` is short for that command. Always type the full command.
-If `${CLAUDE_PLUGIN_ROOT}` appears literally in this file (the skill was loaded without
-plugin support), it means the folder that contains `skills/`.
 
 - **Read the last line.** Each script ends with `NEXT: <what to do>`. "run gaps.py" there
   means `run gaps <slug>`.

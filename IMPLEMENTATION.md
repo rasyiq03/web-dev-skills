@@ -679,6 +679,13 @@ and headings used the browser's default 700, which makes a fake bold. Pairings n
   and the plugin manifest it prefers is `.codex-plugin/plugin.json` (a test version 9.9.9
   there was the version Codex installed). `codex debug prompt-input` lists
   `scaffoldev:web-build` and `scaffoldev:web-design`.
+- (2026-11-02) The whole pipeline (path to handoff, 0 errors, 0 warnings) runs from the copy
+  Codex installs (`$CODEX_HOME/plugins/cache/scaffoldev/scaffoldev/0.2.0`) with `python -S`
+  and no `CLAUDE_PLUGIN_ROOT`, from a fresh work folder. Not yet run: a build driven by a
+  Codex model (needs an OpenAI login) and anything in Antigravity (its installer was not
+  allowed in this session). Antigravity paths come from Google's skills codelab:
+  workspace `.agents/skills/`, global `~/.gemini/config/skills/`; `sync_adapters.py
+  --target` links the skills there.
 
 ## 6. Tests to write first (v0.1)
 
