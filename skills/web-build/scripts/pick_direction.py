@@ -1,6 +1,6 @@
 # ============================================================
 # File      : pick_direction.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Memvalidasi directions.yaml, memilih satu arah visual
 #             (via --pick atau sampling acak tertimbang), dan
 #             menghasilkan decisions.yaml dengan batasan uji.
@@ -16,7 +16,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import io, paths, project, report
+from lib import io, paths, project, report, trace
 from lib.report import EXIT_INVALID, fail
 
 
@@ -200,7 +200,7 @@ def build_decisions(slug, chosen, source, seed, site_type, style_data):
         "based_on": based_on,
         "rationale": chosen["rationale"]["typography"],
         "source": source,
-        "realized_by": ["font.display", "font.body", "font.mono"],
+        "realized_by": ["font.display", "font.body", "font.mono", "weight.display"],
         "verified_by": [c["id"] for c in c_typo],
     }
 
@@ -299,7 +299,7 @@ def format_decisions_yaml(data):
     I.S. : data telah lolos decisions.schema.json.
     F.S. : Teks YAML dikembalikan.
     """
-    src = data["decisions"][0]["source"]
+    src = data["decisions"][0]["source"] if not data.get("overrides") else "client-picked/sampled + decide.py"
     header = (
         f"# Output dari: python skills/web-build/scripts/pick_direction.py {data['project']}\n"
         f"# (sumber: {src}; seed: {data['seed']})\n"
@@ -326,6 +326,13 @@ def format_decisions_yaml(data):
     for c in data["constraints"]:
         lines.append(f"  - {io.yaml_flow_map(c)}")
 
+    # Perubahan dari decide.py di atas arah terpilih
+    if data.get("overrides"):
+        lines.append("overrides:")
+        for key, value in data["overrides"].items():
+            text = io.yaml_flow_map(value) if isinstance(value, dict) else io.yaml_scalar(value)
+            lines.append(f"  {key}: {text}")
+
     return "\n".join(lines) + "\n"
 
 
@@ -334,11 +341,12 @@ def format_decisions_yaml(data):
 # ============================================================
 
 
-def pick(slug, pick_id=None, seed_arg=None):
+def pick(slug, pick_id=None, seed_arg=None, source_override=None):
     """
     Eksekusi alur pemilihan arah desain.
 
-    I.S. : Proyek memiliki brief.yaml, gaps.json, dan directions.yaml.
+    I.S. : Proyek memiliki brief.yaml, gaps.json, dan directions.yaml; source_override
+           ('council') dipakai council.py saat dewan yang memilih arah.
     F.S. : decisions.yaml ditulis, state.yaml diperbarui, mencetak ringkasan
            dan 'NEXT: run compile_tokens.py'.
     """
@@ -369,7 +377,7 @@ def pick(slug, pick_id=None, seed_arg=None):
         if not chosen:
             fail(EXIT_INVALID, f"Arah {pick_id!r} tidak ditemukan di directions.yaml.",
                  "choose an existing direction id (dir-1 to dir-5)")
-        source = "client-picked"
+        source = source_override or "client-picked"
     else:
         weights = [d["probability"] for d in dirs]
         rng = random.Random(seed)
@@ -389,6 +397,7 @@ def pick(slug, pick_id=None, seed_arg=None):
     yaml_content = format_decisions_yaml(decisions_data)
     io.write_text(proj_dir / "decisions.yaml", yaml_content)
     io.save_state(proj_dir, step="direction", seed=seed, direction=chosen["id"])
+    trace.finish(proj_dir, "pick_direction")
 
     lines = [
         f"Arah visual terpilih: {chosen['id']} ({chosen.get('summary', '')})",
@@ -397,6 +406,16 @@ def pick(slug, pick_id=None, seed_arg=None):
         f"  - Gerak: {chosen['motion']}, Nada: {chosen['tone']}",
         f"File decisions.yaml berhasil dibuat dengan {len(decisions_data['decisions'])} keputusan dan {len(decisions_data['constraints'])} batasan.",
     ]
+
+    # Peluang yang hampir rata membuat undian tidak berarti dan situs antarklien mirip
+    probs = [d.get("probability", 0) for d in dirs]
+    if max(probs) - min(probs) < 0.10:
+        lines.append("  - Peringatan: kelima peluang hampir sama; beri arah yang paling wajar 0.30-0.40 dan satu arah berani 0.05-0.12.")
+
+    # Pola yang butuh fakta atau aset yang belum ada akan tampil sebagai blok placeholder
+    for section, pattern, missing in project.layout_risks(brief, site_type, chosen.get("layout", {})):
+        lines.append(f"  - Peringatan: {section}={pattern} butuh {', '.join(missing)} yang belum ada di brief; "
+                     "bangun sebagai placeholder berlabel, atau ganti pola dengan decide.")
 
     return lines, "run compile_tokens.py"
 

@@ -1,0 +1,39 @@
+pages:
+  index:
+    title: Klinik Gigi Senyum Sehat — klinik gigi keluarga di Surabaya
+    description: Klinik gigi untuk keluarga muda di Surabaya. Booking jadwal periksa untuk Anda dan anak lewat WhatsApp.
+    sections:
+      hero:
+        heading: Klinik gigi untuk keluarga muda di Surabaya
+        body:
+          - Periksa gigi Anda dan si kecil di satu tempat. Pilih jadwal lewat WhatsApp, lalu datang sesuai jam yang disepakati.
+        actions: [{ label: Booking jadwal lewat WhatsApp, href: "[[ISI: tautan WhatsApp]]" }]
+      services:
+        heading: Layanan
+        items: [{ name: "[[ISI: daftar layanan atau menu]]", price: "[[ISI: harga]]", note: "" }]
+      proof:
+        heading: Tentang klinik
+        items:
+          - { label: Berdiri sejak, value: "[[ISI: tahun berdiri]]" }
+          - { label: Dokter gigi, value: "[[ISI: nama dan peran tim]]" }
+  tentang:
+    title: Tentang Klinik Gigi Senyum Sehat
+    description: Kenali Klinik Gigi Senyum Sehat di Surabaya, klinik gigi untuk keluarga muda.
+    sections:
+      story:
+        heading: Tentang kami
+        body:
+          - Klinik Gigi Senyum Sehat melayani keluarga muda di Surabaya.
+          - "[[ISI: cerita singkat klinik dan dokter]]"
+  kontak:
+    title: Kontak dan booking — Klinik Gigi Senyum Sehat
+    description: Alamat, jam buka, dan cara booking jadwal di Klinik Gigi Senyum Sehat Surabaya.
+    sections:
+      contact:
+        heading: Booking dan kontak
+        body: [Cara tercepat adalah WhatsApp. Kirim nama, usia pasien, dan jam yang Anda inginkan.]
+        actions: [{ label: Chat via WhatsApp, href: "[[ISI: tautan WhatsApp]]" }]
+        details:
+          - { label: Alamat, value: "[[ISI: alamat]]" }
+          - { label: Jam buka, value: "[[ISI: jam buka]]" }
+          - { label: Email, value: "[[ISI: alamat email]]" }

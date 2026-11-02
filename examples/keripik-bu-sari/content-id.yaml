@@ -1,0 +1,90 @@
+pages:
+  index:
+    title: Keripik Bu Sari — keripik dan camilan pedas buatan rumah dari Kediri
+    description: Keripik singkong balado, keripik tempe, dan makaroni pedas buatan rumah dari Kediri. Pesan lewat WhatsApp,
+      dikirim ke seluruh Karesidenan Kediri.
+    sections:
+      hero:
+        eyebrow: Kirim ke seluruh Karesidenan Kediri
+        heading: Keripik dan camilan pedas buatan rumah dari Kediri
+        mark: pedas
+        body:
+        - Pilih keripik singkong balado, keripik tempe, atau makaroni pedas, lalu chat kami di WhatsApp.
+        actions:
+        - label: Pesan lewat WhatsApp
+          href: 'https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20camilan.'
+      featured:
+        heading: Camilan kami dan harganya
+        items:
+        - name: Keripik singkong balado
+          price: '[[ISI: harga produk]]'
+        - name: Keripik tempe
+          price: '[[ISI: harga produk]]'
+        - name: Makaroni pedas
+          price: '[[ISI: harga produk]]'
+        actions:
+        - label: Pesan lewat WhatsApp
+          href: 'https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20camilan.'
+        links:
+        - label: Lihat daftar harga
+          href: pages/produk.html
+  produk:
+    title: Daftar produk dan harga — Keripik Bu Sari
+    description: Harga keripik singkong balado, keripik tempe, dan makaroni pedas dari Keripik Bu Sari, Kediri. Pesan tiap
+      produk langsung lewat WhatsApp.
+    sections:
+      catalog:
+        heading: Daftar produk dan harga
+        body:
+        - Pilih camilan yang kamu mau, lalu pesan langsung lewat WhatsApp.
+        items:
+        - name: Keripik singkong balado
+          price: '[[ISI: harga produk]]'
+        - name: Keripik tempe
+          price: '[[ISI: harga produk]]'
+        - name: Makaroni pedas
+          price: '[[ISI: harga produk]]'
+        actions:
+        - label: Pesan lewat WhatsApp
+          href: 'https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20keripik%20singkong%20balado.'
+        - label: Pesan lewat WhatsApp
+          href: 'https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20keripik%20tempe.'
+        - label: Pesan lewat WhatsApp
+          href: 'https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20makaroni%20pedas.'
+        footnote:
+          text: Lebih suka belanja di marketplace?
+          link:
+            label: Belanja di marketplace
+            href: '[[ISI: tautan marketplace]]'
+          placeholder: '[[ISI: tautan marketplace]]'
+        note: Setiap tombol dinamai 'Pesan lewat WhatsApp' + nama produk (aria-labelledby).
+  cara-pesan:
+    title: Cara pesan — Keripik Bu Sari
+    description: Cara pesan camilan Keripik Bu Sari lewat WhatsApp, cara bayar, jam buka, dan area kirim ke seluruh Karesidenan
+      Kediri.
+    sections:
+      how-to-order:
+        heading: Cara pesan
+        body:
+        - Pesan cukup lewat chat WhatsApp.
+        steps:
+        - Chat kami di WhatsApp.
+        - Tulis produk yang kamu mau dan jumlahnya.
+        - Kirim alamat lengkapmu.
+        - Bayar pesananmu. Cara bayarnya ada di bawah.
+        details:
+        - label: WhatsApp
+          value: '[[ISI: nomor WhatsApp]]'
+          href: 'https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20camilan.'
+        - label: Jam buka
+          value: '[[ISI: jam buka]]'
+        - label: Area kirim
+          value: Seluruh Karesidenan Kediri.
+        - label: Cara bayar
+          value: '[[ISI: cara pembayaran]]'
+        actions:
+        - label: Pesan lewat WhatsApp
+          href: 'https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20camilan.'
+        links:
+        - label: Belanja di marketplace
+          href: '[[ISI: tautan marketplace]]'

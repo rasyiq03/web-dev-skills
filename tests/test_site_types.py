@@ -37,7 +37,7 @@ def test_landing_site_type(projects_dir):
     Menguji validasi, gaps, dan scaffolding untuk tipe situs landing.
     """
     slug = "kursus-kilat"
-    proj = projects_dir / slug
+    proj = projects_dir / slug / ".ScaffolDev"
     proj.mkdir(parents=True, exist_ok=True)
 
     brief_yaml = """slug: kursus-kilat
@@ -76,7 +76,7 @@ facts:
     res_scaf = run_script("scaffold", slug)
     assert res_scaf.returncode == 0, res_scaf.stderr
 
-    site_dir = proj / "site"
+    site_dir = proj.parent
     assert (site_dir / "index.html").is_file()
     index_html = io.read_text(site_dir / "index.html")
     assert 'data-pd-pattern="test-pattern"' in index_html
@@ -87,7 +87,7 @@ def test_portfolio_site_type(projects_dir):
     Menguji validasi, gaps, dan scaffolding untuk tipe situs portfolio.
     """
     slug = "studio-arunika"
-    proj = projects_dir / slug
+    proj = projects_dir / slug / ".ScaffolDev"
     proj.mkdir(parents=True, exist_ok=True)
 
     brief_yaml = """slug: studio-arunika
@@ -126,7 +126,7 @@ facts:
     res_scaf = run_script("scaffold", slug)
     assert res_scaf.returncode == 0, res_scaf.stderr
 
-    site_dir = proj / "site"
+    site_dir = proj.parent
     assert (site_dir / "index.html").is_file()
     assert (site_dir / "pages" / "karya.html").is_file()
     assert (site_dir / "pages" / "tentang.html").is_file()
@@ -142,7 +142,7 @@ def test_umkm_catalog_site_type(projects_dir):
     Menguji validasi, gaps, dan scaffolding untuk tipe situs umkm-catalog.
     """
     slug = "kripik-singkong-mak-ecih"
-    proj = projects_dir / slug
+    proj = projects_dir / slug / ".ScaffolDev"
     proj.mkdir(parents=True, exist_ok=True)
 
     brief_yaml = """slug: kripik-singkong-mak-ecih
@@ -182,7 +182,7 @@ facts:
     res_scaf = run_script("scaffold", slug)
     assert res_scaf.returncode == 0, res_scaf.stderr
 
-    site_dir = proj / "site"
+    site_dir = proj.parent
     assert (site_dir / "index.html").is_file()
     assert (site_dir / "pages" / "produk.html").is_file()
     assert (site_dir / "pages" / "cara-pesan.html").is_file()

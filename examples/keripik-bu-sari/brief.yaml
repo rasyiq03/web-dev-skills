@@ -1,0 +1,29 @@
+# Prompt: "mode musyawarah, langsung jadi: buat katalog UMKM Keripik Bu Sari di Kediri, jual keripik singkong balado, keripik tempe, dan makaroni pedas, pesan lewat WhatsApp, pembeli utamanya mahasiswa dan ibu rumah tangga, kirim ke seluruh Karesidenan Kediri"
+slug: keripik-bu-sari
+site_type: umkm-catalog
+languages: [id]
+interactive: false
+mode: deep
+business:
+  name: { value: Keripik Bu Sari, source: stated }
+  kind: { value: usaha rumahan keripik dan camilan pedas, source: stated }
+  location: { value: Kediri, source: stated }
+  cultural_context: { value: Jawa Timur, source: inferred, note: dari lokasi Kediri }
+  differentiator: { value: unknown, source: unknown }
+audience: { value: mahasiswa dan ibu rumah tangga, source: stated }
+goal: { value: pesanan lewat WhatsApp, source: stated }
+tone: { value: unknown, source: unknown }
+style_request: { value: unknown, source: unknown }
+brand:
+  colors: { value: unknown, source: unknown }
+  fonts: { value: unknown, source: unknown }
+  logo: { value: unknown, source: unknown }
+facts:
+  products: { value: [keripik singkong balado, keripik tempe, makaroni pedas], source: stated }
+  prices: { value: unknown, source: unknown }
+  whatsapp: { value: unknown, source: unknown }
+  marketplace_links: { value: unknown, source: unknown }
+  shipping_area: { value: seluruh Karesidenan Kediri, source: stated }
+  hours: { value: unknown, source: unknown }
+assets:
+  photos: { value: unknown, source: unknown }

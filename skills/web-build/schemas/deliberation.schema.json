@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "deliberation.schema.json",
+  "title": "Minutes of one council sitting (musyawarah) in deep mode",
+  "type": "object",
+  "required": ["sitting", "simulated", "roles", "rounds", "resolution"],
+  "additionalProperties": false,
+  "properties": {
+    "sitting": { "enum": ["direction", "copy", "first-page", "site"] },
+    "simulated": {
+      "description": "true when one agent played every role in turn because no subagent tool was available",
+      "type": "boolean"
+    },
+    "roles": {
+      "type": "array",
+      "items": { "enum": ["perancang", "penulis", "arsitek", "penguji", "wakil-klien"] },
+      "uniqueItems": true
+    },
+    "rounds": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["round", "kind", "entries"],
+        "additionalProperties": false,
+        "properties": {
+          "round": { "type": "integer", "minimum": 1, "maximum": 3 },
+          "kind": { "enum": ["proposals", "critique", "revision"] },
+          "entries": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["role", "text"],
+              "additionalProperties": false,
+              "properties": {
+                "role": { "enum": ["perancang", "penulis", "arsitek", "penguji", "wakil-klien"] },
+                "text": { "type": "string", "minLength": 10 },
+                "choice": { "type": "string" },
+                "target_role": { "enum": ["perancang", "penulis", "arsitek", "penguji", "wakil-klien"] },
+                "objection": { "type": "string", "minLength": 10 },
+                "blocking": { "type": "boolean" },
+                "resolved": { "type": "boolean" },
+                "evidence": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "required": ["method", "outcome", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "method": { "enum": ["mufakat", "vote"] },
+        "outcome": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 10 },
+        "votes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["role", "choice"],
+            "additionalProperties": false,
+            "properties": {
+              "role": { "enum": ["perancang", "penulis", "arsitek", "penguji", "wakil-klien"] },
+              "choice": { "type": "string" }
+            }
+          }
+        },
+        "dissent": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["role", "note"],
+            "additionalProperties": false,
+            "properties": {
+              "role": { "enum": ["perancang", "penulis", "arsitek", "penguji", "wakil-klien"] },
+              "note": { "type": "string", "minLength": 5 }
+            }
+          }
+        },
+        "vetoes": {
+          "description": "Facts the Wakil klien refused to let anyone invent; each stays a placeholder",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["fact", "placeholder"],
+            "additionalProperties": false,
+            "properties": {
+              "fact": { "type": "string", "minLength": 3 },
+              "placeholder": { "type": "string", "pattern": "^\\[\\[ISI: .+\\]\\]$" }
+            }
+          }
+        }
+      }
+    },
+    "decisions": { "type": "array", "items": { "type": "string" } }
+  }
+}

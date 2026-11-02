@@ -1,0 +1,52 @@
+id: clean-swiss
+name: Clean Swiss
+summary: Calm grid, generous white space, thin rules, one confident accent, no decoration.
+suits: Clinics, pharmacies, law and accounting firms, finance, government offices, schools and courses, B2B services, and any brief that needs trust before personality.
+formality: formal
+avoid: Street food, festivals, youth brands, and anything meant to feel playful or handmade.
+
+base:
+  type_scale: { base: 1rem, ratio: 1.25 }
+  space: { xs: 0.25rem, sm: 0.5rem, md: 1rem, lg: 2rem, xl: 3.5rem, section: 5.5rem }
+  radius: { none: 0, sm: 0.375rem }
+  border: { width: 1px, strong: "1px solid var(--pd-color-ink)" }
+  shadow: { hard: "none", hard-sm: "none" }
+  motion: { fast: 120ms, base: 180ms, easing: "ease-out" }
+
+palettes:
+  - id: porcelain-navy
+    mood: Cool white and deep navy; reliable, institutional, quiet.
+    colors: { ink: "#10213A", paper: "#F7F8FA", accent: "#1F4FA8", muted: "#4A5568", accent-ink: "#FFFFFF" }
+  - id: sage-clinic
+    mood: Pale sage and pine green; clean, caring, unhurried.
+    colors: { ink: "#16241D", paper: "#F4F7F5", accent: "#1E6B54", muted: "#4A5A53", accent-ink: "#FFFFFF" }
+  - id: graphite-amber
+    mood: Off-white, graphite, and a warm amber accent; serious but approachable.
+    colors: { ink: "#1C1C1E", paper: "#FAFAF7", accent: "#A6480A", muted: "#55534E", accent-ink: "#FFFFFF" }
+
+pairings:
+  - id: plex-sans
+    display: IBM Plex Sans
+    body: IBM Plex Sans
+    mono: IBM Plex Mono
+  - id: manrope-source
+    display: Manrope
+    body: Source Sans 3
+    mono: Source Code Pro
+  - id: figtree-noto
+    display: Figtree
+    body: Noto Sans
+    mono: Noto Sans Mono
+
+components:
+  button: Solid accent fill with accent-ink text, small radius, no shadow; on hover the fill darkens
+    through a muted overlay and the label never moves.
+  card: Paper background, 1px muted rule on top only, generous padding, heading in display weight 600.
+  section: Same paper background throughout; sections separated by space and one thin rule, never by color blocks.
+  label: Body font, small size, muted color, sentence case; numbers set with tabular figures.
+  image: Rectangular, small radius, no border; always with a caption or alt text that names who or what it shows.
+
+signature_moves:
+  - A strict 12-column grid with text never wider than 70 characters.
+  - One thin ink rule above every section heading, aligned to the grid.
+  - The accent used only for the primary action and links, nowhere decorative.

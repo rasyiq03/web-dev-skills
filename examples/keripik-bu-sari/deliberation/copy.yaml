@@ -1,0 +1,403 @@
+sitting: copy
+simulated: false
+roles:
+- perancang
+- penulis
+- arsitek
+- penguji
+- wakil-klien
+rounds:
+- round: 1
+  kind: proposals
+  entries:
+  - role: penulis
+    text: "# Halaman index\n\n## hero\nJudul: Keripik Bu Sari, camilan pedas buatan rumah dari Kediri\n\
+      Isi: Ada keripik singkong balado, keripik tempe, dan makaroni pedas. Pesan lewat WhatsApp, kami\
+      \ kirim ke seluruh Karesidenan Kediri.\nTombol utama: Pesan lewat WhatsApp  (tautan: https://wa.me/[[ISI:\
+      \ nomor WhatsApp]], pesan awal: \"Halo Bu Sari, saya mau pesan keripik.\")\nTombol kedua: Lihat\
+      \ semua produk\n\n## featured\nJudul: Tiga camilan andalan Bu Sari\nIsi: Semua dibuat sendiri di\
+      \ dapur rumah Bu Sari di Kediri.\nProduk:\n- Keripik singkong balado. [[ISI: harga produk]]\n  Keripik\
+      \ singkong renyah dengan bumbu balado, buat teman ngemil kapan saja.\n- Keripik tempe. [[ISI: harga\
+      \ produk]]\n  Keripik tempe buatan rumah, cocok buat camilan atau lauk di meja makan.\n- Makaroni\
+      \ pedas. [[ISI: harga produk]]\n  Makaroni goreng berbumbu pedas buat kamu yang suka camilan nendang.\n\
+      Tombol: Lihat daftar harga lengkap\n\n# Halaman produk\n\n## catalog\nJudul: Daftar produk dan harga\n\
+      Isi: Pilih camilan yang kamu mau, lalu pesan langsung lewat WhatsApp. Harga bisa kamu tanyakan juga\
+      \ di chat.\nProduk:\n- Keripik singkong balado. [[ISI: harga produk]]\n  Keripik singkong renyah\
+      \ dengan bumbu balado, buat teman ngemil kapan saja.\n  Tombol: Pesan keripik singkong balado\n\
+      - Keripik tempe. [[ISI: harga produk]]\n  Keripik tempe buatan rumah, cocok buat camilan atau lauk\
+      \ di meja makan.\n  Tombol: Pesan keripik tempe\n- Makaroni pedas. [[ISI: harga produk]]\n  Makaroni\
+      \ goreng berbumbu pedas buat kamu yang suka camilan nendang.\n  Tombol: Pesan makaroni pedas\n(Setiap\
+      \ tombol membuka https://wa.me/[[ISI: nomor WhatsApp]] dengan pesan awal \"Halo Bu Sari, saya mau\
+      \ pesan <nama produk>.\")\nCatatan bawah: Lebih suka belanja di marketplace? [[ISI: tautan marketplace]]\n\
+      \n# Halaman cara-pesan\n\n## how-to-order\nJudul: Cara pesan\nIsi: Pesan cukup lewat chat, kami\
+      \ bantu sampai paketnya sampai.\nLangkah:\n1. Chat Bu Sari di WhatsApp [[ISI: nomor WhatsApp]].\n\
+      2. Tulis produk yang kamu mau dan jumlahnya.\n3. Kirim alamat lengkapmu. Kami kirim ke seluruh Karesidenan\
+      \ Kediri.\n4. Bayar pesananmu: [[ISI: cara pembayaran]]\nSubjudul: Jam buka\nIsi: [[ISI: jam buka]]\n\
+      Subjudul: Belanja di marketplace\nIsi: Kamu juga bisa pesan lewat [[ISI: tautan marketplace]]\n\
+      Tombol: Pesan lewat WhatsApp\n\n# Catatan untuk dewan\n- Cara bayar tidak ada di brief, jadi saya\
+      \ beri placeholder baru [[ISI: cara pembayaran]] (aturan sidang 6); tidak ada klaim QRIS, transfer,\
+      \ atau COD.\n- Deskripsi produk sengaja hanya memakai nama produk, \"buatan rumah\", dan Kediri.\
+      \ Keripik tempe tidak saya sebut pedas karena brief tidak menyatakannya. Kata \"renyah\", \"teman\
+      \ ngemil\", dan \"nendang\" adalah gaya bahasa, bukan fakta baru; Wakil klien boleh mencoretnya\
+      \ bila dianggap klaim.\n- Sapaan \"kamu\" dipakai di seluruh halaman sesuai d-tone-1; tidak ada\
+      \ frasa dari daftar klise.\n"
+    evidence:
+    - d-tone-1
+    - req-business.name
+    - req-business.kind
+    - req-business.location
+    - req-audience
+    - req-goal
+    - req-facts.products
+    - req-facts.shipping_area
+    - ph:prices
+    - ph:whatsapp
+    - ph:marketplace_links
+    - ph:hours
+    - d-layout-1
+    - check:c-register-id
+  - role: perancang
+    text: Hero cukup satu judul pendek (maksimal 6–8 kata) yang menyebut keripik pedas buatan rumah dari
+      Kediri, satu kalimat pendukung, dan satu tombol "Pesan lewat WhatsApp", tanpa foto karena hero berupa
+      pernyataan teks. Judul seksi lain juga harus pendek dan memakai sapaan "kamu" yang sama. Di seksi
+      produk dan katalog, nama produk jadi baris utama dan harga sejajar di kanan seperti daftar harga
+      warung. Langkah cara pesan cukup 3–4 langkah bernomor, masing-masing satu kalimat, dan nomor WhatsApp,
+      area kirim, serta jam buka diletakkan di langkahnya masing-masing.
+    evidence:
+    - d-layout-1
+    - d-tone-1
+    - d-style-1
+    - d-typo-1
+    - req-business.location
+    - req-goal
+    - req-facts.products
+    - req-facts.shipping_area
+    - ph:whatsapp
+    - ph:hours
+    - check:c-layout-hero
+    - check:c-layout-catalog
+    - check:c-layout-how-to-order
+  - role: arsitek
+    text: 'Tiga produk dari brief (keripik singkong balado, keripik tempe, makaroni pedas) ditulis langsung
+      di HTML sebagai konten tetap, bukan lewat data mock, dan harganya tetap [[ISI: harga produk]]. Dengan
+      begitu daftar harga tetap terbaca walau JavaScript mati, dan tidak perlu pemanggilan API tambahan.
+      Setiap produk di featured dan catalog punya tautan WhatsApp sendiri dengan pesan awal berisi nama
+      produk, misalnya ''Pesan keripik tempe lewat WhatsApp'', dari satu nomor [[ISI: nomor WhatsApp]].
+      Label tombol paling banyak sekitar 24 karakter supaya muat satu baris di layar 360 px, judul seksi
+      pendek, dan cara-pesan berupa daftar bernomor <ol> biasa tanpa animasi.'
+    evidence:
+    - req-facts.products
+    - ph:prices
+    - ph:whatsapp
+    - req-goal
+    - d-layout-1
+    - d-motion-1
+    - check:c-layout-featured
+    - check:c-layout-catalog
+    - check:c-layout-how-to-order
+  - role: penguji
+    text: 'Setiap tombol harus jelas walau dibaca sendiri, misalnya ''Pesan Keripik Tempe lewat WhatsApp''
+      (bukan ''Klik di sini'' atau ''Pesan''), tidak ditulis huruf kapital semua, dan boleh turun ke baris
+      berikutnya di HP. Harga, nomor WhatsApp, tautan marketplace, dan jam buka tetap berupa placeholder
+      [[ISI: ...]] sampai klien mengisinya; jangan mengarang angka, rating, atau jumlah pembeli, dan bila
+      sudah terisi tulis harga ''Rp15.000'' dan jam ''08.00–17.00 WIB''. Hindari klise seperti ''kualitas
+      terbaik'' atau ''rasa tak terlupakan'', dan beri setiap seksi judul yang menyebut isinya (''Produk'',
+      ''Cara pesan'') supaya urutan judul rapi untuk pengguna pembaca layar.'
+    evidence:
+    - check:c-register-id
+    - ph:prices
+    - ph:hours
+    - ph:whatsapp
+    - ph:marketplace_links
+    - req-goal
+    - req-facts.products
+    - req-facts.shipping_area
+    - d-tone-1
+  - role: wakil-klien
+    text: 'Pakai hanya fakta dari brief: Keripik Bu Sari, usaha rumahan di Kediri, tiga produk (keripik
+      singkong balado, keripik tempe, makaroni pedas), dan kirim ke seluruh Karesidenan Kediri. Harga,
+      nomor WhatsApp, tautan marketplace, dan jam buka tetap [[ISI: ...]]. Jangan karang testimoni, berat
+      kemasan, angka "terlaris", label halal/P-IRT, atau cara bayar seperti QRIS. Pembeli ingin cepat
+      tahu apa yang dijual, harganya, dan satu tombol jelas "Pesan lewat WhatsApp" di hero, di tiap produk,
+      dan di langkah cara pesan.'
+    evidence:
+    - req-business.name
+    - req-business.location
+    - req-facts.products
+    - req-facts.shipping_area
+    - req-goal
+    - ph:prices
+    - ph:whatsapp
+    - ph:marketplace_links
+    - ph:hours
+- round: 2
+  kind: critique
+  entries:
+  - role: perancang
+    text: 'Perbaikan untuk draf Penulis, per seksi. (1) hero: judul dipendekkan jadi ''Keripik pedas buatan
+      rumah dari Kediri'' (6 kata) supaya pas sebagai pernyataan besar DM Serif Display. ''Keripik Bu
+      Sari'' pindah ke label kecil di atas judul. Isi tetap satu kalimat. Hanya ada satu tombol ''Pesan
+      lewat WhatsApp''. ''Lihat semua produk'' menjadi tautan teks biasa di bawahnya, bukan tombol kedua.
+      (2) featured: judul ''Tiga camilan andalan Bu Sari'' dipertahankan. Tiap produk ditulis dalam satu
+      baris: nama di kiri, [[ISI: harga produk]] sejajar di kanan, lalu satu kalimat deskripsi pendek
+      di bawahnya. Tombol bawah diganti dari ''Lihat daftar harga lengkap'' menjadi ''Lihat semua produk''
+      supaya labelnya sama dengan tautan di hero. (3) catalog: susunan nama, harga, dan tombol per produk
+      dipertahankan. Kalimat ''Harga bisa kamu tanyakan juga di chat'' dihapus karena daftar harga di
+      halaman ini seharusnya sudah menjawab soal harga. (4) how-to-order: jam buka dimasukkan ke langkah
+      1, jadi ''Chat Bu Sari di WhatsApp [[ISI: nomor WhatsApp]], jam [[ISI: jam buka]].'' Subjudul ''Jam
+      buka'' dihapus. Area kirim tetap di langkah 3, dan semua langkah tetap satu kalimat dengan sapaan
+      ''kamu''.'
+    target_role: penulis
+    objection: Hero di draf punya dua tombol dan judul 9 kata. Itu melemahkan hero berupa pernyataan teks
+      dan membuat ajakan pesan lewat WhatsApp bersaing dengan tombol lain. Ini bukan soal selera, tapi
+      saya tidak memblokir karena perbaikannya kecil.
+    blocking: false
+    evidence:
+    - d-layout-1
+    - d-typo-1
+    - d-tone-1
+    - req-goal
+    - req-business.name
+    - req-business.location
+    - req-facts.shipping_area
+    - ph:prices
+    - ph:whatsapp
+    - ph:hours
+    - check:c-layout-hero
+    - check:c-layout-featured
+    - check:c-layout-catalog
+    - check:c-layout-how-to-order
+  - role: penulis
+    text: 'Perbaikan untuk Penguji: contoh tombol ''Pesan Keripik Tempe lewat WhatsApp'' saya ubah jadi
+      ''Pesan keripik tempe''. Nama produk ditulis huruf kecil seperti kalimat biasa, dan labelnya tetap
+      jelas walau dibaca sendiri karena menyebut tindakan dan produknya. Kata ''lewat WhatsApp'' cukup
+      ada di judul seksi dan di tombol utama, jadi tombol tidak terlalu panjang dan tidak bertabrakan
+      dengan batas sekitar 24 karakter dari Arsitek. Judul seksi juga sebaiknya lebih jelas dari sekadar
+      ''Produk'', misalnya ''Daftar produk dan harga''. Penyesuaian drafku: (1) untuk Perancang, judul
+      hero jadi ''Camilan pedas buatan rumah dari Kediri'' (6 kata), nama Keripik Bu Sari pindah ke baris
+      kecil di atas judul. Hero hanya punya satu tombol, ''Pesan lewat WhatsApp'', dan ''Lihat semua produk''
+      jadi tautan teks biasa. Cara pesan dibuat 4 langkah, masing-masing satu kalimat: 1. Chat Bu Sari
+      di WhatsApp [[ISI: nomor WhatsApp]] pada jam buka [[ISI: jam buka]]. 2. Tulis produk dan jumlahnya.
+      3. Kirim alamat lengkapmu, kami kirim ke seluruh Karesidenan Kediri. 4. Bayar pesananmu: [[ISI:
+      cara pembayaran]]. Subjudul ''Jam buka'' yang terpisah saya hapus. (2) Untuk Arsitek dan Wakil klien,
+      tiga produk ditulis tetap di HTML, dan setiap produk punya tombol WhatsApp dengan pesan awal berisi
+      nama produknya. (3) Untuk Wakil klien, kata ''renyah'' dan ''nendang'' saya coret supaya tidak terbaca
+      sebagai klaim rasa. Judul featured jadi ''Tiga camilan buatan Bu Sari'' (bukan ''andalan'', supaya
+      tidak terkesan terlaris). Kalimat ''Harga bisa kamu tanyakan juga di chat'' saya hapus. Cara bayar
+      tetap placeholder, tanpa QRIS, transfer, atau COD. (4) Untuk Penguji, harga ditulis ''Rp15.000''
+      dan jam ditulis ''08.00–17.00 WIB'' setelah klien mengisinya, tidak ada huruf kapital semua, dan
+      tidak ada klise.'
+    target_role: penguji
+    objection: Batas 24 karakter dari Arsitek cocok untuk tombol hero dan cara-pesan, tetapi jangan dipakai
+      untuk tombol per produk. 'Pesan keripik singkong balado' panjangnya 29 karakter, dan nama produk
+      tidak boleh disingkat menjadi nama yang tidak ada di brief. Tombol itu dibiarkan turun ke baris
+      berikutnya di HP, sesuai usul Penguji.
+    blocking: false
+    evidence:
+    - d-tone-1
+    - d-layout-1
+    - d-motion-1
+    - req-business.name
+    - req-business.location
+    - req-facts.products
+    - req-facts.shipping_area
+    - req-goal
+    - ph:prices
+    - ph:whatsapp
+    - ph:hours
+    - ph:marketplace_links
+    - check:c-layout-hero
+    - check:c-layout-how-to-order
+    - check:c-layout-catalog
+    - check:c-register-id
+  - role: arsitek
+    text: 'Usulan perubahan untuk draf Penulis, per seksi. Hero: judul dipendekkan jadi ''Keripik pedas
+      buatan rumah dari Kediri'' (nama usaha sudah ada di header), dan tautan WhatsApp ditulis https://wa.me/[[ISI:
+      nomor WhatsApp]]?text=Halo%20Bu%20Sari%2C%20saya%20mau%20pesan%20keripik. Nomornya ditulis dengan
+      format 62..., tanpa + dan tanpa 0 di depan. Featured: tiga produk dan deskripsinya ditulis sekali
+      saja di content/id.yaml, lalu dipakai juga di catalog sebagai HTML statis. Dengan begitu teksnya
+      tidak bisa berbeda, dan halaman tetap terbaca walau JavaScript mati. Catalog: tombol per produk
+      tetap ''Pesan keripik tempe'' dan sejenisnya, tanpa ''lewat WhatsApp'', supaya muat di layar 360
+      px. Kata WhatsApp dipindah ke ikon dan aria-label, misalnya ''Pesan keripik tempe lewat WhatsApp''.
+      Catatan bawah diganti jadi tautan berlabel ''Belanja di marketplace'' dengan href [[ISI: tautan
+      marketplace]]. How-to-order: langkah 1 jadi ''Chat Bu Sari di WhatsApp'' dengan nomor sebagai tautan
+      tel/wa.me di dalam teks, langkah memakai <ol> biasa, dan subjudul ''Belanja di marketplace'' memakai
+      tautan berlabel yang sama seperti di catalog.'
+    target_role: penulis
+    objection: 'Di draf, placeholder tautan marketplace dipakai sebagai teks tautan, misalnya ''pesan
+      lewat [[ISI: tautan marketplace]]''. Kalau nanti diisi URL mentah, tautan itu tidak jelas bagi pembaca
+      layar dan bisa memanjang keluar layar HP. Label tautan sebaiknya tetap berupa kata-kata, dan URL
+      hanya masuk ke href. Ini soal struktur, bukan selera, tapi tidak memblokir karena mudah diperbaiki.'
+    blocking: false
+    evidence:
+    - ph:marketplace_links
+    - ph:whatsapp
+    - req-facts.products
+    - req-goal
+    - d-layout-1
+    - d-motion-1
+    - check:c-layout-catalog
+    - check:c-layout-how-to-order
+    - check:c-layout-hero
+  - role: penguji
+    text: 'Perbaikan untuk draf Penulis, per seksi. hero: pesan awal WhatsApp diganti jadi ''Halo Bu Sari,
+      saya mau pesan camilan.'', karena makaroni bukan keripik; judul ini jadi satu-satunya h1 di index.
+      featured: judul seksi jadi h2, dan tiap nama produk jadi h3 supaya urutan judul rapi. catalog: judul
+      ''Daftar produk dan harga'' jadi h1 halaman produk; tombol per item ditambah kata ''lewat WhatsApp''
+      (misalnya ''Pesan keripik tempe lewat WhatsApp''), boleh turun baris di HP, supaya pembaca layar
+      tahu tombol ini membuka aplikasi lain. Catatan bawah ditulis ''Lebih suka belanja di marketplace?
+      Buka toko kami di [[ISI: nama marketplace]]'', dengan [[ISI: tautan marketplace]] hanya dipakai
+      sebagai alamat tautan, jangan sebagai teks yang tampil. Kalimat ''Harga bisa kamu tanyakan juga
+      di chat'' dihapus. how-to-order: ''Cara pesan'' jadi h1, sedangkan ''Jam buka'' dan ''Belanja di
+      marketplace'' jadi h2. Langkah 1 ditulis ''Chat Bu Sari di WhatsApp'', dan nomornya jadi tautan
+      wa.me yang teksnya nomor itu sendiri. Langkah 3 dipecah supaya area kirim ''Kami kirim ke seluruh
+      Karesidenan Kediri.'' menjadi kalimat sendiri. Teks tautan marketplace di sini juga memakai nama
+      toko, bukan URL.'
+    target_role: penulis
+    objection: 'Placeholder baru [[ISI: cara pembayaran]] tidak ada di daftar simpul graf. Saya setuju
+      isinya tetap placeholder, tetapi placeholder ini perlu didaftarkan ke graf supaya check bisa menangkapnya
+      sebelum serah terima. Tautan dengan teks URL mentah atau teks yang hanya berupa placeholder tidak
+      bermakna bila dibaca terpisah. Belum ada hasil check, jadi keberatan ini belum memblokir; saya akan
+      menilai ulang setelah run check.'
+    blocking: false
+    evidence:
+    - ph:whatsapp
+    - ph:marketplace_links
+    - ph:prices
+    - req-facts.products
+    - req-goal
+    - req-facts.shipping_area
+    - d-tone-1
+    - check:c-register-id
+    - check:c-layout-catalog
+    - check:c-layout-how-to-order
+  - role: wakil-klien
+    text: 'Perbaikan untuk draf Penulis, per seksi. hero: sudah sesuai brief, biarkan. featured: judul
+      "Tiga camilan andalan Bu Sari" diganti "Tiga camilan dari dapur Bu Sari" karena brief tidak menyebut
+      produk mana yang paling laku; kalimat "Semua dibuat sendiri di dapur rumah Bu Sari di Kediri" diganti
+      "Semua buatan rumah, dari Kediri"; deskripsi makaroni "Makaroni goreng berbumbu pedas" diganti "Makaroni
+      berbumbu pedas". catalog: deskripsi makaroni diganti sama seperti di featured; sisanya sudah benar.
+      how-to-order: langkah 1 "Chat Bu Sari di WhatsApp" diganti "Chat kami di WhatsApp", karena brief
+      tidak menyebut siapa yang membalas chat; kalimat "kami bantu sampai paketnya sampai" diganti "Pesan
+      cukup lewat chat WhatsApp" supaya tidak ada janji layanan yang tidak ada di brief; placeholder baru
+      [[ISI: cara pembayaran]] sudah benar dan perlu dicatat sebagai ph:payment. Kata "renyah", "teman
+      ngemil", dan "nendang" boleh tetap dipakai karena itu gaya bahasa, bukan fakta. Tombol "Pesan lewat
+      WhatsApp" sudah ada di hero, di tiap produk, dan di cara pesan, jadi pembeli mudah tahu harus berbuat
+      apa.'
+    target_role: penulis
+    objection: 'Saya memveto tiga fakta karangan. (1) "goreng" pada makaroni pedas: cara masaknya tidak
+      ada di brief (req-facts.products). (2) "andalan": klaim produk paling laku tidak ada di brief (req-facts.products).
+      (3) "dibuat sendiri di dapur rumah Bu Sari" dan "Chat Bu Sari": brief hanya menyebut usaha rumahan
+      bernama Keripik Bu Sari di Kediri, tidak menyebut siapa yang memasak atau membalas chat (req-business.name,
+      req-business.kind). Ketiganya dihapus sesuai perbaikan di atas dan tidak perlu placeholder. Cara
+      bayar tetap [[ISI: cara pembayaran]] (ph:payment, placeholder baru).'
+    blocking: true
+    evidence:
+    - req-facts.products
+    - req-business.name
+    - req-business.kind
+    - req-business.location
+    - req-facts.shipping_area
+    - req-goal
+    - ph:prices
+    - ph:whatsapp
+    - ph:marketplace_links
+    - ph:hours
+    - d-tone-1
+    resolved: true
+- round: 3
+  kind: revision
+  entries:
+  - role: penulis
+    text: "Revisi menerapkan ketiga veto Wakil klien dan perbaikan Perancang, Arsitek, dan Penguji. Naskah\
+      \ final:\npages:\n  index:\n    title: Keripik Bu Sari — keripik dan camilan pedas buatan rumah\
+      \ dari Kediri\n    description: Keripik singkong balado, keripik tempe, dan makaroni pedas buatan\
+      \ rumah dari Kediri. Pesan lewat WhatsApp, dikirim ke seluruh Karesidenan Kediri.\n    sections:\n\
+      \      hero:\n        eyebrow: Keripik Bu Sari\n        heading: Keripik dan camilan pedas buatan\
+      \ rumah dari Kediri\n        body:\n          - Ada keripik singkong balado, keripik tempe, dan\
+      \ makaroni pedas. Pesan lewat WhatsApp, kami kirim ke seluruh Karesidenan Kediri.\n        actions:\n\
+      \          - { label: Pesan lewat WhatsApp, href: \"https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20camilan.\"\
+      \ }\n        links:\n          - { label: Lihat semua produk, href: pages/produk.html }\n      featured:\n\
+      \        heading: Tiga camilan Keripik Bu Sari\n        body:\n          - Semuanya buatan rumah,\
+      \ dari Kediri.\n        items:\n          - { name: Keripik singkong balado, price: \"[[ISI: harga\
+      \ produk]]\", note: Keripik singkong dengan bumbu balado. }\n          - { name: Keripik tempe,\
+      \ price: \"[[ISI: harga produk]]\", note: Keripik tempe buatan rumah. }\n          - { name: Makaroni\
+      \ pedas, price: \"[[ISI: harga produk]]\", note: Makaroni berbumbu pedas. }\n        actions:\n\
+      \          - { label: Lihat semua produk, href: pages/produk.html }\n  produk:\n    title: Daftar\
+      \ produk dan harga — Keripik Bu Sari\n    description: Harga keripik singkong balado, keripik tempe,\
+      \ dan makaroni pedas dari Keripik Bu Sari, Kediri. Pesan tiap produk langsung lewat WhatsApp.\n\
+      \    sections:\n      catalog:\n        heading: Daftar produk dan harga\n        body:\n      \
+      \    - Pilih camilan yang kamu mau, lalu pesan langsung lewat WhatsApp.\n        items:\n      \
+      \    - { name: Keripik singkong balado, price: \"[[ISI: harga produk]]\", note: Keripik singkong\
+      \ dengan bumbu balado. }\n          - { name: Keripik tempe, price: \"[[ISI: harga produk]]\", note:\
+      \ Keripik tempe buatan rumah. }\n          - { name: Makaroni pedas, price: \"[[ISI: harga produk]]\"\
+      , note: Makaroni berbumbu pedas. }\n        # satu tombol per produk, urutannya sama dengan items;\
+      \ label boleh turun baris di HP\n        actions:\n          - { label: Pesan keripik singkong balado\
+      \ lewat WhatsApp, href: \"https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20keripik%20singkong%20balado.\"\
+      \ }\n          - { label: Pesan keripik tempe lewat WhatsApp, href: \"https://wa.me/[[ISI: nomor\
+      \ WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20keripik%20tempe.\" }\n  \
+      \        - { label: Pesan makaroni pedas lewat WhatsApp, href: \"https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20makaroni%20pedas.\"\
+      \ }\n        footnote:\n          text: Lebih suka belanja di marketplace?\n          link: { label:\
+      \ Belanja di marketplace, href: \"[[ISI: tautan marketplace]]\" }\n  cara-pesan:\n    title: Cara\
+      \ pesan — Keripik Bu Sari\n    description: Cara pesan camilan Keripik Bu Sari lewat WhatsApp, cara\
+      \ bayar, jam buka, dan area kirim ke seluruh Karesidenan Kediri.\n    sections:\n      how-to-order:\n\
+      \        heading: Cara pesan\n        body:\n          - Pesan cukup lewat chat WhatsApp.\n    \
+      \    steps:\n          - Chat kami di WhatsApp pada jam buka.\n          - Tulis produk yang kamu\
+      \ mau dan jumlahnya.\n          - Kirim alamat lengkapmu.\n          - \"Bayar pesananmu: [[ISI:\
+      \ cara pembayaran]]\"\n        details:\n          - { label: WhatsApp, value: \"[[ISI: nomor WhatsApp]]\"\
+      , href: \"https://wa.me/[[ISI: nomor WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20camilan.\"\
+      \ }\n          - { label: Jam buka, value: \"[[ISI: jam buka]]\" }\n          - { label: Area kirim,\
+      \ value: Seluruh Karesidenan Kediri. }\n          - { label: Cara bayar, value: \"[[ISI: cara pembayaran]]\"\
+      \ }\n        actions:\n          - { label: Pesan lewat WhatsApp, href: \"https://wa.me/[[ISI: nomor\
+      \ WhatsApp]]?text=Halo%20Keripik%20Bu%20Sari%2C%20saya%20mau%20pesan%20camilan.\" }\n        links:\n\
+      \          - { label: Belanja di marketplace, href: \"[[ISI: tautan marketplace]]\" }\n"
+    evidence:
+    - d-tone-1
+    - req-business.name
+    - req-business.kind
+    - req-business.location
+    - req-facts.products
+    - req-facts.shipping_area
+    - req-goal
+    - ph:prices
+    - ph:whatsapp
+    - ph:marketplace_links
+    - ph:hours
+  - role: wakil-klien
+    text: 'Ketiga vetoku sudah dipenuhi. Kata "goreng" sudah hilang, jadi makaroni kini ditulis "Makaroni
+      berbumbu pedas". Kata "andalan" juga hilang, judulnya kini "Tiga camilan Keripik Bu Sari". Kalimat
+      "dibuat sendiri di dapur rumah Bu Sari" kini menjadi "Semuanya buatan rumah, dari Kediri", dan "Chat
+      Bu Sari" kini menjadi "Chat kami di WhatsApp", termasuk pesan awal WhatsApp "Halo Keripik Bu Sari".
+      Saya sudah memeriksa naskah kata demi kata dan tidak ada fakta karangan baru. Nama produk, Kediri,
+      buatan rumah, area kirim seluruh Karesidenan Kediri, dan pesan lewat WhatsApp semuanya ada di brief.
+      Harga, nomor WhatsApp, jam buka, tautan marketplace, dan cara bayar tetap ditulis sebagai [[ISI:
+      ...]]. Tombol "Pesan lewat WhatsApp" mudah ditemukan di setiap halaman.'
+    objection: 'Tidak memblokir. Placeholder [[ISI: cara pembayaran]] (ph:payment) belum terdaftar di
+      graf. Placeholder ini perlu dicatat supaya check menangkapnya sebelum serah terima. Isinya sudah
+      benar karena tidak menyebut QRIS, transfer, atau COD.'
+    blocking: false
+    resolved: true
+    evidence:
+    - req-facts.products
+    - req-business.name
+    - req-business.kind
+    - req-business.location
+    - req-facts.shipping_area
+    - req-goal
+    - ph:prices
+    - ph:whatsapp
+    - ph:hours
+    - ph:marketplace_links
+resolution:
+  method: mufakat
+  outcome: content/id.yaml
+  summary: Penulis membuat draf; Perancang memendekkan hero menjadi satu tombol, Arsitek meminta produk
+    sebagai HTML tetap dan label tautan marketplace berupa kata-kata, Penguji merapikan judul dan label
+    tombol. Wakil klien memveto tiga fakta karangan (makaroni 'goreng', produk 'andalan', Bu Sari sendiri
+    yang memasak dan membalas chat); ketiganya dihapus di putaran revisi dan veto dinyatakan selesai.
+    Cara bayar menjadi placeholder baru.
+  votes: []
+  dissent: []
+  vetoes:
+  - fact: cara bayar (QRIS, transfer, COD) tidak ada di brief
+    placeholder: '[[ISI: cara pembayaran]]'

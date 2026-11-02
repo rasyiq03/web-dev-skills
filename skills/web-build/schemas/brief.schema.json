@@ -43,6 +43,21 @@
       "type": "boolean",
       "default": false
     },
+    "mode": {
+      "description": "auto: AI works alone; guided: the developer frames, verifies, and accepts at three checkpoints; deep: an AI council deliberates.",
+      "enum": [
+        "auto",
+        "guided",
+        "deep"
+      ],
+      "default": "auto"
+    },
+    "support_level": {
+      "description": "Guided mode only: 3 Demonstrasi, 2 Terbimbing, 1 Petunjuk, 0 Mandiri. Overrides the developer profile for this project.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
     "business": {
       "type": "object",
       "required": [

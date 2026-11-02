@@ -1,0 +1,93 @@
+# Anchors: who = wisatawan (sopan, dua bahasa); where = Yogyakarta, batik tulis;
+# what = satu workshop, daftar lewat WhatsApp.
+directions:
+  - id: dir-1
+    probability: 0.34
+    style: soft-organic
+    palette: gula-aren
+    type_pairing: lora-work
+    layout: { hero: stacked-statement, problem: two-column-narrative, offer: list-with-prices, proof: facts-ledger, action: band-with-button }
+    motion: low
+    tone: hangat-ramah
+    register: { id: Anda, en: you }
+    summary: Cokelat soga dan krem kain mori, hangat seperti sanggar batik di Yogyakarta.
+    rationale:
+      style: Batik tulis adalah kerja tangan, jadi bentuk membulat dan warna tanah terasa jujur bagi wisatawan.
+      color: Cokelat gula aren dekat dengan warna soga yang khas pada batik tulis Yogyakarta.
+      typography: Lora memberi kesan tradisi, Work Sans tetap jelas dibaca wisatawan asing di HP.
+      layout: Tanpa foto, hero berupa pernyataan dan satu tombol daftar lewat WhatsApp.
+      motion: Gerak rendah agar ringan di HP wisatawan yang memakai data roaming.
+      tone: Wisatawan dari berbagai usia lebih nyaman disapa "Anda" dengan nada ramah.
+    based_on: [req-business.kind, req-business.cultural_context, req-audience, req-goal]
+  - id: dir-2
+    probability: 0.24
+    style: editorial
+    palette: ink-on-cream
+    type_pairing: fraunces-plex
+    layout: { hero: full-bleed-type, problem: two-column-narrative, offer: grid-staggered, proof: facts-ledger, action: closing-statement }
+    motion: none
+    tone: tenang-bercerita
+    register: { id: Anda, en: you }
+    summary: Seperti halaman majalah perjalanan tentang sanggar batik di Yogyakarta.
+    rationale:
+      style: Wisatawan sering mencari pengalaman budaya lewat cerita, dan gaya majalah memberi ruang untuk itu.
+      color: Kertas krem dan tinta hitam dengan aksen merah bata terasa seperti buku panduan wisata Yogyakarta.
+      typography: Fraunces memberi kesan warisan budaya yang pantas untuk batik tulis.
+      layout: Judul penuh selebar layar lalu narasi dua kolom tentang proses membatik.
+      motion: Tanpa gerak, sesuai nada tenang.
+      tone: Nada bercerita membantu wisatawan asing memahami apa itu batik tulis.
+    based_on: [req-business.cultural_context, req-audience, req-business.location]
+  - id: dir-3
+    probability: 0.20
+    style: clean-swiss
+    palette: graphite-amber
+    type_pairing: figtree-noto
+    layout: { hero: stacked-statement, problem: two-column-narrative, offer: list-with-prices, proof: facts-ledger, action: band-with-button }
+    motion: low
+    tone: jelas-praktis
+    register: { id: Anda, en: you }
+    summary: Rapi dan praktis seperti jadwal kelas, untuk wisatawan yang ingin cepat memutuskan.
+    rationale:
+      style: Grid tenang membuat informasi workshop mudah dipindai wisatawan yang waktunya terbatas.
+      color: Aksen amber mengingatkan pada malam (lilin) yang dipakai untuk membatik.
+      typography: Figtree dan Noto Sans sangat jelas di dua bahasa.
+      layout: Pernyataan singkat, daftar yang didapat, lalu satu pita ajakan daftar.
+      motion: Gerak rendah, cukup umpan balik tombol.
+      tone: Wisatawan asing perlu kalimat yang jelas dan praktis.
+    based_on: [req-audience, req-goal, req-facts.product_name]
+  - id: dir-4
+    probability: 0.14
+    style: soft-organic
+    palette: kunyit
+    type_pairing: nunito-rounded
+    layout: { hero: full-bleed-type, problem: two-column-narrative, offer: grid-staggered, proof: facts-ledger, action: band-with-button }
+    motion: none
+    tone: akrab-santai
+    register: { id: kamu, en: you }
+    summary: Kuning kunyit dan huruf bulat, santai untuk wisatawan muda di Yogyakarta.
+    rationale:
+      style: Wisatawan muda di Yogyakarta mencari pengalaman yang santai dan ramah.
+      color: Kuning kunyit hangat dan cerah tanpa meniru motif batik secara klise.
+      typography: Nunito yang bulat terasa bersahabat.
+      layout: Judul besar penuh layar dan kartu yang menjelaskan apa yang dikerjakan di workshop.
+      motion: Tanpa gerak supaya ringan.
+      tone: Sapaan "kamu" cocok untuk wisatawan muda dan backpacker.
+    based_on: [req-audience, req-business.location, req-goal]
+  - id: dir-5
+    probability: 0.08
+    style: neobrutalism
+    palette: sun-block
+    type_pairing: bricolage-plex
+    layout: { hero: full-bleed-type, problem: two-column-narrative, offer: grid-staggered, proof: facts-ledger, action: band-with-button }
+    motion: medium
+    tone: ceria-berani
+    register: { id: kamu, en: you }
+    summary: Blok warna berani, seperti poster acara seni di Yogyakarta.
+    rationale:
+      style: Yogyakarta punya budaya poster seni yang berani, cocok untuk menarik wisatawan muda.
+      color: Kuning terang menonjol di antara banyak tawaran wisata.
+      typography: Bricolage Grotesque terasa seperti tulisan poster buatan tangan.
+      layout: Judul besar dan kartu tebal untuk satu tawaran workshop.
+      motion: Sedikit gerak untuk kesan ceria, karena pembacanya anak muda.
+      tone: Nada ceria untuk wisatawan yang mencari pengalaman seru.
+    based_on: [req-audience, req-business.location, req-goal]

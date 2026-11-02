@@ -174,6 +174,17 @@ def is_in_srgb_gamut(r_lin, g_lin, b_lin, tol=0.0005):
     )
 
 
+def mix(top_hex, base_hex, amount):
+    """
+    Mencampur dua warna di ruang sRGB, seperti color-mix(in srgb, top amount, base).
+
+    I.S. : Kedua hex sah; amount dalam [0, 1] adalah porsi top_hex.
+    F.S. : Hex string hasil campuran dikembalikan.
+    """
+    top, base = hex_to_rgb(top_hex), hex_to_rgb(base_hex)
+    return rgb_to_hex(*(t * amount + b * (1 - amount) for t, b in zip(top, base)))
+
+
 def oklch_to_hex(L, C, h):
     """
     Mengonversi OKLCH ke #RRGGBB dengan penjepitan kroma ke gamut sRGB.
@@ -253,12 +264,14 @@ def derive_state_color(target_hue, paper_hex):
     chroma = 0.16
     paper_l = relative_luminance(paper_hex)
 
-    # Bila background terang (paper_l > 0.3), arahkan L ke gelap; sebaliknya ke terang
+    # Mulai dari lightness yang paling dekat dengan latar, lalu menjauh: yang pertama lolos
+    # 4.5 adalah warna paling berwarna yang masih terbaca. Mulai dari ujung gelap justru
+    # memilih warna nyaris hitam (misalnya #001100) yang lolos kontras tapi kehilangan rona.
     l_candidates = [x / 100.0 for x in range(15, 95, 2)]
     if paper_l > 0.3:
-        l_candidates.sort()  # Coba yang gelap dulu
+        l_candidates.sort(reverse=True)  # Latar terang: dari terang ke gelap
     else:
-        l_candidates.sort(reverse=True)  # Coba yang terang dulu
+        l_candidates.sort()  # Latar gelap: dari gelap ke terang
 
     for l_val in l_candidates:
         c_hex = oklch_to_hex(l_val, chroma, target_hue)

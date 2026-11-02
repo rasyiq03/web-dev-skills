@@ -12,6 +12,7 @@ import importlib
 import importlib.util
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -39,8 +40,8 @@ def cache_root():
     Menentukan folder cache dependensi milik pengguna.
 
     I.S. : PD_CACHE_DIR, LOCALAPPDATA, atau XDG_CACHE_HOME boleh diatur.
-    F.S. : Urutan: PD_CACHE_DIR; %LOCALAPPDATA%/web-skills di Windows;
-           $XDG_CACHE_HOME/web-skills; ~/.cache/web-skills. Path belum tentu ada.
+    F.S. : Urutan: PD_CACHE_DIR; %LOCALAPPDATA%/scaffoldev di Windows;
+           $XDG_CACHE_HOME/scaffoldev; ~/.cache/scaffoldev. Path belum tentu ada.
     """
     override = os.environ.get("PD_CACHE_DIR")
 
@@ -50,12 +51,12 @@ def cache_root():
     local_app_data = os.environ.get("LOCALAPPDATA")
 
     if os.name == "nt" and local_app_data:
-        return Path(local_app_data) / "web-skills"
+        return Path(local_app_data) / "scaffoldev"
 
     xdg = os.environ.get("XDG_CACHE_HOME")
     base = Path(xdg) if xdg else Path.home() / ".cache"
 
-    return base / "web-skills"
+    return base / "scaffoldev"
 
 
 def file_hash(path):
@@ -115,6 +116,52 @@ def install_into(final, label, install):
             raise
 
 
+def prune_cache(final):
+    """
+    Menghapus cache lama sejenis setelah cache baru terpasang, supaya pembaruan plugin
+    tidak menumpuk folder ratusan MB.
+
+    I.S. : final adalah folder cache yang baru saja lengkap, bernama <jenis>-<12 heks>
+           (misalnya py-3.12-ab12cd34ef56 atau node-ab12cd34ef56).
+    F.S. : Folder saudara dengan awalan yang sama dan sidik lain dihapus; nama yang dihapus
+           dikembalikan. Cache Python untuk versi interpreter lain tidak disentuh, begitu
+           juga folder sementara (.tmp-<pid>) milik instalasi yang mungkin sedang berjalan.
+    """
+    prefix = final.name[:-12]
+    removed = []
+
+    for sibling in sorted(final.parent.iterdir()):
+        stale = sibling.name.startswith(prefix) and re.fullmatch(r"[0-9a-f]{12}", sibling.name[len(prefix):])
+
+        if sibling.is_dir() and sibling != final and stale:
+            shutil.rmtree(sibling, ignore_errors=True)
+            removed.append(sibling.name)
+
+    return removed
+
+
+def prune_legacy_cache(cache):
+    """
+    Menghapus cache dari sebelum nama ScaffolDev (folder web-skills di samping cache ini).
+
+    I.S. : cache adalah folder cache pengguna.
+    F.S. : <induk>/web-skills dihapus hanya bila cache memakai nama bawaan (scaffoldev) dan
+           isinya semata folder cache py-/node- buatan skill ini; True bila dihapus.
+    """
+    legacy = Path(cache).parent / "web-skills"
+
+    if Path(cache).name != "scaffoldev" or not legacy.is_dir():
+        return False
+
+    ours = re.compile(r"(py-\d+\.\d+-|node-)[0-9a-f]{12}(\.tmp-\d+)?")
+
+    if not all(ours.fullmatch(child.name) for child in legacy.iterdir()):
+        return False
+
+    shutil.rmtree(legacy, ignore_errors=True)
+    return True
+
+
 # ============================================================
 # ======================= PAKET PYTHON =======================
 # ============================================================
@@ -164,6 +211,7 @@ def ensure_python_packages(repo_root, cache):
 
     if not target.is_dir():
         install_into(target, "paket Python (pip)", functools.partial(pip_install, requirements))
+        prune_cache(target)
 
     sys.path.insert(0, str(target))
     importlib.invalidate_caches()
@@ -258,5 +306,6 @@ def ensure_node_tools(repo_root, cache):
             )
 
         install_into(final, "alat Node (npm ci)", functools.partial(npm_ci, repo_root, npm, packages))
+        prune_cache(final)
 
     return final / "node_modules"

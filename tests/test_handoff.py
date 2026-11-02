@@ -3,6 +3,8 @@
 # Deskripsi : Pengujian unit dan CLI untuk handoff.py.
 # ============================================================
 
+import json
+
 from conftest import add_git_folder, copy_fixture, next_line, run_script
 from lib import io
 
@@ -13,7 +15,7 @@ def test_handoff_provenance_skips_git_folder(projects_dir):
     run_script("pick_direction", "kopi-senja", "--pick", "dir-2")
     run_script("compile_tokens", "kopi-senja")
     run_script("scaffold", "kopi-senja")
-    add_git_folder(proj / "site")
+    add_git_folder(proj.parent)
 
     result = run_script("handoff", "kopi-senja")
 
@@ -33,6 +35,8 @@ def test_handoff_acceptance(projects_dir):
     result = run_script("handoff", "kopi-senja")
     assert result.returncode == 0, result.stderr
     assert next_line(result) == "NEXT: handoff complete"
+    assert (proj / "EXPLAIN.html").is_file()
+    assert "EXPLAIN.html" in result.stdout
 
     # 1. HANDOFF.md ada dan mencantumkan placeholder
     handoff_file = proj / "HANDOFF.md"
@@ -51,10 +55,10 @@ def test_handoff_acceptance(projects_dir):
     prov_file = proj / "provenance.json"
     assert prov_file.is_file()
     prov_data = io.read_json(prov_file)
-    assert prov_data["tool"] == "pd-web-skills"
+    assert prov_data["tool"] == "scaffoldev"
     assert prov_data["version"] == "0.1"
 
-    site_dir = proj / "site"
+    site_dir = proj.parent
     for rel_path, exp_hash in prov_data["files"].items():
         actual_hash = io.sha256_file(site_dir / rel_path)
         assert actual_hash == exp_hash, f"Hash tidak cocok untuk {rel_path}"
@@ -77,5 +81,61 @@ def test_handoff_no_provenance(projects_dir):
     assert not prov_file.exists()
 
     # Pastikan tag meta generator terhapus dari HTML
-    index_html = io.read_text(proj / "site" / "index.html")
+    index_html = io.read_text(proj.parent / "index.html")
     assert '<meta name="generator"' not in index_html
+
+
+def test_handoff_lists_placeholders_found_on_the_site(projects_dir):
+    work = copy_fixture(projects_dir, "kopi-senja", ["brief.yaml", "directions.yaml"])
+    for args in (("gaps",), ("pick_direction", "--pick", "dir-2"), ("compile_tokens",), ("scaffold",)):
+        assert run_script(args[0], "kopi-senja", *args[1:]).returncode == 0
+
+    index = work.parent / "index.html"
+    index.write_text(index.read_text(encoding="utf-8").replace(
+        "</main>", '<p>[[ISI: alamat]] <a href="https://wa.me/[[ISI: nomor WhatsApp]]">WA</a> [[ISI: harga kopi]]</p></main>'),
+        encoding="utf-8")
+
+    assert run_script("handoff", "kopi-senja").returncode == 0
+
+    text = (work / "HANDOFF.md").read_text(encoding="utf-8")
+    shown, unused = text.split("Fakta yang belum diketahui")
+
+    assert "- `[[ISI: harga kopi]]`: index.html" in shown
+    assert "- `[[ISI: nomor WhatsApp]]`: index.html" in shown
+    assert "`hours`: `[[ISI: jam buka]]`" in unused
+    assert "[[ISI: alamat]]" not in unused
+
+    from lib import explain
+    page = explain.build_html(work)
+    assert "[[ISI: harga kopi]]</code></td><td>dipakai di index.html" in page
+    assert "belum dipakai di halaman" in page
+
+
+def test_handoff_reports_the_a11y_review_as_it_happened(projects_dir):
+    work = copy_fixture(projects_dir, "kopi-senja", ["brief.yaml", "directions.yaml"])
+    for args in (("gaps",), ("pick_direction", "--pick", "dir-2"), ("compile_tokens",), ("scaffold",)):
+        assert run_script(args[0], "kopi-senja", *args[1:]).returncode == 0
+    pages = sorted(p.relative_to(work.parent).as_posix() for p in work.parent.rglob("*.html") if ".ScaffolDev" not in p.parts)
+
+    def handoff_line():
+        assert run_script("handoff", "kopi-senja").returncode == 0
+        text = (work / "HANDOFF.md").read_text(encoding="utf-8")
+        return next(line for line in text.splitlines() if line.startswith("- Review semantik aksesibilitas:"))
+
+    assert "dilewati (tidak ada a11y-review.json)" in handoff_line()
+
+    review = {"reviewer": "subagent", "pages": [{"page": p, "findings": []} for p in pages]}
+    (work / "a11y-review.json").write_text(json.dumps(review), encoding="utf-8")
+    assert f"subagent independen: 0 temuan di {len(pages)} dari {len(pages)} halaman" in handoff_line()
+
+    review = {"reviewer": "self", "pages": [{"page": "index.html", "findings": [{"rule": "alt-text"}]}]}
+    (work / "a11y-review.json").write_text(json.dumps(review), encoding="utf-8")
+    line = handoff_line()
+    assert "agen yang sama (kurang independen): 1 temuan di 1 dari" in line
+    assert "(0 sudah diperbaiki)" in line
+
+    review["pages"][0]["findings"][0]["applied"] = "alt ditulis ulang"
+    (work / "a11y-review.json").write_text(json.dumps(review), encoding="utf-8")
+    assert "(1 sudah diperbaiki)" in handoff_line()
+    if len(pages) > 1:
+        assert "belum ditinjau:" in line

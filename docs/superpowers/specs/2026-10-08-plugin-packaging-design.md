@@ -251,8 +251,10 @@ The same path changes for `styles/`, `layouts/`, `directions.schema.json`, and
 
 - A Codex plugin manifest (`.codex-plugin/plugin.json`): Codex is not installed here, so
   its plugin loading cannot be verified. Codex keeps using `sync_adapters.py`.
+  (Done on 2026-10-30 with Codex CLI 0.166.0; see IMPLEMENTATION.md §5.)
 - Submission to Anthropic's plugin directory.
-- Automatic removal of old dependency cache folders.
+- Automatic removal of old dependency cache folders. (Done on 2026-10-30: `deps.prune_cache`
+  after each new install, and `deps.prune_legacy_cache` for the pre-rename `web-skills`.)
 - The audit gaps found earlier (`low-contrast` and the others); they stay v0.2 work.
 
 ## Risks

@@ -43,17 +43,22 @@ audit/           anti-slop.yaml cliches-id.txt cliches-en.txt
 skills/
 	web-build/
 		SKILL.md
-		references/  conventions.md copy-id.md copy-en.md a11y-judge.md
+		references/  conventions.md dashboard.md copy-id.md copy-en.md indonesia.md mode-guided.md mode-deep.md
+		             a11y-judge.md council/ (one card per role)
 		schemas/     brief.schema.json directions.schema.json decisions.schema.json mock.schema.json
+		             deliberation.schema.json
 		templates/   js/api/ config.js client.js endpoints.js mock-label.js
 		site-types/  company-profile.yaml dashboard.yaml landing.yaml portfolio.yaml umkm-catalog.yaml
 		scripts/     run.py validate_brief.py gaps.py serve.py pick_direction.py compile_tokens.py
-		             scaffold.py context.py check.py handoff.py lib/ (deps.py node_tools.py …)
+		             scaffold.py context.py graph.py explain.py decide.py checkpoint.py council.py
+		             check.py handoff.py lib/ (graph.py explain.py trace.py guided.py council.py …)
 	web-design/
 		SKILL.md
-		styles/      index.yaml neobrutalism.yaml editorial.yaml _template.yaml
+		styles/      index.yaml neobrutalism.yaml editorial.yaml clean-swiss.yaml soft-organic.yaml
+		             data-utility.yaml _template.yaml
 		layouts/     patterns.yaml
-tools/           sync_adapters.py (v0.1) · render_check.py, build_cliches.py, eval/ (v0.3)
+tools/           sync_adapters.py (v0.1) · eval/collect.py (signals CSV) · render_check.py,
+                 build_cliches.py, eval/ model runs (v0.3)
                  export_rdf.py, shapes.ttl (v0.4)
 examples/kopi-senja/   brief.yaml directions.yaml decisions.yaml
 tests/
@@ -68,7 +73,26 @@ two drift apart. `sync_adapters.py` warns when it finds one.
 
 The project folder is `$PD_PROJECTS_DIR/<slug>/` when that variable is set,
 `projects/<slug>/` when the scripts run from the repository root, and otherwise
-`<current folder>/<slug>/`. `run.py path <slug>` prints it.
+`<current folder>/<slug>/`. `run.py path <slug>` prints it (`PROJECT:`) and its work folder
+(`WORK:`).
+
+**Layout.** The project folder holds only the website, laid out as in `conventions.md`
+(`index.html`, `pages/`, `css/`, `js/`, `data/`, `assets/`). Every other file below lives in
+the work folder `<slug>/.ScaffolDev/`, so deleting it leaves a clean site, and no site file
+refers to it. In this document "`site/`" means those site files in the project folder.
+
+- `paths.WORK_DIR` is `.ScaffolDev`; `project.open_project()` returns the work folder, and
+  `paths.site_dir(work)` is its parent. `paths.site_files()` walks the site and skips
+  `.ScaffolDev/` and `.git/` (`paths.SITE_IGNORED_DIRS`); linters get explicit file lists
+  from it, run from the project folder, and read their config from the work folder.
+  Finding paths are relative to the project folder (`index.html`, `css/base.css`).
+- `scaffold.py --force` deletes only site entries, never `.ScaffolDev/` or `.git/`; check
+  snapshots (`rounds/<n>/site/`) and provenance hashes skip both.
+- A project in the old layout (`brief.yaml` at the root, site in `site/`) is moved once by
+  `project.migrate_legacy()` the first time any script opens it: work files into
+  `.ScaffolDev/`, the contents of `site/` up to the project folder.
+
+Files in the work folder:
 
 | File | Written by | Purpose |
 | --- | --- | --- |
@@ -78,11 +102,14 @@ The project folder is `$PD_PROJECTS_DIR/<slug>/` when that variable is set,
 | `decisions.yaml` | `pick_direction.py` | Chosen decisions and constraints; schema `decisions.schema.json` |
 | `tokens.json`, `tokens.css`, `fonts.html` | `compile_tokens.py` | DTCG tokens, CSS variables, Google Fonts link |
 | `content/<lang>.yaml` | agent (step 5) | Copy per page and section |
-| `site/` | `scaffold.py`, agent | The website |
 | `.prettierrc.json` … | `scaffold.py` | Copies of `config/`, hashed in `state.yaml` |
 | `report.json`, `rounds/<n>/` | `check.py` | Findings and per-round snapshots |
-| `provenance.json`, `HANDOFF.md` | `handoff.py` | File hashes and the summary for the client |
+| `provenance.json`, `HANDOFF.md`, `API_CONTRACT.md` | `handoff.py` | File hashes, the summary for the client, the mock API contract |
 | `state.yaml` | every script | Current step, round counters, seed, config hashes |
+| `graph.json` | every script, through `lib/graph.py` | Context graph of the files above; see §3.13 |
+| `EXPLAIN.html` | `explain.py`, `handoff.py` | Visual explanation for the developer; see §3.14 |
+| `deliberation/<sitting>.packet.md`, `deliberation/<sitting>.yaml` | `council.py`, agent (chair) | Deep mode: packet for the members, and the minutes; see §3.17 |
+| `trace.jsonl` | every script, `decide.py`, `checkpoint.py` | One JSON line per event: step finished, decision changed or accepted, checkpoint result; see §3.15 |
 
 ### Requirement ids
 
@@ -193,6 +220,10 @@ Standard library only (`http.server`, `secrets`, `json`, `threading`).
 `examples/kopi-senja/decisions.yaml` exactly, except `seed`. The same `--seed` gives the
 same choice on every run. Over 1,000 seeds the choice frequencies match the probabilities
 within ±3 percentage points.
+- Warnings (exit 0) for the chosen direction: probabilities nearly flat (spread under 0.10),
+  and each section whose pattern lists `needs` (brief paths in `patterns.yaml`, such as
+  `assets.photos` or `facts.client_names`) that the brief leaves unknown, via
+  `project.layout_risks()`. `decide.py` gives the same warning for a new layout.
 
 ### 3.5 `compile_tokens.py <slug>` (v0.1)
 
@@ -218,6 +249,15 @@ within ±3 percentage points.
 
 **Accept:** for dir-2, `--pd-color-paper: #F4EBDD;`, `--pd-font-display: 'Archivo Black',
 sans-serif;` exist; a custom palette with ink `#777777` on paper `#888888` exits 2.
+- Also emits `color.link`: the accent when its contrast on the paper is at least 4.5:1,
+  otherwise the ink. Pages set link text in `--pd-color-link`, never in the accent.
+- Size steps are named `step-<n>` and `step-neg-<n>` in both `tokens.json` and `tokens.css`
+  (never `step--1`, which stylelint's custom-property-pattern rejects). When the site already
+  exists, `tokens.css` is copied into `css/` and NEXT is `run check.py`.
+- (2026-10-30) `color.tint`: the palette's `tint`, or 6% accent on paper when the palette has
+  none; ink, muted, and link must reach 4.5:1 on it. `weight.display`: the pairing's
+  `display_weight` (default 700), used by `base.css` for headings. State colors take the
+  lightness nearest the paper that still reaches 4.5:1, so they keep their hue.
 
 ### 3.6 `scaffold.py <slug>` (v0.1)
 
@@ -227,7 +267,7 @@ sans-serif;` exist; a custom palette with ink `#777777` on paper `#888888` exits
   `layout.css`, `components.css`, `js/main.js`, each with its file header.
 - For every page of the site type writes a skeleton HTML: doctype, file header comment,
   `<html lang>` from the first brief language, meta charset and viewport,
-  `<meta name="generator" content="pd-web-skills <version>">`, the `fonts.html` links, CSS
+  `<meta name="generator" content="scaffoldev <version>">`, the `fonts.html` links, CSS
   links in order, `<header>`, `<main>`, `<footer>`, and for each section of that page:
   its three-line banner and
   `<section class="pd-section pd-section--<id>" id="<id>" data-pd-pattern="<pattern>"></section>`.
@@ -249,6 +289,9 @@ sans-serif;` exist; a custom palette with ink `#777777` on paper `#888888` exits
 
 **Accept:** after scaffolding kopi-senja, `npx prettier --check`, `npx stylelint`, and
 `npx html-validate` all pass on the untouched skeleton.
+- Writes a stand-in icon `assets/img/favicon.svg` (first letter of the business name on the
+  accent, letter in accent-ink) and links it in every page's `<head>`; `handoff.py` asks for
+  the real logo while it exists.
 
 ### 3.7 `context.py <slug> <page>` (v0.1)
 
@@ -267,6 +310,12 @@ content | content/id.yaml#index
 ```
 
 End with the approximate size (`characters / 4` tokens). Target: under 1,500 tokens per page.
+- Adds a `risk | <section> | <pattern> needs <paths> (unknown) | …` line for each section
+  of the page whose pattern needs a fact or asset the brief lacks, telling the agent to
+  build a labelled placeholder of the real content's size.
+- Placeholders come in two lines: `placeholders |` for the facts this page's sections use
+  (graph `fills` edges) and `placeholders-site |` for the rest, which header, footer, and
+  buttons may still need.
 
 ### 3.8 `check.py <slug>` (v0.1 core, v0.2 full)
 
@@ -327,6 +376,24 @@ One run = one round. Order of work:
 }
 ```
 
+**Build-completeness and copy rules (2026-10-30).** `section-empty` (warning): a scaffold
+section shell still empty, so an unbuilt page cannot pass. `bilingual-structure-mismatch`
+(warning): the two copy files differ in keys or list lengths. `banner-missing` requires the
+banner on the line right above the section. The round snapshot is taken after formatting,
+so a restored round matches the report's line numbers. The sample-data label is required
+only when `endpoints.js` defines an endpoint (comments are ignored).
+
+**Locale rules (`lib/locale_rules.py`, 2026-10-30).** Measurable parts of
+`references/indonesia.md`, kept out of `audit/` because they read the brief:
+
+| Rule | Level | Applies to | Checks |
+| --- | --- | --- | --- |
+| `page-lang` | error | every page | `<html lang>` matches the page's language (first language at the root, others under `<lang>/`) |
+| `wa-number-format` | error | every page | `wa.me` links use `62…` with no 0, `+`, or dashes (a placeholder passes) |
+| `page-weight` | warning | every page | HTML plus local CSS, JS, and images stays under 500 KB |
+| `wa-in-hero` | warning | Indonesian home page, site types with a `whatsapp` fact | a built hero holds a WhatsApp link; an empty scaffold hero is skipped |
+| `id-price-format`, `id-time-format` | warning | Indonesian pages | visible text writes Rp25.000 and 08.00 WIB, not Rp 25,000 or 8:00 AM |
+
 **Rounds and stopping.** Copy `site/` to `rounds/<n>/` before writing the report.
 Limits: findings with `category: lint` may continue up to round 5; once only `design`
 findings remain, at most 2 further rounds. Stop when there are no errors and no warnings,
@@ -346,7 +413,9 @@ round reports zero errors; the restore picks the best round.
 - Writes `HANDOFF.md` in the brief's first language and prints it: the chosen direction
   and why; assumptions (inferred requirements and sampled decisions); every placeholder
   with its page; every mock endpoint (data the client or a backend must replace); check
-  summary (errors, warnings, `tfs_auto`, signature score, semantic review done or skipped);
+  summary (errors, warnings, `tfs_auto`, signature score, and the semantic review read from `<work>/a11y-review.json`: who
+  reviewed (independent subagent or the same agent), findings, and pages not reviewed;
+  "skipped" when the file is missing);
   where the files are; how to preview: `python -m http.server` inside `site/`, because
   ES modules and `fetch()` do not work when a page is opened as `file://`.
 - Writes `API_CONTRACT.md` from `endpoints.js` and the mock files: one section per
@@ -355,6 +424,9 @@ round reports zero errors; the restore picks the best round.
 - Writes `provenance.json`: SHA-256 of every file in `site/`, SHA-256 of `decisions.yaml`,
   tool version, ISO timestamp. `--no-provenance` skips this file and removes the
   generator meta tag (for clients who do not want it).
+- Section 3 lists the placeholders found in the built pages (`project.site_placeholders()`),
+  each with the files it appears in, then the facts from `gaps.json` that are still unknown
+  but not used on any page. `EXPLAIN.html` shows the same split.
 
 ### 3.10 `tools/sync_adapters.py` (v0.1)
 
@@ -390,6 +462,159 @@ round reports zero errors; the restore picks the best round.
 - Writes each constraint as a SHACL shape; validates with pySHACL against facts extracted
   from the built site; compares the result with `check.py`'s `tfs_auto`.
 - Condition C3 of the evaluation: same information as C2, delivered through the ontology.
+
+### 3.13 `graph.py <slug> [--impact NODE | --why NODE]`
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §2.
+
+- `lib/graph.py` builds the context graph from `brief.yaml`, `gaps.json`, `decisions.yaml`,
+  `tokens.json`, `site/`, and `report.json`, whichever exist, and writes `graph.json`.
+  Every pipeline script calls `graph.refresh()` right after `io.save_state()`;
+  `context.py` refreshes it and reads the page subgraph, with output unchanged.
+- Nodes: `requirement` (`req-…`), `placeholder` (`ph:<fact>`), `page` (`page:<id>`),
+  `section` (`section:<page>#<id>`), `token` (`token:<group>.<name>`), `style`, `decision`
+  (`d-…`), `check` (`check:<id>`), `file` (`file:<path in site/>`), `finding`
+  (`finding:<n>`). Each has `owner` (`developer`, `ai`, `script`) and, where known, `why`.
+- Edges: `based_on`, `realized_by`, `verified_by`, `about` (check → token), `located_in`,
+  `contains` (page → section), `fills` (placeholder → section), `violates`
+  (finding → check, from rules named `constraint-<id>`).
+- Nodes and edges keep the order of their source files; no timestamps, so the file is
+  byte-identical for the same inputs.
+- `--impact` lists what is affected downstream; `--why` lists the chain upstream. Both
+  print one line per step in plain Indonesian, with the relation read in the right
+  direction (`d-palette-1 berdasar pada -> req-audience`,
+  `req-audience menjadi dasar untuk -> d-palette-1`). An unknown node exits with code 1.
+
+### 3.14 `explain.py <slug>`
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §3.
+
+- `lib/explain.py` writes `<project>/EXPLAIN.html` from the context graph, `directions.yaml`,
+  `state.yaml`, and `report.json`. `handoff.py` calls it after saving state.
+- One self-contained file: inline CSS and JavaScript, no external URLs, no timestamps, so
+  the same inputs give the same bytes. Colours come from `tokens.json` (light) with a dark
+  variant; text follows the brief's first language (`id` or `en`).
+- Sections: the eight steps coloured by owner; the developer/AI/script split of
+  requirements and decisions (Agentivism P1); one card per decision (choice, why,
+  requirements, owner and source, the five directions' options with probabilities, what a
+  change affects, and each check as passed, failed, or not checked yet); the graph in five
+  columns with page filters (tokens not tied to a decision are counted, not drawn); the
+  placeholders with the sections that use them; the check summary; two questions with
+  hidden answers taken from `--why` and `--impact`.
+- The SVG layout is computed in Python, so the page is complete without JavaScript; the
+  script only highlights a node's chain on click, using the same traversal rules as
+  `lib/graph.py`.
+
+### 3.15 `decide.py <slug> <decision> (--choice VALUE | --accept) --reason TEXT`
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §4.
+
+- Options: `--section` (layout), `--register lang=pronoun` (tone), `--by developer|ai|council`
+  (default `developer`), `--verification pick|compare|justify|predict|none` (default
+  `justify`). `--reason` is required and at least 10 characters, matching the schema.
+- A change is stored as `overrides` in `decisions.yaml` (palette, type_pairing, layout per
+  section, motion, tone, register, and the rationale per axis); `directions.yaml` is never
+  edited. `project.effective_direction()` merges them, and `compile_tokens.py` uses it.
+  `decisions.yaml` is rebuilt with `pick_direction.build_decisions()`; the changed axis
+  gets `source: overridden`, the others keep theirs. The style axis cannot be overridden.
+- Only downstream work is redone: palette or type pairing recompiles the tokens, copies
+  `tokens.css` into `site/css/`, and swaps the Google Fonts URL in every page; layout
+  changes `data-pd-pattern` on that one section and asks the agent to rebuild it; tone asks
+  for new copy; anything with a built site ends with "run check". If a downstream step
+  fails, `decisions.yaml` is restored and nothing is traced.
+- `lib/trace.py` appends to `trace.jsonl` (`seq`, `date` from `PD_DATE`, `event`, fields;
+  no wall-clock time). Pipeline scripts call `trace.finish()` (a `step` event plus
+  `graph.refresh()`); `decide.py` writes `decide` and `accept` events. The graph gives each
+  decision `accepted_by` and `verification` from its latest event, and a changed decision
+  belongs to whoever changed it. `EXPLAIN.html` shows both, and marks the current choice
+  among the five directions' options.
+- Gate: for each axis, every graph node that changes is in `graph.impact()` of that
+  decision (`tests/test_decide.py`).
+
+### 3.16 `checkpoint.py <slug> [framing|direction|acceptance --result R --note TEXT]` (guided mode)
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §4.
+Agent instructions: `skills/web-build/references/mode-guided.md`.
+
+- `brief.yaml` gains `mode: auto | guided | deep` (default `auto`) and, for guided mode,
+  an optional `support_level` 0–3 that overrides the profile for that project.
+- Without a checkpoint name: prints the support level (3 Demonstrasi, 2 Terbimbing,
+  1 Petunjuk, 0 Mandiri) and where it came from, the status of the three checkpoints, and
+  for the next one the instruction at that level from `lib/guided.py` (what the agent does,
+  what the developer does, when it passes) plus the feedback rule. For acceptance it also
+  prints two questions with their reference chains from `graph.why()` and `graph.impact()`.
+- With a name: `--result passed|failed|skipped` and `--note` (the developer's answer in
+  short, at least 10 characters) are required; writes a `checkpoint` event to the trace.
+  Exits 1 for a project that is not in guided mode.
+- The profile is `profile.yaml` in the dependency cache folder, or `PD_PROFILE`:
+  `support_level` (default 2) and a history of projects with their level and results.
+  `handoff.py` records the project (replacing an earlier entry for the same folder, so a
+  repeated handoff counts once; missing checkpoints count as skipped) and prints the next
+  level. `guided.next_level()`: a failed acceptance raises the level by one (max 3); two
+  consecutive projects at the same level with every checkpoint passed lower it by one
+  (min 0); otherwise it stays. Auto mode never reads or writes the profile.
+- `EXPLAIN.html` shows the level, the checkpoint results, and the next level once handoff
+  has recorded the project.
+
+### 3.17 `council.py <slug> <direction|copy|first-page|site> [--record]` (deep mode)
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §5.
+Agent instructions: `skills/web-build/references/mode-deep.md` and
+`skills/web-build/references/council/<role>.md`.
+
+- Members: `perancang`, `penulis`, `arsitek`, `penguji`, `wakil-klien`; the main agent is the
+  chair (`pimpinan`) and does not vote. Sittings and the member whose vote counts double:
+  direction (perancang), copy (penulis), first-page and site (penguji).
+- Without `--record`: writes `deliberation/<sitting>.packet.md` (task, rules, every graph id
+  that counts as evidence, and the five directions or the check summary) and prints the
+  role cards and the minutes path. Exits 1 for a project that is not `mode: deep`, and for
+  the direction sitting without `directions.yaml`.
+- With `--record`: validates `deliberation/<sitting>.yaml` against
+  `deliberation.schema.json` and `lib/council.validate_minutes()`: all five members
+  present; round 1 proposals and round 2 critique with every member exactly once; each
+  critique targets another member; every blocking objection cites evidence; every
+  evidence id resolves in the graph; `mufakat` only with no unresolved blocking objection;
+  a vote has one ballot per member and its outcome equals `weighted_outcome()` (owner ×2,
+  a tie goes to the owner's choice); the direction outcome is a direction id. Vetoes name
+  the `[[ISI: …]]` placeholder that replaces the fact. On failure nothing changes.
+- On success: the direction sitting runs `pick_direction.pick()` with `source: council`;
+  every sitting writes a `council` trace event. The graph adds `minutes:<sitting>` nodes
+  (owner `council`) with `decided_in` edges from the decisions they made, and `--why` walks
+  through them. `EXPLAIN.html` lists the sittings with method, outcome, summary, and a link
+  to the minutes, and marks steps 3 and 5 as the council's.
+- `handoff.py` in deep mode lists the recorded sittings, says when any was simulated, and
+  prints "Siap pakai" only when all four sittings are recorded and check reports zero
+  errors and zero warnings; otherwise it names what is missing.
+- (2026-10-30) Packets for copy and review sittings list every page's sections with
+  purpose and facts, the absolute paths of the pages, copy, guides, report, and CSS, and
+  every token id; the evidence list includes placeholders written on pages
+  (`ph:site:<text>`). Dogfood: `docs/superpowers/dogfood/2026-10-30-deep-and-guided.md`.
+
+### 3.18 Learning signals and `tools/eval/collect.py`
+
+Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md`
+§ "Agentivism" (propositions table) and phase 6.
+
+- `lib/signals.py` computes, from the graph, the trace, and `report.json`: P1 decisions
+  owned or accepted by the developer; P2 the developer's verification moves (accept and
+  decide events with a move other than `none`, plus one `pick` when the client picked the
+  direction); P3 decisions the developer changed with `decide` (file edits cannot be
+  attributed to a person, so they are not counted, and the text says so); P4 check errors,
+  warnings, and constraint score next to the acceptance checkpoint result; P5 the number
+  of trace events; P6 dependence risk `high` when there is no developer verification, no
+  client pick, and no passed checkpoint. Changes made `--by ai` or `--by council` never
+  count for the developer.
+- `handoff.py` appends section 7 to `HANDOFF.md` with one plain sentence per signal; in deep
+  mode a high P6 is explained as expected and points to `EXPLAIN.html` and
+  `decide --accept`. `EXPLAIN.html` shows the same list.
+- `python tools/eval/collect.py [folders…] [--out eval-results.csv]` finds every folder
+  with a `brief.yaml` (the folder itself or its direct children; default: the projects
+  folder) and writes one CSV row per project: mode, site type, languages, support level,
+  the signals, checkpoints passed, council sittings, votes, simulated, dissent, vetoes,
+  placeholders, signature score, and `ready` (zero errors and warnings, and for deep mode
+  all four sittings). It prints a per-mode summary. Same inputs give the same bytes.
+- This compares projects that were actually built. Running briefs through models
+  unattended (conditions C0–C2, §3.11) is still the v0.3 harness.
 
 ## 4. Milestones and gates
 
@@ -438,11 +663,22 @@ Pin these versions in `package.json` once v0.1 passes, so behaviour does not dri
 - A `site/` that the user turns into a git repo (for deployment) holds read-only object
   files on Windows; `check.py` and `handoff.py` skip `site/.git/`.
 
-**Still to verify:**
+**Verified on 2026-10-30 (Google Fonts):** every family in the style files exists. Three
+display families have only weight 400 (DM Serif Display, Archivo Black, Instrument Serif),
+and headings used the browser's default 700, which makes a fake bold. Pairings now carry
+`display_weight`, compiled into `--pd-weight-display` and used by `base.css` for `h1`–`h3`;
+`fonts.html` asks only for the weights a family is used at. The network test
+`test_every_font_exists_on_google_fonts_with_the_weights_used` keeps this true.
 
-1. **Claude Code AGENTS.md support** (2.1.277+, used only when no CLAUDE.md exists) and the
-   **Codex skill path** `.agents/skills/`: both taken from third-party articles.
-2. **Google Fonts availability** of every family in the style files.
+**Verified on 2026-10-30 (agents):**
+
+- Claude Code 2.1.314 loads `AGENTS.md` when the folder has no `CLAUDE.md`, and ignores it
+  when a `CLAUDE.md` exists (tested with a codeword in a scratch repository).
+- Codex CLI 0.166.0 reads skills from `.agents/skills/` in the repository, and installs this
+  repository as a plugin: `codex plugin marketplace add` accepts `.claude-plugin/marketplace.json`,
+  and the plugin manifest it prefers is `.codex-plugin/plugin.json` (a test version 9.9.9
+  there was the version Codex installed). `codex debug prompt-input` lists
+  `scaffoldev:web-build` and `scaffoldev:web-design`.
 
 ## 6. Tests to write first (v0.1)
 

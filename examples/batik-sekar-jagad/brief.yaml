@@ -1,0 +1,29 @@
+# Prompt: "ajari aku bikin landing page untuk workshop batik tulis Sekar Jagad di Yogyakarta, untuk wisatawan, bahasa Indonesia dan Inggris, daftar lewat WhatsApp"
+slug: batik-sekar-jagad
+site_type: landing
+languages: [id, en]
+interactive: false
+mode: guided
+business:
+  name: { value: Sekar Jagad, source: stated }
+  kind: { value: workshop batik tulis, source: stated }
+  location: { value: Yogyakarta, source: stated }
+  cultural_context: { value: batik tulis Yogyakarta, source: stated }
+  differentiator: { value: unknown, source: unknown }
+audience: { value: wisatawan, source: stated }
+goal: { value: daftar workshop lewat WhatsApp, source: stated }
+tone: { value: unknown, source: unknown }
+style_request: { value: unknown, source: unknown }
+brand:
+  colors: { value: unknown, source: unknown }
+  fonts: { value: unknown, source: unknown }
+  logo: { value: unknown, source: unknown }
+facts:
+  product_name: { value: workshop batik tulis, source: stated }
+  price: { value: unknown, source: unknown }
+  features: { value: unknown, source: unknown }
+  whatsapp: { value: unknown, source: unknown }
+  signup_url: { value: unknown, source: unknown }
+  deadline: { value: unknown, source: unknown }
+assets:
+  photos: { value: unknown, source: unknown }

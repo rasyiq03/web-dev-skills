@@ -7,13 +7,13 @@
 
 import re
 import pytest
-from conftest import next_line, run_script
+from conftest import fill_empty_sections, next_line, run_script
 from lib import io
 
 
 @pytest.mark.node
 def test_dashboard_end_to_end_smoke(projects_dir):
-    dash_dir = projects_dir / "analytics-demo"
+    dash_dir = projects_dir / "analytics-demo" / ".ScaffolDev"
     dash_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. Buat brief dashboard
@@ -177,7 +177,7 @@ def test_dashboard_end_to_end_smoke(projects_dir):
     res_s = run_script("scaffold", "analytics-demo")
     assert res_s.returncode == 0, res_s.stderr
 
-    site_dir = dash_dir / "site"
+    site_dir = dash_dir.parent
 
     # Verifikasi file khusus dashboard dibuat
     assert (site_dir / "js" / "charts.js").is_file()
@@ -214,7 +214,7 @@ export const ENDPOINTS = {
         {
             "_mock": True,
             "endpoint": "GET /metrics",
-            "generated_by": "pd-web-skills 0.1",
+            "generated_by": "scaffoldev 0.1",
             "data": [
                 {"date": "2026-10-01", "users": 1200, "revenue": 50000000},
                 {"date": "2026-10-02", "users": 1250, "revenue": 52000000},
@@ -228,6 +228,8 @@ export const ENDPOINTS = {
             continue
         text = io.read_text(js_path)
         assert not re.search(r"\bfetch\(", text), f"fetch() ditemukan di {js_path}"
+
+    fill_empty_sections(projects_dir / "analytics-demo")
 
     # 7. Jalankan check.py -> harus 0 error
     res_chk = run_script("check", "analytics-demo")

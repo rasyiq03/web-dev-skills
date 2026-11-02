@@ -26,7 +26,7 @@ decisions:
     based_on: [req-audience, req-business.location]
     rationale: Mono prices read like the receipts students compare when budgeting.
     source: client-picked
-    realized_by: [font.display, font.body, font.mono]
+    realized_by: [font.display, font.body, font.mono, weight.display]
     verified_by: [c-type-heading, c-type-body]
   - id: d-layout-1
     axis: layout

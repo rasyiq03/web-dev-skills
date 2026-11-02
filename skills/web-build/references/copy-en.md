@@ -9,6 +9,9 @@ customer: concrete, plain, and short.
   client's own words from the brief.
 - **One register for the whole site**: conversational for consumer brands, precise and
   formal for professional services.
+- **Hero in three parts, two sentences at most**: what the business is, for whom (or where),
+  and the one action. Example: "Palm-sugar iced coffee for students in Dago. Order ahead and
+  skip the queue."
 - **One idea per sentence; one or two sentences per paragraph** in hero and card text.
 - **Headings say what the section holds**: "Menu", "Opening hours", "How to order", "Find us".
 - **Buttons name the action and its result**: "Order on WhatsApp", "See the full menu",

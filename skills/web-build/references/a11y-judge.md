@@ -31,3 +31,7 @@ Return JSON only, in this shape, with an empty list when the page is fine:
   ]
 }
 ```
+
+The main agent collects one object per page into `<work>/a11y-review.json` as
+`{"reviewer": "subagent", "pages": [...]}` (`"self"` when no subagent was used), so the
+handoff reports the review honestly.

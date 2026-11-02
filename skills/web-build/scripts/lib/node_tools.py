@@ -129,6 +129,6 @@ def failure_finding(package, result, target):
         "file": target,
         "line": 1,
         "message": f"{package} gagal berjalan (kode keluar {result.returncode}): {failure_detail(result)}",
-        "fix": "Bila pesan menyebut file di site/, perbaiki sintaks file itu. Bila menyebut paket, "
+        "fix": "Bila pesan menyebut file situs (misalnya index.html atau css/base.css), perbaiki sintaks file itu. Bila menyebut paket, "
         "modul, atau node yang tidak ditemukan, jalankan npm run setup di root repo.",
     }

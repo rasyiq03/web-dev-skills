@@ -1,0 +1,119 @@
+# Anchors: who = keluarga muda (orang tua dengan anak; layanan kesehatan, butuh rasa percaya),
+# where = Surabaya, what = klinik gigi dengan booking lewat WhatsApp.
+# Formality: kesehatan -> hanya gaya formal/netral. Brief tanpa foto, nama klien, atau alamat.
+directions:
+  - id: dir-1
+    probability: 0.36
+    style: clean-swiss
+    palette: sage-clinic
+    type_pairing: figtree-noto
+    layout:
+      hero: stacked-statement
+      services: list-with-prices
+      proof: facts-ledger
+      story: two-column-narrative
+      contact: contact-card
+    motion: low
+    tone: tenang-meyakinkan
+    register: { id: Anda }
+    summary: Klinik yang tenang dan bersih; hijau sage, grid rapi, satu tombol WhatsApp yang jelas.
+    rationale:
+      style: Orang tua memilih klinik gigi untuk anak dari rasa percaya, dan grid yang tenang terasa seperti ruang praktik yang rapi.
+      color: Hijau sage memberi kesan bersih dan sehat tanpa dinginnya putih rumah sakit yang membuat anak takut.
+      typography: Figtree dan Noto Sans mudah dibaca di HP saat orang tua mencari jadwal sambil menggendong anak.
+      layout: Hero teks saja karena belum ada foto klinik; daftar layanan langsung menjawab pertanyaan pertama pasien.
+      motion: Gerak sedikit saja agar halaman cepat terbuka di data seluler Surabaya.
+      tone: Keluarga muda butuh penjelasan yang menenangkan dan sapaan Anda untuk layanan kesehatan.
+    based_on: [req-audience, req-business.kind, req-goal]
+  - id: dir-2
+    probability: 0.22
+    style: clean-swiss
+    palette: porcelain-navy
+    type_pairing: plex-sans
+    layout:
+      hero: full-bleed-type
+      services: tabs-by-category
+      proof: facts-ledger
+      story: two-column-narrative
+      contact: split-form
+    motion: none
+    tone: profesional-ringkas
+    register: { id: Anda }
+    summary: Klinik yang serius dan modern; biru tua, nama klinik besar, layanan per kategori.
+    rationale:
+      style: Gaya formal yang lugas cocok untuk klinik yang ingin terlihat profesional di mata keluarga muda.
+      color: Biru tua dan putih porselen menegaskan kebersihan dan kepercayaan pada tindakan medis.
+      typography: IBM Plex Sans terasa teknis dan jujur, pas untuk menjelaskan jenis perawatan gigi.
+      layout: Tab per kategori memisahkan perawatan anak dan dewasa yang dicari keluarga.
+      motion: Tanpa gerak supaya fokus pada informasi jadwal dan booking.
+      tone: Kalimat ringkas membantu orang tua yang sibuk memutuskan dengan cepat.
+    based_on: [req-audience, req-business.kind]
+  - id: dir-3
+    probability: 0.20
+    style: soft-organic
+    palette: daun-pisang
+    type_pairing: nunito-rounded
+    layout:
+      hero: stacked-statement
+      services: grid-staggered
+      proof: facts-ledger
+      story: two-column-narrative
+      contact: contact-card
+    motion: low
+    tone: hangat-ramah
+    register: { id: Anda }
+    summary: Klinik keluarga yang hangat; hijau daun, sudut membulat, terasa ramah untuk anak.
+    rationale:
+      style: Bentuk membulat dan warna alami mengurangi rasa takut anak ke dokter gigi, kekhawatiran utama keluarga muda.
+      color: Hijau daun pisang terasa segar dan dekat dengan keseharian keluarga di Surabaya.
+      typography: Nunito yang membulat ramah dibaca anak dan orang tua.
+      layout: Kartu layanan bergaya grid membuat perawatan mudah dibandingkan di layar HP.
+      motion: Sedikit gerak untuk sentuhan ramah tanpa memperlambat halaman.
+      tone: Nada hangat membuat orang tua merasa diterima, tetap dengan sapaan Anda.
+    based_on: [req-audience, req-business.location]
+  - id: dir-4
+    probability: 0.14
+    style: editorial
+    palette: forest-ledger
+    type_pairing: newsreader-public
+    layout:
+      hero: full-bleed-type
+      services: feature-rows
+      proof: facts-ledger
+      story: two-column-narrative
+      contact: contact-card
+    motion: none
+    tone: edukatif-tenang
+    register: { id: Anda }
+    summary: Klinik yang mengedukasi; tipografi seperti majalah kesehatan, penjelasan tiap perawatan.
+    rationale:
+      style: Gaya editorial cocok bila klinik ingin dikenal lewat edukasi kesehatan gigi untuk keluarga.
+      color: Hijau tua dan krem terasa tenang dan terpercaya seperti majalah kesehatan.
+      typography: Newsreader membuat penjelasan perawatan nyaman dibaca orang tua.
+      layout: Baris fitur memberi ruang menjelaskan tiap perawatan, tetapi butuh foto yang belum ada.
+      motion: Tanpa gerak agar fokus pada bacaan.
+      tone: Nada edukatif menjawab pertanyaan orang tua sebelum mereka bertanya.
+    based_on: [req-audience, req-business.kind]
+  - id: dir-5
+    probability: 0.08
+    style: soft-organic
+    palette: gula-aren
+    type_pairing: dm-serif-sans
+    layout:
+      hero: full-bleed-type
+      services: list-with-prices
+      proof: facts-ledger
+      story: two-column-narrative
+      contact: split-form
+    motion: low
+    tone: personal-akrab
+    register: { id: Anda }
+    summary: Pilihan berani; warna gula aren hangat dan judul serif, seperti klinik milik keluarga.
+    rationale:
+      style: Klinik bisa tampil sebagai praktik keluarga yang personal, berbeda dari klinik waralaba di Surabaya.
+      color: Coklat gula aren hangat menonjol di antara klinik yang serba putih dan biru.
+      typography: DM Serif Display memberi karakter personal pada nama klinik.
+      layout: Judul besar memperkenalkan klinik tanpa perlu foto.
+      motion: Sedikit gerak untuk kesan hangat.
+      tone: Nada akrab namun sopan untuk keluarga yang ingin dokter langganan.
+    based_on: [req-audience, req-business.location]

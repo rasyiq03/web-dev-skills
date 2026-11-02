@@ -1,11 +1,12 @@
 # ============================================================
 # File      : compile_tokens.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Mengompilasi keputusan desain menjadi tokens.json (DTCG),
 #             tokens.css (variabel CSS), dan fonts.html (Google Fonts).
 #             Memeriksa kepatuhan kontras WCAG 2.x (>= 4.5:1).
 # ============================================================
 
+import shutil
 import sys
 import urllib.parse
 from pathlib import Path
@@ -13,7 +14,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import color, io, paths, project, report
+from lib import color, io, paths, project, report, trace
 from lib.report import EXIT_CHECK_FAILED, EXIT_INVALID, fail
 
 SERIF_FONTS = {
@@ -38,6 +39,17 @@ def is_serif(font_name):
 # ============================================================
 
 
+def size_name(n):
+    """
+    Menamai satu langkah skala ukuran, sama di tokens.json dan tokens.css.
+
+    I.S. : n adalah langkah skala, boleh negatif.
+    F.S. : 'step-<n>' atau 'step-neg-<n>' dikembalikan; tanpa tanda hubung ganda, karena
+           stylelint (custom-property-pattern) menolak --pd-size-step--1.
+    """
+    return f"step-neg-{abs(n)}" if n < 0 else f"step-{n}"
+
+
 def compile_tokens(slug):
     """
     Menghasilkan tokens.json, tokens.css, dan fonts.html untuk proyek.
@@ -52,7 +64,8 @@ def compile_tokens(slug):
     directions_data = io.read_yaml(proj_dir / "directions.yaml")
 
     chosen_dir_id = decisions.get("direction")
-    chosen = next((d for d in directions_data.get("directions", []) if d["id"] == chosen_dir_id), None)
+    # Arah terpilih beserta perubahan dari decide.py
+    chosen = project.effective_direction(decisions, directions_data)
     if not chosen:
         fail(EXIT_INVALID, f"Arah {chosen_dir_id!r} dari decisions.yaml tidak ditemukan di directions.yaml.",
              "check direction id in decisions.yaml")
@@ -79,6 +92,9 @@ def compile_tokens(slug):
     accent = raw_colors["accent"]
     muted = raw_colors["muted"]
     accent_ink = raw_colors["accent-ink"]
+
+    # Latar bidang khas palet (seksi selang-seling, kotak catatan); bawaannya 6% aksen di atas paper
+    tint = raw_colors.get("tint") or color.mix(accent, paper, 0.06)
 
     # 2. Uji kontras WCAG 2.x (harus >= 4.5:1)
     ratio_ink_paper = color.contrast_ratio(ink, paper)
@@ -121,12 +137,28 @@ def compile_tokens(slug):
         "warning": color.derive_state_color(80, paper),
     }
 
+    # Warna tautan: aksen bila terbaca sebagai teks di atas paper (4.5:1), selain itu ink.
+    # Aksen boleh lebih lembut untuk blok dan tombol bergaris, tetapi teks harus terbaca.
+    link = accent if color.contrast_ratio(accent, paper) >= 4.5 else ink
+
+    # Teks utama, teks sekunder, dan tautan harus tetap terbaca di atas tint
+    for name, value in (("ink", ink), ("muted", muted), ("link", link)):
+        ratio = color.contrast_ratio(value, tint)
+        if ratio < 4.5:
+            fail(
+                EXIT_CHECK_FAILED,
+                f"Kontras {name} ({value}) di atas tint ({tint}) = {ratio:.2f}:1 (minimal 4.5:1).",
+                "use a lighter tint in the palette",
+            )
+
     all_colors = {
         "ink": ink,
         "paper": paper,
         "accent": accent,
         "muted": muted,
         "accent-ink": accent_ink,
+        "link": link,
+        "tint": tint,
         **chart_colors,
         **state_colors,
     }
@@ -143,6 +175,7 @@ def compile_tokens(slug):
             "display": pair_entry["display"],
             "body": pair_entry["body"],
             "mono": pair_entry["mono"],
+            "display_weight": pair_entry.get("display_weight", 700),
         }
 
     disp_family = raw_fonts["display"]
@@ -152,6 +185,11 @@ def compile_tokens(slug):
     disp_fallback = "serif" if is_serif(disp_family) else "sans-serif"
     body_fallback = "serif" if is_serif(body_family) else "sans-serif"
     mono_fallback = "monospace"
+
+    # Judul memakai ketebalan yang benar-benar dimiliki font judul; tanpa itu browser
+    # menebalkan huruf secara palsu (misalnya DM Serif Display hanya punya 400)
+    display_weight = int(raw_fonts.get("display_weight", 700))
+    weight_tokens = {"display": str(display_weight)}
 
     fonts_tokens = {
         "display": f"'{disp_family}', {disp_fallback}",
@@ -169,7 +207,7 @@ def compile_tokens(slug):
         step_val = base_rem_val * (ratio_val ** n)
         val_str = f"{step_val:.3f}rem"
         # Sertakan format Utopia/DTCG
-        size_tokens[f"step-{n}"] = val_str
+        size_tokens[size_name(n)] = val_str
 
     # 6. Ruang, Radius, Border, Shadow, Motion
     space_tokens = {k: str(v) for k, v in base.get("space", {}).items()}
@@ -195,6 +233,7 @@ def compile_tokens(slug):
         "$schema": "https://design-tokens.github.io/community-group/format/",
         "color": dtcg_group(all_colors, "color"),
         "font": dtcg_group(fonts_tokens, "fontFamily"),
+        "weight": dtcg_group(weight_tokens, "fontWeight"),
         "size": dtcg_group(size_tokens, "dimension"),
         "space": dtcg_group(space_tokens, "dimension"),
         "radius": dtcg_group(radius_tokens, "dimension"),
@@ -235,6 +274,8 @@ def compile_tokens(slug):
     ]
     for k, v in fonts_tokens.items():
         css_lines.append(f"\t--pd-font-{k}: {v};")
+    for k, v in weight_tokens.items():
+        css_lines.append(f"\t--pd-weight-{k}: {v};")
 
     css_lines += [
         "",
@@ -243,12 +284,7 @@ def compile_tokens(slug):
         "\t/* ============================================================ */",
     ]
     for n in range(-2, 6):
-        val_str = size_tokens[f"step-{n}"]
-        if n < 0:
-            css_name = f"step-neg-{abs(n)}"
-        else:
-            css_name = f"step-{n}"
-        css_lines.append(f"\t--pd-size-{css_name}: {val_str};")
+        css_lines.append(f"\t--pd-size-{size_name(n)}: {size_tokens[size_name(n)]};")
 
     css_lines += [
         "",
@@ -303,9 +339,11 @@ def compile_tokens(slug):
     # 8. Susun fonts.html
     # Bangun parameter URL Google Fonts
     font_params = []
-    for fam in [disp_family, body_family, mono_family]:
+    # Font judul hanya diminta pada ketebalannya sendiri, supaya tidak mengunduh yang tak dipakai
+    disp_weights = "400;600;700" if display_weight == 700 else ";".join(sorted({"400", str(display_weight)}))
+    for fam, weights in ((disp_family, disp_weights), (body_family, "400;600;700"), (mono_family, "400;700")):
         safe_name = fam.replace(" ", "+")
-        font_params.append(f"family={safe_name}:wght@400;600;700")
+        font_params.append(f"family={safe_name}:wght@{weights}")
 
     query_str = "&".join(font_params) + "&display=swap"
     google_fonts_url = f"https://fonts.googleapis.com/css2?{query_str}"
@@ -318,6 +356,7 @@ def compile_tokens(slug):
     io.write_text(proj_dir / "fonts.html", fonts_html_content)
 
     io.save_state(proj_dir, step="tokens")
+    trace.finish(proj_dir, "compile_tokens")
 
     lines = [
         f"Kompilasi token berhasil untuk '{slug}':",
@@ -326,6 +365,13 @@ def compile_tokens(slug):
         f"  - fonts.html (Google Fonts: {disp_family}, {body_family}, {mono_family})",
         f"  - Kontras: ink/paper {ratio_ink_paper:.2f}:1, muted/paper {ratio_muted_paper:.2f}:1, accent-ink/accent {ratio_accent_ink:.2f}:1",
     ]
+
+    # Situs yang sudah ada langsung memakai token baru; scaffold ulang akan ditolak
+    site_dir = paths.site_dir(proj_dir)
+    if paths.has_site_content(site_dir) and (site_dir / "css").is_dir():
+        shutil.copyfile(proj_dir / "tokens.css", site_dir / "css" / "tokens.css")
+        lines.append("  - css/tokens.css di situs diperbarui")
+        return lines, "run check.py"
 
     return lines, "run scaffold.py"
 

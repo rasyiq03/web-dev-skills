@@ -1,6 +1,6 @@
 # ============================================================
 # File      : handoff.py
-# Proyek    : web-skills
+# Proyek    : ScaffolDev
 # Deskripsi : Menyusun HANDOFF.md, API_CONTRACT.md, dan provenance.json
 #             sebagai paket serah terima akhir untuk klien.
 # ============================================================
@@ -14,7 +14,7 @@ from pathlib import Path
 # Memungkinkan impor modul lib saat dijalankan langsung
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lib import io, paths, project, report
+from lib import council, explain, guided, io, paths, project, report, signals, trace
 from lib.report import EXIT_INVALID, fail
 
 
@@ -29,7 +29,7 @@ def build_api_contract(endpoints_data, mock_dir):
         "# Kontrak API (API Contract)",
         "",
         "Dokumen ini mendefinisikan bentuk data yang diharapkan oleh antarmuka situs.",
-        "Ganti file mock di `site/data/mock/` atau hubungkan backend sungguhan melalui `site/js/api/config.js`.",
+        "Ganti file mock di `data/mock/` atau hubungkan backend sungguhan melalui `js/api/config.js`.",
         "",
     ]
 
@@ -43,7 +43,7 @@ def build_api_contract(endpoints_data, mock_dir):
         mock_name = ep_info.get("mock", "")
         lines.append(f"## `{method} {path}`")
         lines.append(f"- **Endpoint Name**: `{ep_name}`")
-        lines.append(f"- **Mock File**: `site/data/mock/{mock_name}.mock.json`")
+        lines.append(f"- **Mock File**: `data/mock/{mock_name}.mock.json`")
 
         mock_file = mock_dir / f"{mock_name}.mock.json"
         if mock_file.is_file():
@@ -64,7 +64,80 @@ def build_api_contract(endpoints_data, mock_dir):
     return "\n".join(lines) + "\n"
 
 
-def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
+A11Y_FILE = "a11y-review.json"
+
+
+def a11y_line(proj_dir, lang):
+    """
+    Meringkas tinjauan aksesibilitas semantik dari a11y-review.json, apa adanya.
+
+    I.S. : <work>/a11y-review.json boleh belum ada; isinya {"reviewer": "subagent" | "self",
+           "pages": [ {page, findings}, ... ]} sesuai references/a11y-judge.md.
+    F.S. : Satu kalimat dikembalikan: siapa meninjau, berapa temuan, halaman mana yang
+           belum ditinjau; "dilewati" bila file tidak ada atau tidak terbaca.
+    """
+    path = proj_dir / A11Y_FILE
+    pages = [p.relative_to(paths.site_dir(proj_dir)).as_posix() for p in paths.site_files(paths.site_dir(proj_dir), "*.html")]
+
+    try:
+        data = io.read_json(path) if path.is_file() else None
+        reviewed = {entry["page"]: entry.get("findings", []) for entry in data["pages"]} if data else None
+    except (KeyError, TypeError, ValueError):
+        reviewed = None
+
+    if reviewed is None:
+        return "dilewati (tidak ada a11y-review.json)" if lang == "id" else "skipped (no a11y-review.json)"
+
+    count = sum(len(f) for f in reviewed.values())
+    # Temuan yang sudah diterapkan ditandai "applied" (lihat SKILL.md langkah 7)
+    applied = sum(1 for f in reviewed.values() for item in f if isinstance(item, dict) and item.get("applied"))
+    missing = [p for p in pages if p not in reviewed]
+    independent = data.get("reviewer") == "subagent"
+
+    if lang == "id":
+        who = "subagent independen" if independent else "agen yang sama (kurang independen)"
+        text = f"dilakukan oleh {who}: {count} temuan di {len(pages) - len(missing)} dari {len(pages)} halaman"
+        text += f" ({applied} sudah diperbaiki)" if count else ""
+        return text + (f"; belum ditinjau: {', '.join(missing)}" if missing else "")
+
+    who = "an independent subagent" if independent else "the same agent (less independent)"
+    text = f"done by {who}: {count} findings on {len(pages) - len(missing)} of {len(pages)} pages"
+    text += f" ({applied} fixed)" if count else ""
+    return text + (f"; not reviewed: {', '.join(missing)}" if missing else "")
+
+
+def placeholder_lines(site_ph, unused, favicon, lang):
+    """
+    Menulis bagian placeholder HANDOFF.md dari isi situs yang sebenarnya.
+
+    I.S. : site_ph adalah hasil project.site_placeholders(); unused adalah {fakta: teks} dari
+           gaps.json yang tidak tampil di situs; favicon True bila ikon sementara masih ada.
+    F.S. : Daftar baris markdown dikembalikan.
+    """
+    lines = []
+
+    if site_ph:
+        lines.append("Tampil di situs; ganti semuanya sebelum situs dipakai:" if lang == "id"
+                     else "Shown on the site; replace every one before the site goes live:")
+        lines += [f"- `{text}`: {', '.join(files)}" for text, files in site_ph.items()]
+    else:
+        lines.append("- Tidak ada placeholder di halaman situs." if lang == "id" else "- No placeholders on the site pages.")
+
+    if favicon:
+        lines.append("")
+        lines.append("Ikon situs `assets/img/favicon.svg` masih sementara (huruf pertama nama); ganti dengan logo usaha." if lang == "id"
+                     else "The site icon `assets/img/favicon.svg` is a stand-in (the first letter of the name); replace it with the real logo.")
+
+    if unused:
+        lines.append("")
+        lines.append("Fakta yang belum diketahui dan belum dipakai di halaman (isi bila ingin ditambahkan):" if lang == "id"
+                     else "Facts still unknown and not used on any page (fill in if you want them added):")
+        lines += [f"- `{fact}`: `{text}`" for fact, text in unused.items()]
+
+    return lines
+
+
+def build_handoff_md(brief, decisions, gaps, report_summary, placeholders, a11y):
     """
     Menyusun dokumen HANDOFF.md dalam bahasa pertama brief.
 
@@ -103,27 +176,26 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
             lines.append("- Seluruh data dan keputusan sesuai pernyataan eksplisit dari brief.")
         lines.append("")
         lines.append("## 3. Placeholder yang Perlu Diisi Klien")
-        if placeholders_map:
-            for fact, ph_text in placeholders_map.items():
-                lines.append(f"- `{fact}`: `{ph_text}`")
-        else:
-            lines.append("- Tidak ada placeholder; seluruh fakta terisi.")
+        lines += placeholder_lines(*placeholders, "id")
         lines.append("")
         lines.append("## 4. Hasil Uji Otomatis (Quality Gates)")
         lines.append(f"- Error: {report_summary.get('errors', 0)}")
         lines.append(f"- Warning: {report_summary.get('warnings', 0)}")
         lines.append(f"- Kepatuhan Batasan (TFS Auto): {report_summary.get('tfs_auto', 1.0) * 100:.0f}%")
         lines.append(f"- Skor Tanda Tangan Konvensi: {report_summary.get('signature', 1.0) * 100:.0f}%")
-        lines.append("- Review semantik aksesibilitas: semantic review skipped")
+        lines.append(f"- Review semantik aksesibilitas: {a11y}")
         lines.append("")
         lines.append("## 5. Cara Pratinjau (Preview)")
         lines.append("Karena situs menggunakan ES Modules (`import`/`export`) dan `fetch()` lokal, halaman tidak dapat dibuka langsung sebagai `file://`.")
-        lines.append("Jalankan server HTTP lokal di dalam folder `site/`:")
+        lines.append("Jalankan server HTTP lokal di folder proyek (folder yang berisi `index.html`):")
         lines.append("```bash")
-        lines.append("cd site")
+        lines.append(f"cd {brief.get('slug', '<slug>')}")
         lines.append("python -m http.server 8000")
         lines.append("```")
         lines.append("Buka browser di `http://127.0.0.1:8000`.")
+        lines.append("")
+        lines.append("## 6. Penjelasan Keputusan")
+        lines.append("Buka `EXPLAIN.html` di folder proyek (bisa langsung diklik dua kali, tanpa server dan tanpa internet). Isinya: siapa memutuskan apa, kenapa, dan bagian mana yang ikut berubah bila satu keputusan diganti.")
     else:
         lines.append(f"# Site Handoff Report — {pname}")
         lines.append("")
@@ -142,27 +214,26 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
             lines.append("- All facts and decisions follow stated brief requirements.")
         lines.append("")
         lines.append("## 3. Placeholders to Fill")
-        if placeholders_map:
-            for fact, ph_text in placeholders_map.items():
-                lines.append(f"- `{fact}`: `{ph_text}`")
-        else:
-            lines.append("- No placeholders remaining.")
+        lines += placeholder_lines(*placeholders, "en")
         lines.append("")
         lines.append("## 4. Automated Check Scores")
         lines.append(f"- Errors: {report_summary.get('errors', 0)}")
         lines.append(f"- Warnings: {report_summary.get('warnings', 0)}")
         lines.append(f"- TFS Auto Score: {report_summary.get('tfs_auto', 1.0) * 100:.0f}%")
         lines.append(f"- Signature Score: {report_summary.get('signature', 1.0) * 100:.0f}%")
-        lines.append("- Accessibility Review: semantic review skipped")
+        lines.append(f"- Accessibility Review: {a11y}")
         lines.append("")
         lines.append("## 5. Preview Instructions")
         lines.append("Because the site relies on ES Modules and local fetch, previewing as a raw `file://` URL is blocked by browser CORS.")
-        lines.append("Run a local HTTP server from the `site/` folder:")
+        lines.append("Run a local HTTP server from the project folder (the one with `index.html`):")
         lines.append("```bash")
-        lines.append("cd site")
+        lines.append(f"cd {brief.get('slug', '<slug>')}")
         lines.append("python -m http.server 8000")
         lines.append("```")
         lines.append("Open `http://127.0.0.1:8000` in your browser.")
+        lines.append("")
+        lines.append("## 6. Decision Explanation")
+        lines.append("Open `EXPLAIN.html` in the project folder (double-click works, no server or internet needed). It shows who decided what, why, and what changes if a decision is replaced.")
 
     return "\n".join(lines) + "\n"
 
@@ -172,17 +243,86 @@ def build_handoff_md(brief, decisions, gaps, report_summary, placeholders_map):
 # ============================================================
 
 
+def signals_md(proj_dir, brief):
+    """
+    Menyusun bagian 7 HANDOFF.md: sinyal Agentivism P1-P6 dalam kalimat sederhana.
+
+    I.S. : Proyek punya brief.yaml; trace dan report boleh belum ada.
+    F.S. : Teks markdown bagian 7 dikembalikan.
+    """
+    lang = "id" if project.first_language(brief) == "id" else "en"
+    title, intro, items = signals.lines(signals.compute(proj_dir), lang)
+
+    return "\n".join(["", f"## 7. {title}", intro, *[f"- {item}" for item in items]]) + "\n"
+
+
+def finish_guided(proj_dir, brief):
+    """
+    Mencatat hasil checkpoint proyek mode terpandu di profil developer.
+
+    I.S. : trace.jsonl berisi peristiwa checkpoint (boleh kosong).
+    F.S. : Untuk mode guided: profil diperbarui dan baris ringkasan dikembalikan;
+           mode lain: daftar kosong dan profil tidak disentuh.
+    """
+    if brief.get("mode") != "guided":
+        return []
+
+    lang = "id" if project.first_language(brief) == "id" else "en"
+    level = guided.project_level(brief)
+    results = guided.results_from_trace(trace.read(proj_dir))
+    recorded = {name: results.get(name, "skipped") for name in guided.CHECKPOINTS}
+    new_level = guided.record_project(str(proj_dir.resolve()), level, recorded)
+    states = ", ".join(f"{name} {guided.RESULT_NAMES[lang][result]}" for name, result in recorded.items())
+
+    return [
+        f"  - Mode terpandu: tingkat {level} ({guided.LEVEL_NAMES[lang][level]}); checkpoint: {states}",
+        f"  - Proyek berikutnya: tingkat {new_level} ({guided.LEVEL_NAMES[lang][new_level]})",
+    ]
+
+
+def finish_deep(proj_dir, brief, report_summary):
+    """
+    Meringkas sidang dewan dan menyatakan apakah situs siap pakai, khusus mode deep work.
+
+    I.S. : trace.jsonl berisi peristiwa council untuk sidang yang notulennya lolos.
+    F.S. : Baris ringkasan dikembalikan; daftar kosong untuk mode lain. "Siap pakai" hanya
+           bila keempat sidang tercatat dan check melaporkan nol error dan nol peringatan.
+    """
+    if brief.get("mode") != "deep":
+        return []
+
+    held = {e["sitting"]: e for e in trace.read(proj_dir) if e.get("event") == "council"}
+    done = [f"{s} ({held[s]['method']})" for s in council.SITTINGS if s in held]
+    missing = [s for s in council.SITTINGS if s not in held]
+    simulated = any(e.get("simulated") for e in held.values())
+    errors, warnings = report_summary.get("errors", 0), report_summary.get("warnings", 0)
+    lines = [f"  - Mode deep work: sidang tercatat {', '.join(done) or 'tidak ada'}"]
+
+    if simulated:
+        lines.append("  - Sebagian sidang disimulasikan oleh satu agen (tanpa subagent)")
+
+    if missing or errors or warnings or not report_summary:
+        reasons = ([f"sidang belum diadakan: {', '.join(missing)}"] if missing else []) + \
+                  ([f"check: {errors} error, {warnings} peringatan"] if (errors or warnings) else []) + \
+                  (["check belum dijalankan"] if not report_summary else [])
+        lines.append(f"  - Belum siap pakai: {'; '.join(reasons)}")
+    else:
+        lines.append("  - Siap pakai: keempat sidang mufakat atau voting, check nol error dan nol peringatan; isi placeholder sebelum dipublikasikan")
+
+    return lines
+
+
 def handoff(slug, no_provenance=False):
     """
     Eksekusi serah terima proyek: tulis HANDOFF.md, API_CONTRACT.md, provenance.json.
 
-    I.S. : Proyek memiliki brief, decisions, gaps, site/.
+    I.S. : Proyek memiliki brief, decisions, gaps, dan situs yang sudah di-scaffold.
     F.S. : Dokumen handoff tertulis; mencetak ringkasan dan 'NEXT: handoff complete'.
     """
     proj_dir = project.open_project(slug, need=["brief.yaml", "decisions.yaml", "gaps.json"])
-    site_dir = proj_dir / "site"
-    if not site_dir.is_dir():
-        fail(EXIT_INVALID, f"Folder {site_dir} belum ada.", f"run scaffold.py {slug} first")
+    site_dir = paths.site_dir(proj_dir)
+    if not paths.has_site_content(site_dir):
+        fail(EXIT_INVALID, f"Situs di {site_dir} belum ada.", f"run scaffold.py {slug} first")
 
     brief = io.read_yaml(proj_dir / "brief.yaml")
     decisions = io.read_yaml(proj_dir / "decisions.yaml")
@@ -216,7 +356,12 @@ def handoff(slug, no_provenance=False):
     io.write_text(proj_dir / "API_CONTRACT.md", api_contract_md)
 
     # 3. Tulis HANDOFF.md
-    handoff_md = build_handoff_md(brief, decisions, gaps, report_summary, gaps.get("placeholders", {}))
+    site_ph = project.site_placeholders(site_dir)
+    unused = {fact: text for fact, text in gaps.get("placeholders", {}).items() if text not in site_ph}
+    favicon = (site_dir / "assets" / "img" / "favicon.svg").is_file()
+    a11y = a11y_line(proj_dir, "id" if project.first_language(brief) == "id" else "en")
+    handoff_md = build_handoff_md(brief, decisions, gaps, report_summary, (site_ph, unused, favicon), a11y)
+    handoff_md += signals_md(proj_dir, brief)
     io.write_text(proj_dir / "HANDOFF.md", handoff_md)
 
     # 4. Provenance
@@ -224,8 +369,8 @@ def handoff(slug, no_provenance=False):
     if no_provenance:
         if prov_file.is_file():
             prov_file.unlink()
-        # Hapus meta generator dari semua file HTML di site/
-        for html_f in site_dir.rglob("*.html"):
+        # Hapus meta generator dari semua file HTML situs
+        for html_f in paths.site_files(site_dir, "*.html"):
             h_text = io.read_text(html_f)
             h_cleaned = re.sub(r'[ \t]*<meta name="generator" content="[^"]*"\s*/?>\n?', "", h_text)
             io.write_text(html_f, h_cleaned)
@@ -247,17 +392,22 @@ def handoff(slug, no_provenance=False):
         io.write_json(prov_file, prov_data)
 
     io.save_state(proj_dir, step="handoff")
+    trace.append(proj_dir, "step", script="handoff")
+    guided_lines = finish_guided(proj_dir, brief) + finish_deep(proj_dir, brief, report_summary)
+    explain.write(proj_dir)
 
     lines = [
         f"Serah terima selesai untuk proyek '{slug}':",
         "  - HANDOFF.md berhasil dibuat",
         "  - API_CONTRACT.md berhasil disusun",
+        "  - EXPLAIN.html berhasil dibuat (penjelasan keputusan untuk developer)",
     ]
     if no_provenance:
         lines.append("  - provenance.json dilewati (--no-provenance), generator meta tag dibersihkan")
     else:
         lines.append(f"  - provenance.json tercatat ({len(site_hashes)} file di-hash)")
 
+    lines.extend(guided_lines)
     lines.append("")
     lines.append("=== ISI HANDOFF.MD ===")
     lines.extend(handoff_md.strip().splitlines())

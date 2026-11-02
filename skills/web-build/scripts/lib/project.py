@@ -4,6 +4,10 @@
 #             pola layout, validasi skema, dan id requirement.
 # ============================================================
 
+import re
+import shutil
+from pathlib import Path
+
 from jsonschema import Draft202012Validator
 
 from lib import io, paths
@@ -14,37 +18,77 @@ from lib.report import EXIT_INVALID, fail
 # ============================================================
 
 
+def migrate_legacy(project):
+    """
+    Memindahkan proyek susunan lama ke susunan baru, sekali saja.
+
+    I.S. : project adalah folder proyek. Susunan lama: brief.yaml dan file kerja lain di akar,
+           situs di site/. Susunan baru: situs di akar, file kerja di .ScaffolDev/.
+    F.S. : True bila proyek dipindahkan; False bila sudah susunan baru atau bukan proyek.
+           Entri situs yang namanya bentrok dengan isi akar dibiarkan di site/.
+    """
+    project = Path(project)
+    work = project / paths.WORK_DIR
+
+    if work.exists() or not (project / "brief.yaml").is_file():
+        return False
+
+    work.mkdir()
+
+    for entry in sorted(project.iterdir()):
+        if entry.name not in ("site", paths.WORK_DIR, ".git"):
+            shutil.move(str(entry), str(work / entry.name))
+
+    site = project / "site"
+
+    for entry in sorted(site.iterdir()) if site.is_dir() else []:
+        if not (project / entry.name).exists():
+            shutil.move(str(entry), str(project / entry.name))
+
+    if site.is_dir() and not any(site.iterdir()):
+        site.rmdir()
+
+    return True
+
+
 def open_project(slug, need=()):
     """
-    Membuka folder proyek dan memastikan file yang dibutuhkan ada.
+    Membuka folder kerja proyek dan memastikan file yang dibutuhkan ada.
 
-    I.S. : slug dari argumen baris perintah; need berisi nama file relatif.
-    F.S. : Path folder proyek dikembalikan, atau ScriptExit kode 1 dengan petunjuk.
+    I.S. : slug dari argumen baris perintah; need berisi nama file relatif terhadap folder
+           kerja (<proyek>/.ScaffolDev/).
+    F.S. : Path folder kerja dikembalikan (situsnya ada di folder induknya, lihat
+           paths.site_dir); proyek susunan lama dipindahkan dulu. ScriptExit kode 1 dengan
+           petunjuk bila proyek atau file belum ada.
     """
     if not paths.is_valid_slug(slug):
         fail(EXIT_INVALID, f"Slug tidak sah: {slug!r} (pakai kebab-case huruf kecil).",
              "fix the slug and run the script again")
 
     project = paths.project_dir(slug)
+    work = paths.work_dir(slug)
 
-    if not project.is_dir():
+    if project.is_dir():
+        migrate_legacy(project)
+
+    if not work.is_dir():
         # Agen yang pindah ke dalam proyek akan membuat proyek ganda bila disuruh menulis brief
         home = paths.find_project_home(slug)
 
-        if home is not None:
+        if home is not None and home != project.parent:
             fail(EXIT_INVALID, [f"Folder proyek tidak ada: {project}", f"Proyek {slug} ada di {home / slug}."],
                  f"run the command from {home}, the folder that contains {slug}/")
 
-        fail(EXIT_INVALID, f"Folder proyek tidak ada: {project}",
-             f"write {project / 'brief.yaml'} first")
+        fail(EXIT_INVALID, f"Folder kerja proyek belum ada: {work}",
+             f"write {work / 'brief.yaml'} first")
 
-    missing = [name for name in need if not (project / name).is_file()]
+    missing = [name for name in need if not (work / name).is_file()]
 
     if missing:
-        fail(EXIT_INVALID, [f"File belum ada: {project / name}" for name in missing],
+        fail(EXIT_INVALID, [f"File belum ada: {work / name}" for name in missing],
              f"create {', '.join(missing)} first (see skills/web-build/SKILL.md)")
 
-    return project
+    return work
 
 
 # ============================================================
@@ -253,6 +297,52 @@ def load_patterns():
     return {kind: {item["id"]: item for item in items} for kind, items in raw.items()}
 
 
+PLACEHOLDER = re.compile(r"\[\[ISI: [^\]]+\]\]")
+
+
+def site_placeholders(site_dir):
+    """
+    Mengumpulkan placeholder [[ISI: ...]] yang benar-benar tampil di halaman situs.
+
+    I.S. : site_dir adalah folder proyek (boleh belum di-scaffold).
+    F.S. : dict {placeholder: [file relatif tempat ia muncul]} dikembalikan, urut menurut
+           kemunculan pertama; file kerja di .ScaffolDev tidak ikut dipindai.
+    """
+    found = {}
+
+    for page in paths.site_files(site_dir, "*.html"):
+        rel = page.relative_to(site_dir).as_posix()
+
+        for text in PLACEHOLDER.findall(io.read_text(page)):
+            files = found.setdefault(text, [])
+
+            if rel not in files:
+                files.append(rel)
+
+    return found
+
+
+def layout_risks(brief, site_type, layout_map):
+    """
+    Mencari seksi yang polanya butuh fakta atau aset yang belum ada di brief.
+
+    I.S. : layout_map adalah {id seksi: id pola}; pola boleh punya needs (path brief).
+    F.S. : Daftar (seksi, pola, [path yang belum diketahui]) dikembalikan, urut seperti tipe situs.
+    """
+    patterns_all = load_patterns()
+    risks = []
+
+    for section in site_type.get("sections", []):
+        pattern_id = layout_map.get(section["id"])
+        entry = patterns_all.get(section.get("pattern_kind", ""), {}).get(pattern_id or "", {})
+        missing = [path for path in entry.get("needs", []) if is_unknown(brief, path)]
+
+        if missing:
+            risks.append((section["id"], pattern_id, missing))
+
+    return risks
+
+
 def find_by_id(items, item_id):
     """
     Mencari satu entri berdasarkan id di list dict.
@@ -262,3 +352,38 @@ def find_by_id(items, item_id):
     """
     return next((item for item in items if item.get("id") == item_id), None)
 
+
+# Kolom arah yang bisa diubah decide.py, dan poros keputusan yang terkena
+OVERRIDE_AXES = {
+    "palette": "palette",
+    "type_pairing": "typography",
+    "layout": "layout",
+    "motion": "motion",
+    "tone": "tone",
+    "register": "tone",
+}
+
+
+def effective_direction(decisions, directions_data):
+    """
+    Menggabungkan arah terpilih dengan perubahan dari decide.py.
+
+    I.S. : decisions adalah isi decisions.yaml; directions_data adalah isi directions.yaml.
+    F.S. : Salinan arah terpilih dengan overrides diterapkan dikembalikan (layout, register,
+           dan rationale digabung per kunci); None bila arahnya tidak ada.
+    """
+    chosen_id = decisions.get("direction")
+    chosen = find_by_id(directions_data.get("directions", []), chosen_id)
+
+    if chosen is None:
+        return None
+
+    merged = {key: (dict(value) if isinstance(value, dict) else value) for key, value in chosen.items()}
+
+    for key, value in (decisions.get("overrides") or {}).items():
+        if isinstance(value, dict):
+            merged[key] = {**merged.get(key, {}), **value}
+        else:
+            merged[key] = value
+
+    return merged

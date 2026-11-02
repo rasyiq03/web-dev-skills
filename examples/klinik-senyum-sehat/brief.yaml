@@ -1,0 +1,27 @@
+# Prompt: "buat company profile Klinik Gigi Senyum Sehat di Surabaya, untuk keluarga muda, pasien bisa booking lewat WhatsApp"
+slug: klinik-senyum-sehat
+site_type: company-profile
+languages: [id]
+interactive: false
+mode: auto
+business:
+  name: { value: Klinik Gigi Senyum Sehat, source: stated }
+  kind: { value: klinik gigi, source: stated }
+  location: { value: Surabaya, source: stated }
+  cultural_context: { value: Jawa Timur, source: inferred, note: dari lokasi Surabaya }
+  differentiator: { value: unknown, source: unknown }
+audience: { value: keluarga muda, source: stated }
+goal: { value: pasien booking jadwal lewat WhatsApp, source: stated }
+tone: { value: unknown, source: unknown }
+style_request: { value: unknown, source: unknown }
+brand:
+  colors: { value: unknown, source: unknown }
+  fonts: { value: unknown, source: unknown }
+  logo: { value: unknown, source: unknown }
+facts:
+  address: { value: unknown, source: unknown }
+  whatsapp: { value: unknown, source: unknown }
+  hours: { value: unknown, source: unknown }
+  services: { value: unknown, source: unknown }
+assets:
+  photos: { value: unknown, source: unknown }

@@ -36,7 +36,7 @@ def test_bilingual_scaffolding_and_parity(projects_dir):
     res_scaf = run_script("scaffold", "kopi-senja")
     assert res_scaf.returncode == 0, res_scaf.stderr
 
-    site_dir = proj / "site"
+    site_dir = proj.parent
     assert (site_dir / "index.html").is_file()
     assert (site_dir / "pages" / "tentang.html").is_file()
     assert (site_dir / "en" / "index.html").is_file()
@@ -54,7 +54,7 @@ def test_bilingual_scaffolding_and_parity(projects_dir):
 
     io.write_text(
         content_dir / "id.yaml",
-        "tahun: 2024\nharga: 15000\nkontak: '[[ISI: nomor wa]]'\n",
+        "year: 2024\nprice: 15000\ncontact: '[[ISI: nomor wa]]'\n",
     )
     io.write_text(
         content_dir / "en.yaml",
