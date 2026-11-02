@@ -121,3 +121,33 @@ def test_bilingual_copy_with_a_split_sentence_is_flagged(tmp_path):
 
     assert [f["message"] for f in findings if f["rule"] == "bilingual-structure-mismatch"] == [
         "Struktur naskah id dan en berbeda di pages.index.sections.story.body (2 lawan 1 butir)."]
+
+
+def test_broken_internal_links_are_errors(projects_dir):
+    from lib import audit_rules
+
+    work, index, brief, site_type = built_kopi(projects_dir)
+    kontak = index.parent / "pages" / "kontak.html"
+    text = kontak.read_text(encoding="utf-8")
+    kontak.write_text(text.replace("</main>", '<a href="../tentang.html">Tentang</a> <a href="tentang.html#tim">Tim</a> '
+                                   '<a href="https://wa.me/[[ISI: nomor WhatsApp]]">WA</a> <a href="#isi">Isi</a></main>'), encoding="utf-8")
+
+    broken = [f["message"] for f in audit_rules.check_local_links(index.parent) if f["file"] == "pages/kontak.html"]
+
+    # Dari pages/, saudara halaman ditulis tanpa ../; tautan luar dan jangkar tidak diperiksa
+    assert broken == ["Tautan '../tentang.html' menunjuk ke berkas yang tidak ada di situs."]
+
+
+def test_numbers_in_select_options_are_not_facts(projects_dir):
+    from lib import audit_rules
+
+    work, index, brief, site_type = built_kopi(projects_dir)
+    decisions = io.read_yaml(work / "decisions.yaml")
+    rule = {"id": "unsourced-number", "level": "error"}
+    index.write_text(index.read_text(encoding="utf-8").replace(
+        "</main>", '<select id="range"><option value="14">14 hari terakhir</option></select></main>'), encoding="utf-8")
+
+    assert audit_rules.check_unsourced_number(work, rule, brief, decisions, site_type) == []
+
+    index.write_text(index.read_text(encoding="utf-8").replace("</main>", "<p>Sudah 14 tahun</p></main>"), encoding="utf-8")
+    assert [f["message"] for f in audit_rules.check_unsourced_number(work, rule, brief, decisions, site_type)]

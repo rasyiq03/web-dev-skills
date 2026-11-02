@@ -1,0 +1,183 @@
+{
+	"_mock": true,
+	"endpoint": "GET /orders",
+	"generated_by": "scaffoldev 0.2",
+	"note": "Data contoh; ganti dengan API sungguhan.",
+	"data": [
+		{
+			"id": "PSN-1299",
+			"date": "2026-11-02",
+			"product": "Roti manis",
+			"qty": 4,
+			"total": 180000
+		},
+		{
+			"id": "PSN-1298",
+			"date": "2026-11-02",
+			"product": "Pie susu",
+			"qty": 1,
+			"total": 60000
+		},
+		{
+			"id": "PSN-1297",
+			"date": "2026-11-02",
+			"product": "Pie susu",
+			"qty": 6,
+			"total": 270000
+		},
+		{
+			"id": "PSN-1296",
+			"date": "2026-11-02",
+			"product": "Bolu gulung",
+			"qty": 5,
+			"total": 225000
+		},
+		{
+			"id": "PSN-1295",
+			"date": "2026-11-01",
+			"product": "Roti manis",
+			"qty": 1,
+			"total": 35000
+		},
+		{
+			"id": "PSN-1294",
+			"date": "2026-11-01",
+			"product": "Pie susu",
+			"qty": 1,
+			"total": 45000
+		},
+		{
+			"id": "PSN-1293",
+			"date": "2026-11-01",
+			"product": "Brownies kukus",
+			"qty": 6,
+			"total": 480000
+		},
+		{
+			"id": "PSN-1292",
+			"date": "2026-11-01",
+			"product": "Roti manis",
+			"qty": 4,
+			"total": 320000
+		},
+		{
+			"id": "PSN-1291",
+			"date": "2026-11-01",
+			"product": "Roti manis",
+			"qty": 3,
+			"total": 135000
+		},
+		{
+			"id": "PSN-1290",
+			"date": "2026-10-31",
+			"product": "Kue lapis",
+			"qty": 6,
+			"total": 270000
+		},
+		{
+			"id": "PSN-1289",
+			"date": "2026-10-31",
+			"product": "Bolu gulung",
+			"qty": 5,
+			"total": 300000
+		},
+		{
+			"id": "PSN-1288",
+			"date": "2026-10-31",
+			"product": "Pie susu",
+			"qty": 4,
+			"total": 240000
+		},
+		{
+			"id": "PSN-1287",
+			"date": "2026-10-31",
+			"product": "Brownies kukus",
+			"qty": 3,
+			"total": 105000
+		},
+		{
+			"id": "PSN-1286",
+			"date": "2026-10-31",
+			"product": "Bolu gulung",
+			"qty": 5,
+			"total": 400000
+		},
+		{
+			"id": "PSN-1285",
+			"date": "2026-10-30",
+			"product": "Kue lapis",
+			"qty": 3,
+			"total": 135000
+		},
+		{
+			"id": "PSN-1284",
+			"date": "2026-10-30",
+			"product": "Brownies kukus",
+			"qty": 4,
+			"total": 140000
+		},
+		{
+			"id": "PSN-1283",
+			"date": "2026-10-30",
+			"product": "Bolu gulung",
+			"qty": 5,
+			"total": 300000
+		},
+		{
+			"id": "PSN-1282",
+			"date": "2026-10-30",
+			"product": "Roti manis",
+			"qty": 6,
+			"total": 360000
+		},
+		{
+			"id": "PSN-1281",
+			"date": "2026-10-30",
+			"product": "Pie susu",
+			"qty": 4,
+			"total": 320000
+		},
+		{
+			"id": "PSN-1280",
+			"date": "2026-10-29",
+			"product": "Bolu gulung",
+			"qty": 1,
+			"total": 60000
+		},
+		{
+			"id": "PSN-1279",
+			"date": "2026-10-29",
+			"product": "Brownies kukus",
+			"qty": 6,
+			"total": 210000
+		},
+		{
+			"id": "PSN-1278",
+			"date": "2026-10-29",
+			"product": "Bolu gulung",
+			"qty": 6,
+			"total": 360000
+		},
+		{
+			"id": "PSN-1277",
+			"date": "2026-10-29",
+			"product": "Pie susu",
+			"qty": 6,
+			"total": 480000
+		},
+		{
+			"id": "PSN-1276",
+			"date": "2026-10-29",
+			"product": "Roti manis",
+			"qty": 6,
+			"total": 480000
+		},
+		{
+			"id": "PSN-1275",
+			"date": "2026-10-28",
+			"product": "Roti manis",
+			"qty": 1,
+			"total": 80000
+		}
+	]
+}

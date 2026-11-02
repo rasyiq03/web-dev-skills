@@ -315,6 +315,7 @@ def run_check(slug):
     findings += audit_rules.check_file_headers(site_dir)
     findings += audit_rules.check_html_banners_and_links(site_dir)
     findings += audit_rules.check_empty_sections(site_dir)
+    findings += audit_rules.check_local_links(site_dir)
     findings += audit_rules.check_css_raw_color(site_dir)
     findings += audit_rules.check_js_conventions(site_dir)
 

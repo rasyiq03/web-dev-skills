@@ -1,0 +1,20 @@
+{
+	"_mock": true,
+	"endpoint": "GET /sales/summary",
+	"generated_by": "scaffoldev 0.2",
+	"note": "Data contoh; ganti dengan API sungguhan.",
+	"data": {
+		"period": {
+			"from": "2026-10-27",
+			"to": "2026-11-02"
+		},
+		"revenue": 11595000,
+		"revenue_change": -0.179,
+		"orders": 221,
+		"orders_change": -0.23,
+		"top_product": {
+			"name": "Bolu gulung",
+			"qty": 96
+		}
+	}
+}

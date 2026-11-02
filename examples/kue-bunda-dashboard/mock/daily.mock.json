@@ -1,0 +1,78 @@
+{
+	"_mock": true,
+	"endpoint": "GET /sales/daily",
+	"generated_by": "scaffoldev 0.2",
+	"note": "Data contoh; ganti dengan API sungguhan.",
+	"data": [
+		{
+			"date": "2026-10-20",
+			"orders": 42,
+			"revenue": 2100000
+		},
+		{
+			"date": "2026-10-21",
+			"orders": 47,
+			"revenue": 2115000
+		},
+		{
+			"date": "2026-10-22",
+			"orders": 26,
+			"revenue": 1170000
+		},
+		{
+			"date": "2026-10-23",
+			"orders": 45,
+			"revenue": 2025000
+		},
+		{
+			"date": "2026-10-24",
+			"orders": 54,
+			"revenue": 2700000
+		},
+		{
+			"date": "2026-10-25",
+			"orders": 24,
+			"revenue": 1080000
+		},
+		{
+			"date": "2026-10-26",
+			"orders": 49,
+			"revenue": 2940000
+		},
+		{
+			"date": "2026-10-27",
+			"orders": 26,
+			"revenue": 1300000
+		},
+		{
+			"date": "2026-10-28",
+			"orders": 27,
+			"revenue": 1620000
+		},
+		{
+			"date": "2026-10-29",
+			"orders": 25,
+			"revenue": 1125000
+		},
+		{
+			"date": "2026-10-30",
+			"orders": 36,
+			"revenue": 1620000
+		},
+		{
+			"date": "2026-10-31",
+			"orders": 58,
+			"revenue": 3480000
+		},
+		{
+			"date": "2026-11-01",
+			"orders": 25,
+			"revenue": 1250000
+		},
+		{
+			"date": "2026-11-02",
+			"orders": 24,
+			"revenue": 1200000
+		}
+	]
+}

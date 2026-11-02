@@ -97,7 +97,9 @@ def test_serve_security_and_errors(projects_dir):
         resp = urllib.request.urlopen(url)
         assert resp.status == 200
         html = resp.read().decode("utf-8")
-        assert "Kuesioner Brief" in html
+        # Judul memakai nama usaha dari brief, bukan slug, dan tanpa istilah teknis
+        assert "Beberapa pertanyaan untuk situs Kopi Senja" in html
+        assert "<textarea" in html and "Anda" not in html
         assert "<form id=\"brief-form\">" in html
 
     finally:
@@ -151,3 +153,8 @@ def test_serve_successful_submit_and_double_submit(projects_dir):
     assert updated_brief["business"]["differentiator"]["value"] == "biji kopi lokal Jawa Barat"
     assert updated_brief["business"]["differentiator"]["source"] == "stated"
     assert updated_brief["business"]["differentiator"]["note"] == "form"
+
+    # Semua pertanyaan yang tampil tercatat, termasuk yang dikosongkan
+    gaps_fields = [q["field"] for q in io.read_json(proj / "gaps.json")["questions"]] if (proj / "gaps.json").is_file() else []
+    assert set(gaps_fields) <= set(io.load_state(proj).get("asked", []))
+    assert io.load_state(proj).get("asked")
