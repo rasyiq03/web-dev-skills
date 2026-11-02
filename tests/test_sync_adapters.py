@@ -71,3 +71,36 @@ def test_sync_adapters_warns_on_claude_md(fake_repo):
 
     assert res.returncode == 0
     assert "PERINGATAN: CLAUDE.md ditemukan" in res.stdout
+
+
+@pytest.mark.skipif(os.name == "nt", reason="symlink butuh Developer Mode di Windows")
+def test_global_target_links_skills_that_still_run(fake_repo, tmp_path_factory):
+    # Misalnya ~/.gemini/config/skills untuk Antigravity: di luar repo, jadi harus tautan
+    target = tmp_path_factory.mktemp("home") / ".gemini" / "config" / "skills"
+    res = subprocess.run(
+        [sys.executable, str(fake_repo / "tools" / "sync_adapters.py"), "--target", str(target)],
+        cwd=fake_repo, capture_output=True, text=True, encoding="utf-8", timeout=120,
+    )
+    assert res.returncode == 0, res.stdout + res.stderr
+    assert (target / "web-build").is_symlink()
+
+    # Skrip dipanggil lewat jalur tautan, dari folder kerja yang lain
+    work = tmp_path_factory.mktemp("work")
+    run = subprocess.run(
+        [sys.executable, str(target / "web-build" / "scripts" / "run.py"), "path", "demo"],
+        cwd=work, env={**os.environ, "PD_PROJECTS_DIR": ""}, capture_output=True, text=True, encoding="utf-8", timeout=120,
+    )
+    assert run.returncode == 0, run.stdout + run.stderr
+    assert f"PROJECT: {work.resolve() / 'demo'}" in run.stdout
+
+
+def test_copy_to_a_folder_outside_the_repo_is_refused(fake_repo, tmp_path_factory):
+    target = tmp_path_factory.mktemp("outside") / "skills"
+    res = subprocess.run(
+        [sys.executable, str(fake_repo / "tools" / "sync_adapters.py"), "--copy", "--target", str(target)],
+        cwd=fake_repo, capture_output=True, text=True, encoding="utf-8", timeout=120,
+    )
+
+    assert res.returncode == 1
+    assert "drop --copy" in res.stdout
+    assert not target.exists()

@@ -64,12 +64,12 @@ action:
 
 work:
   - id: case-list
-    layout: Projects as rows with title, role, year, and a thumbnail that grows on hover.
+    layout: Projects as rows with title, kind, and role; a thumbnail only when photos are stated, and a year only when given.
   - id: masonry-plain
     layout: Images in columns of uneven heights with captions under each.
     needs: [assets.photos]
   - id: index-table
-    layout: A sortable-looking table of projects with a preview image on the side.
+    layout: A table of projects (title, kind, role) that reads well without images; a preview image only when photos are stated.
 
 catalog:
   - id: product-grid-dense

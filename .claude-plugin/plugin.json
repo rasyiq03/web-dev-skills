@@ -9,6 +9,12 @@
   "homepage": "https://github.com/rasyiq03/web-dev-skills",
   "repository": "https://github.com/rasyiq03/web-dev-skills",
   "license": "MIT",
-  "icon": "./.claude-plugin/icon.png",
-  "keywords": ["website", "web-design", "landing-page", "dashboard", "indonesian"]
+  "icon": "./assets/icon.png",
+  "keywords": [
+    "website",
+    "web-design",
+    "landing-page",
+    "dashboard",
+    "indonesian"
+  ]
 }

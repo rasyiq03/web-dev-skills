@@ -51,21 +51,27 @@ def set_nested_value(data, key_path, value):
     }
 
 
-def build_form_html(slug, lang, questions, token):
+def build_form_html(slug, lang, questions, token, name=None):
     """
-    Menghasilkan halaman formulir HTML sesuai konvensi pd-.
+    Menghasilkan halaman formulir HTML sesuai konvensi pd-, untuk dibaca klien awam.
 
-    I.S. : slug nama proyek, lang kode bahasa, questions daftar pertanyaan, token token akses.
-    F.S. : String dokumen HTML lengkap dikembalikan.
+    I.S. : slug nama proyek, lang kode bahasa, questions daftar pertanyaan, token token akses,
+           name nama usaha dari brief (boleh None).
+    F.S. : String dokumen HTML lengkap dikembalikan; semua teks dalam bahasa lang, tanpa
+           istilah teknis dan tanpa kata ganti, karena sapaan klien belum diputuskan.
     """
     is_id = lang == "id"
-    title = f"Kuesioner Brief — {slug}" if is_id else f"Brief Questionnaire — {slug}"
-    submit_label = "Kirim Jawaban" if is_id else "Submit Answers"
+    who = name or slug
+    title = f"Beberapa pertanyaan untuk situs {who}" if is_id else f"A few questions for the {who} website"
+    submit_label = "Kirim jawaban" if is_id else "Send answers"
     desc_text = (
-        "Lengkapi informasi proyek berikut untuk melanjutkan pembuatan situs."
+        "Isi yang sudah diketahui saja. Yang dikosongkan menjadi tanda [[ISI: …]] di situs dan bisa diisi nanti."
         if is_id
-        else "Fill in the project details below to continue building the site."
+        else "Answer what is known so far. Anything left empty becomes an [[ISI: …]] marker on the site, to fill in later."
     )
+    saved_text = "Jawaban tersimpan. Tab ini boleh ditutup." if is_id else "Answers saved. This tab can be closed."
+    failed_text = "Jawaban belum tersimpan, coba kirim lagi. Kode: " if is_id else "The answers were not saved; please send again. Code: "
+    offline_text = "Tidak tersambung ke komputer pembuat situs: " if is_id else "Could not reach the computer building the site: "
 
     questions_html = []
     for q in questions:
@@ -75,7 +81,7 @@ def build_form_html(slug, lang, questions, token):
 
         field_html = f"""\t\t\t\t<div class="pd-form-group">
 \t\t\t\t\t<label class="pd-label" for="{field}">{label_text}</label>
-\t\t\t\t\t<input class="pd-input" id="{field}" name="{field}" type="text" placeholder="{label_text}">
+\t\t\t\t\t<textarea class="pd-input" id="{field}" name="{field}" rows="3"></textarea>
 \t\t\t\t</div>"""
         questions_html.append(field_html)
 
@@ -131,6 +137,8 @@ def build_form_html(slug, lang, questions, token):
 \t\t\tborder: 1px solid #CCC;
 \t\t\tborder-radius: 4px;
 \t\t\tfont-size: 1rem;
+\t\t\tfont-family: inherit;
+\t\t\tresize: vertical;
 \t\t}}
 \t\t.pd-btn {{
 \t\t\tbackground: var(--pd-color-accent);
@@ -159,7 +167,7 @@ def build_form_html(slug, lang, questions, token):
 {fields_rendered}
 \t\t\t<button class="pd-btn" type="submit">{submit_label}</button>
 \t\t</form>
-\t\t<div class="pd-message" id="msg"></div>
+\t\t<div class="pd-message" id="msg" role="status"></div>
 \t</main>
 \t<script>
 \t\tdocument.getElementById("brief-form").addEventListener("submit", async function(e) {{
@@ -178,13 +186,13 @@ def build_form_html(slug, lang, questions, token):
 \t\t\t\t\tbody: JSON.stringify(answers)
 \t\t\t\t}});
 \t\t\t\tif (res.ok) {{
-\t\t\t\t\tdocument.getElementById("msg").textContent = "Jawaban berhasil disimpan. Anda dapat menutup tab ini.";
+\t\t\t\t\tdocument.getElementById("msg").textContent = "{saved_text}";
 \t\t\t\t\tdocument.getElementById("brief-form").style.display = "none";
 \t\t\t\t}} else {{
-\t\t\t\t\tdocument.getElementById("msg").textContent = "Gagal menyimpan jawaban: " + res.status;
+\t\t\t\t\tdocument.getElementById("msg").textContent = "{failed_text}" + res.status;
 \t\t\t\t}}
 \t\t\t}} catch (err) {{
-\t\t\t\tdocument.getElementById("msg").textContent = "Kesalahan koneksi: " + err.message;
+\t\t\t\tdocument.getElementById("msg").textContent = "{offline_text}" + err.message;
 \t\t\t}}
 \t\t}});
 \t</script>
@@ -367,7 +375,8 @@ def run_server(slug, timeout_seconds=1800):
         questions = st_data.get("questions", [])
 
     token = secrets.token_urlsafe(16)
-    form_html = build_form_html(slug, lang, questions, token)
+    name = (brief.get("business", {}).get("name") or {}).get("value")
+    form_html = build_form_html(slug, lang, questions, token, None if name in (None, "unknown") else name)
 
     # Bind pada 127.0.0.1:0 (port acak yang tersedia)
     server = http.server.HTTPServer(("127.0.0.1", 0), QuestionnaireHandler)
@@ -413,6 +422,10 @@ def run_server(slug, timeout_seconds=1800):
         for k, v in answers.items():
             set_nested_value(brief, k, v)
         io.write_yaml(brief_file, brief)
+
+    # Catat pertanyaan yang sudah ditampilkan, supaya gaps tidak mengulanginya
+    asked = io.load_state(proj_dir).get("asked", [])
+    io.save_state(proj_dir, asked=sorted(set(asked) | {q.get("field") for q in questions if q.get("field")}))
 
     # Validasi ulang brief
     val_script = paths.scripts_dir() / "validate_brief.py"

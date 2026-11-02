@@ -1,0 +1,93 @@
+# Anchors: who = penerbit buku anak (profesional, menilai karya); where = Makassar;
+# what = ilustrasi buku cerita anak, dua proyek dinyatakan.
+directions:
+  - id: dir-1
+    probability: 0.34
+    style: editorial
+    palette: ink-on-cream
+    type_pairing: newsreader-public
+    layout: { hero: stacked-statement, selected-work: case-list, work-index: index-table, about: two-column-narrative, contact: contact-card }
+    motion: low
+    tone: hangat-profesional
+    register: { id: Anda }
+    summary: Seperti halaman katalog penerbit, tenang agar ilustrasi Rina yang bicara.
+    rationale:
+      style: Editor penerbit buku anak terbiasa membaca katalog, jadi tata letak majalah terasa akrab dan profesional.
+      color: Kertas krem dan tinta hitam memberi latar netral bagi ilustrasi berwarna untuk buku anak.
+      typography: Newsreader terasa seperti teks buku, Public Sans jelas untuk keterangan proyek.
+      layout: Tanpa foto karya, daftar studi kasus menonjolkan peran Rina di tiap buku.
+      motion: Gerak rendah agar perhatian tetap pada karya.
+      tone: Penerbit adalah klien bisnis, jadi sapaan Anda dengan nada hangat.
+    based_on: [req-audience, req-business.kind, req-facts.projects, req-tone]
+  - id: dir-2
+    probability: 0.22
+    style: soft-organic
+    palette: kunyit
+    type_pairing: nunito-rounded
+    layout: { hero: full-bleed-type, selected-work: case-list, work-index: index-table, about: two-column-narrative, contact: contact-card }
+    motion: low
+    tone: ceria-hangat
+    register: { id: Anda }
+    summary: Hangat dan membulat seperti buku cerita anak, tetap rapi untuk penerbit.
+    rationale:
+      style: Bentuk membulat dekat dengan dunia buku anak yang Rina garap.
+      color: Kuning kunyit hangat dan ceria, sesuai kesan yang diminta.
+      typography: Nunito yang bulat ramah tanpa terlihat kekanak-kanakan.
+      layout: Judul besar lalu daftar proyek yang menyebut peran Rina.
+      motion: Gerak rendah, cukup umpan balik pada tautan.
+      tone: Ceria dan hangat sesuai jawaban Rina, tetap profesional bagi penerbit.
+    based_on: [req-tone, req-audience, req-facts.projects]
+  - id: dir-3
+    probability: 0.20
+    style: clean-swiss
+    palette: porcelain-navy
+    type_pairing: manrope-source
+    layout: { hero: stacked-statement, selected-work: case-list, work-index: index-table, about: two-column-narrative, contact: contact-card }
+    motion: none
+    tone: jelas-profesional
+    register: { id: Anda }
+    summary: Grid tenang dan rapi, memudahkan editor menilai pengalaman Rina.
+    rationale:
+      style: Editor penerbit menilai banyak portofolio, jadi grid yang tenang mempercepat penilaian.
+      color: Biru tua di atas putih porselen netral untuk ilustrasi apa pun.
+      typography: Manrope jelas untuk judul, Source Sans untuk keterangan proyek.
+      layout: Daftar proyek dan tabel karya yang mudah dipindai.
+      motion: Tanpa gerak.
+      tone: Nada jelas dan profesional untuk klien penerbit.
+    based_on: [req-audience, req-facts.projects]
+  - id: dir-4
+    probability: 0.16
+    style: editorial
+    palette: forest-ledger
+    type_pairing: fraunces-plex
+    layout: { hero: full-bleed-type, selected-work: case-list, work-index: index-table, about: two-column-narrative, contact: split-form }
+    motion: none
+    tone: bercerita
+    register: { id: Anda }
+    summary: Gaya buku cerita klasik dengan judul Fraunces, untuk penerbit dongeng daerah.
+    rationale:
+      style: Seri dongeng Sulawesi yang Rina kerjakan cocok dengan kesan buku cerita klasik.
+      color: Hijau tua dan abu hangat terasa seperti sampul buku dongeng lama.
+      typography: Fraunces memberi rasa buku cerita tanpa ornamen.
+      layout: Judul besar dan narasi tentang cara Rina bekerja.
+      motion: Tanpa gerak.
+      tone: Nada bercerita sesuai dunia buku anak.
+    based_on: [req-facts.projects, req-business.cultural_context, req-audience]
+  - id: dir-5
+    probability: 0.08
+    style: neobrutalism
+    palette: sun-block
+    type_pairing: wide-display
+    layout: { hero: full-bleed-type, selected-work: case-list, work-index: index-table, about: two-column-narrative, contact: contact-card }
+    motion: medium
+    tone: ceria-berani
+    register: { id: Anda }
+    summary: Blok warna berani seperti poster, untuk penerbit yang mencari gaya baru.
+    rationale:
+      style: Garis tebal dan blok warna menonjolkan ilustrator yang berani.
+      color: Kuning terang menarik perhatian editor di antara banyak portofolio.
+      typography: Huruf lebar Unbounded terasa ceria.
+      layout: Judul penuh layar dan daftar proyek tebal.
+      motion: Sedikit gerak untuk kesan ceria.
+      tone: Ceria dan berani, sesuai kesan yang diminta.
+    based_on: [req-tone, req-audience]

@@ -49,3 +49,19 @@ def test_gaps_interactive_mode(kopi):
     result = run_script("gaps", "kopi-senja")
     assert result.returncode == 0
     assert next_line(result) == "NEXT: run serve.py"
+
+
+def test_interactive_gaps_does_not_ask_twice(kopi):
+    brief = io.read_yaml(kopi / "brief.yaml")
+    brief["interactive"] = True
+    io.write_yaml(kopi / "brief.yaml", brief)
+    assert run_script("gaps", "kopi-senja").returncode == 0
+    asked = [q["field"] for q in io.read_json(kopi / "gaps.json")["questions"]]
+    assert asked
+
+    # Seperti sesudah serve: semua pertanyaan sudah tampil, sebagian dikosongkan klien
+    io.save_state(kopi, asked=asked)
+    result = run_script("gaps", "kopi-senja")
+
+    assert io.read_json(kopi / "gaps.json")["questions"] == []
+    assert next_line(result) == "NEXT: write directions.yaml (web-design skill)"

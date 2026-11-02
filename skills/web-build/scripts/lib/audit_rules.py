@@ -97,6 +97,45 @@ def check_html_banners_and_links(site_dir):
     return findings
 
 
+def check_local_links(site_dir):
+    """
+    Memastikan setiap href dan src lokal menunjuk ke berkas yang ada di situs.
+
+    I.S. : site_dir folder situs.
+    F.S. : List finding dikembalikan; satu per tautan yang rusak. Tautan ke luar
+           (http, mailto, tel, data, //), jangkar di halaman yang sama, dan tautan yang
+           masih berupa placeholder [[ISI: ...]] tidak diperiksa.
+    """
+    findings = []
+    site_root = site_dir.resolve()
+    external = re.compile(r"^(?:[a-z][a-z0-9+.-]*:|//|#)", re.IGNORECASE)
+
+    for html_file in paths.site_files(site_dir, "*.html"):
+        rel = html_file.relative_to(site_dir).as_posix()
+        content = io.read_text(html_file)
+
+        for match in re.finditer(r"""\b(?:href|src)=["']([^"']*)["']""", content):
+            link = match.group(1).strip()
+            if not link or external.match(link) or "[[ISI" in link:
+                continue
+
+            target = (html_file.parent / link.split("#", 1)[0].split("?", 1)[0]).resolve()
+            if target.exists() and (target == site_root or site_root in target.parents):
+                continue
+
+            findings.append({
+                "rule": "broken-link",
+                "category": "design",
+                "level": "error",
+                "file": rel,
+                "line": content.count("\n", 0, match.start()) + 1,
+                "message": f"Tautan {link!r} menunjuk ke berkas yang tidak ada di situs.",
+                "fix": "Use a path relative to this page: from pages/ the home page is ../index.html and a sibling page is name.html.",
+            })
+
+    return findings
+
+
 def check_empty_sections(site_dir):
     """
     Menandai seksi kerangka scaffold yang belum diisi, supaya check tidak menyatakan situs
@@ -382,8 +421,9 @@ def check_unsourced_number(proj_dir, rule, brief, decisions, site_type):
         rel = html_file.relative_to(site_dir).as_posix()
         soup = BeautifulSoup(io.read_text(html_file), "html.parser")
 
-        # Abaikan skrip, style, dan footer copyright
-        for tag in soup(["script", "style"]):
+        # Abaikan skrip, style, dan pilihan kontrol formulir (7 hari / 14 hari adalah pilihan
+        # antarmuka, bukan fakta)
+        for tag in soup(["script", "style", "select"]):
             tag.decompose()
 
         text = soup.get_text()
@@ -656,6 +696,9 @@ def check_hardcoded_data(proj_dir, rule, brief, decisions, site_type):
         main_tag = soup.find("main")
         if not main_tag:
             continue
+        # Pilihan kontrol formulir bukan data yang ditulis langsung
+        for control in main_tag.find_all("select"):
+            control.decompose()
         for num_match in re.finditer(r"\b\d{2,}\b", main_tag.get_text()):
             val = num_match.group(0)
             if not (1900 <= int(val) <= 2099):

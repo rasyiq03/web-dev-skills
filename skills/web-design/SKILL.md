@@ -12,8 +12,9 @@ stays internally consistent. Your only output is `<work>/directions.yaml`.
 ## Read first
 
 `<work>` is the `WORK:` folder printed by web-build step 1 (`<project>/.ScaffolDev/`).
-If `${CLAUDE_PLUGIN_ROOT}` appears literally in this file, it means the folder that contains
-`skills/`.
+If `${CLAUDE_PLUGIN_ROOT}` stays literal (Codex, Antigravity, or a copy in
+`.agents/skills/`), `${CLAUDE_PLUGIN_ROOT}/skills` is the folder that holds this skill's
+folder.
 
 1. `<work>/brief.yaml` and `<work>/gaps.json` (it lists the requirement ids, such as
    `req-audience`, that your rationale cites).

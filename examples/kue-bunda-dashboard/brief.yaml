@@ -1,0 +1,28 @@
+# Prompt: "buat dashboard penjualan Toko Kue Bunda di Medan untuk pemilik: omzet harian, jumlah pesanan, dan produk terlaris; datanya belum ada"
+slug: kue-bunda-dashboard
+site_type: dashboard
+languages: [id]
+interactive: false
+mode: auto
+business:
+  name: { value: Toko Kue Bunda, source: stated }
+  kind: { value: toko kue, source: stated }
+  location: { value: Medan, source: stated }
+  cultural_context: { value: Sumatera Utara, source: inferred, note: dari lokasi Medan }
+  differentiator: { value: unknown, source: unknown }
+audience: { value: pemilik toko, source: stated }
+goal: { value: memantau penjualan, source: stated }
+tone: { value: unknown, source: unknown }
+style_request: { value: unknown, source: unknown }
+brand:
+  colors: { value: unknown, source: unknown }
+  fonts: { value: unknown, source: unknown }
+  logo: { value: unknown, source: unknown }
+facts:
+  data_source: { value: belum ada, source: stated }
+  metrics: { value: [omzet harian, jumlah pesanan, produk terlaris], source: stated }
+  entities: { value: unknown, source: unknown }
+  time_range: { value: unknown, source: unknown }
+  user_roles: { value: unknown, source: unknown }
+assets:
+  photos: { value: unknown, source: unknown }

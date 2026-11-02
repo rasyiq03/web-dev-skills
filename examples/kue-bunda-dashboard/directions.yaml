@@ -1,0 +1,93 @@
+# Anchors: who = pemilik toko (cek angka cepat, sering di HP); where = Medan;
+# what = omzet harian, jumlah pesanan, produk terlaris; data belum ada (mock).
+directions:
+  - id: dir-1
+    probability: 0.36
+    style: data-utility
+    palette: slate-light
+    type_pairing: public-sans
+    layout: { shell: topbar-tabs, filters: filter-bar, kpis: kpi-row, charts: chart-stack, records: table-plain }
+    motion: none
+    tone: jelas-ringkas
+    register: { id: Anda }
+    summary: Layar data yang tenang; warna hanya untuk arti, angka paling menonjol.
+    rationale:
+      style: Pemilik toko kue perlu membaca omzet dan pesanan sekilas, jadi tampilan padat dan netral paling tepat.
+      color: Abu terang dan warna hanya untuk naik-turun omzet, supaya tidak ada yang mengalihkan dari angka.
+      typography: Public Sans jelas untuk angka di HP pemilik.
+      layout: Tab di atas lebih mudah dipakai di HP daripada menu samping, lalu tiga angka utama dan grafik bertumpuk.
+      motion: Tanpa animasi supaya angka langsung tampil.
+      tone: Pemilik hanya butuh label singkat yang jelas.
+    based_on: [req-audience, req-facts.metrics, req-goal]
+  - id: dir-2
+    probability: 0.22
+    style: data-utility
+    palette: teal-ledger
+    type_pairing: plex-data
+    layout: { shell: sidebar-left, filters: filter-bar, kpis: kpi-ledger, charts: chart-grid-2, records: table-dense }
+    motion: none
+    tone: jelas-ringkas
+    register: { id: Anda }
+    summary: Seperti buku kas digital, rapi untuk pemilik yang terbiasa mencatat.
+    rationale:
+      style: Buku kas adalah alat yang sudah dikenal pemilik toko kue.
+      color: Hijau toska untuk angka positif terasa seperti buku besar.
+      typography: IBM Plex dengan angka tabular memudahkan membandingkan omzet.
+      layout: Menu samping dan dua grafik berdampingan di layar laptop toko.
+      motion: Tanpa animasi supaya angka omzet langsung tampil di HP pemilik.
+      tone: Label singkat seperti kolom buku kas yang sudah dikenal pemilik.
+    based_on: [req-audience, req-facts.metrics]
+  - id: dir-3
+    probability: 0.18
+    style: clean-swiss
+    palette: graphite-amber
+    type_pairing: figtree-noto
+    layout: { shell: topbar-tabs, filters: filter-drawer, kpis: kpi-lead, charts: chart-lead-side, records: table-plain }
+    motion: low
+    tone: hangat-ringkas
+    register: { id: Anda }
+    summary: Satu angka utama besar (omzet hari ini), sisanya pendukung.
+    rationale:
+      style: Grid tenang menonjolkan satu angka yang paling sering dicek pemilik.
+      color: Amber hangat seperti warna kue panggang, dipakai hemat.
+      typography: Figtree jelas di HP.
+      layout: Omzet hari ini besar di atas, grafik pesanan di sampingnya.
+      motion: Gerak rendah pada tab, angka omzet tetap diam.
+      tone: Hangat tapi singkat, sesuai usaha keluarga di Medan.
+    based_on: [req-facts.metrics, req-business.kind, req-audience]
+  - id: dir-4
+    probability: 0.16
+    style: data-utility
+    palette: night-desk
+    type_pairing: atkinson
+    layout: { shell: icon-rail, filters: filter-bar, kpis: kpi-row, charts: chart-grid-2, records: table-dense }
+    motion: none
+    tone: jelas-ringkas
+    register: { id: Anda }
+    summary: Mode gelap dengan huruf Atkinson yang sangat terbaca, untuk cek malam hari.
+    rationale:
+      style: Pemilik toko sering mengecek penjualan setelah toko tutup.
+      color: Latar gelap nyaman dibaca malam hari.
+      typography: Atkinson Hyperlegible dirancang untuk keterbacaan tinggi.
+      layout: Rel ikon hemat ruang di HP.
+      motion: Tanpa animasi supaya angka omzet langsung tampil di HP pemilik.
+      tone: Label singkat agar mudah dibaca saat pemilik lelah setelah toko tutup.
+    based_on: [req-audience, req-goal]
+  - id: dir-5
+    probability: 0.08
+    style: soft-organic
+    palette: kunyit
+    type_pairing: nunito-rounded
+    layout: { shell: topbar-tabs, filters: filter-bar, kpis: kpi-lead, charts: chart-stack, records: table-plain }
+    motion: low
+    tone: ramah
+    register: { id: Anda }
+    summary: Dashboard yang terasa seperti toko kue sendiri, hangat dan ramah.
+    rationale:
+      style: Usaha keluarga lebih nyaman dengan tampilan hangat daripada aplikasi kantor.
+      color: Kuning kunyit hangat seperti kue yang baru dipanggang.
+      typography: Nunito yang bulat ramah.
+      layout: Omzet besar di atas lalu grafik bertumpuk untuk HP.
+      motion: Gerak rendah pada tab saja, supaya angka penjualan tetap tenang.
+      tone: Sapaan ramah cocok untuk usaha keluarga seperti Toko Kue Bunda.
+    based_on: [req-business.kind, req-audience]

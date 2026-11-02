@@ -61,10 +61,13 @@ def build_gaps(slug):
             open_decisions.append(path)
 
     # 4. Questions: pertanyaan tipe situs yang field-nya masih unknown (maksimal 6)
+    # Yang sudah pernah ditampilkan di formulir tidak ditanyakan lagi: jawaban kosong adalah
+    # pilihan klien, dan faktanya tetap menjadi placeholder
+    asked = set(io.load_state(proj_dir).get("asked", []))
     questions = []
     for q in site_type.get("questions", []):
         field_name = q.get("field")
-        if field_name and project.is_unknown(brief, field_name):
+        if field_name and field_name not in asked and project.is_unknown(brief, field_name):
             questions.append(q)
             if len(questions) >= 6:
                 break
@@ -93,7 +96,7 @@ def build_gaps(slug):
     ]
 
     is_interactive = bool(brief.get("interactive", False))
-    next_step = "run serve.py" if is_interactive else "write directions.yaml (web-design skill)"
+    next_step = "run serve.py" if is_interactive and questions else "write directions.yaml (web-design skill)"
 
     return lines, next_step
 

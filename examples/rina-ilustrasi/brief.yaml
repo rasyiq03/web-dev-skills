@@ -1,0 +1,67 @@
+slug: rina-ilustrasi
+site_type: portfolio
+languages:
+- id
+interactive: true
+mode: auto
+business:
+  name:
+    value: Rina Pratiwi
+    source: stated
+  kind:
+    value: ilustrator lepas
+    source: stated
+  location:
+    value: Makassar
+    source: stated
+  cultural_context:
+    value: Sulawesi Selatan
+    source: inferred
+    note: dari lokasi Makassar
+  differentiator:
+    value: unknown
+    source: unknown
+audience:
+  value: penerbit buku anak
+  source: stated
+goal:
+  value: unknown
+  source: unknown
+tone:
+  value: hangat dan ceria, tapi tetap profesional
+  source: stated
+  note: form
+style_request:
+  value: unknown
+  source: unknown
+brand:
+  colors:
+    value: unknown
+    source: unknown
+  fonts:
+    value: unknown
+    source: unknown
+  logo:
+    value: unknown
+    source: unknown
+facts:
+  projects:
+    value: Buku cerita bergambar "Pakarena Kecil" (ilustrator utama); sampul seri dongeng Sulawesi (ilustrator sampul)
+    source: stated
+    note: form
+  skills:
+    value: unknown
+    source: unknown
+  email:
+    value: unknown
+    source: unknown
+  social_links:
+    value: unknown
+    source: unknown
+  cv_url:
+    value: unknown
+    source: unknown
+assets:
+  photos:
+    value: unknown
+    source: unknown

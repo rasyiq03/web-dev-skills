@@ -1,0 +1,45 @@
+pages:
+  index:
+    title: Rina Pratiwi — ilustrator buku anak di Makassar
+    description: Portofolio Rina Pratiwi, ilustrator lepas di Makassar untuk penerbit buku anak.
+    sections:
+      hero:
+        eyebrow: Ilustrator lepas, Makassar
+        heading: Ilustrasi buku cerita anak yang hangat dan ceria
+        body:
+          - "Rina Pratiwi menggambar untuk penerbit buku anak: buku cerita bergambar dan sampul."
+        actions: [{ label: Lihat karya, href: pages/karya.html }]
+        links: [{ label: Ajak bekerja sama, href: pages/kontak.html }]
+      selected-work:
+        heading: Karya pilihan
+        items:
+          - { name: "Pakarena Kecil", kind: Buku cerita bergambar, role: Ilustrator utama }
+          - { name: Seri dongeng Sulawesi, kind: Sampul buku, role: Ilustrator sampul }
+  karya:
+    title: Karya — Rina Pratiwi
+    description: Daftar karya ilustrasi Rina Pratiwi untuk buku anak.
+    sections:
+      work-index:
+        heading: Semua karya
+        columns: [Judul, Jenis, Peran]
+        items: same as selected-work
+  tentang:
+    title: Tentang — Rina Pratiwi
+    description: Latar dan keahlian Rina Pratiwi, ilustrator lepas di Makassar.
+    sections:
+      about:
+        heading: Tentang Rina
+        body:
+          - "Rina Pratiwi adalah ilustrator lepas di Makassar yang menggambar untuk penerbit buku anak."
+          - "Keahlian: [[ISI: keahlian]]"
+        links: [{ label: Unduh CV, href: "[[ISI: tautan CV]]" }]
+  kontak:
+    title: Kontak — Rina Pratiwi
+    description: Hubungi Rina Pratiwi untuk proyek ilustrasi buku anak.
+    sections:
+      contact:
+        heading: Ajak bekerja sama
+        body: [Ceritakan buku yang sedang disiapkan dan tenggat waktunya.]
+        details:
+          - { label: Email, value: "[[ISI: alamat email]]", href: "mailto:[[ISI: alamat email]]" }
+          - { label: Media sosial, value: "[[ISI: tautan media sosial]]", href: "[[ISI: tautan media sosial]]" }
