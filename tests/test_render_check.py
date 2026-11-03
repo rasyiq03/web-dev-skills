@@ -61,7 +61,7 @@ def test_render_check_finds_overflow_contrast_and_script_errors(projects_dir):
         "</main>", '<p style="width: 600px; color: #ddd">Pertanggungjawaban</p></main>'), encoding="utf-8")
     (work.parent / "js" / "main.js").write_text("throw new Error('uji');\n", encoding="utf-8")
 
-    result = run_script("render_check", "kopi-senja", script_dir=REPO / "tools")
+    result = run_script("run", "render_check", "kopi-senja")
 
     assert result.returncode == 2, result.stdout + result.stderr
     rules = {(f["rule"], f["file"]) for f in io.read_json(work / "report.json")["findings"]}

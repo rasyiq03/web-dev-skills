@@ -40,6 +40,9 @@ SCRIPTS = (
     "handoff",
 )
 
+# Alat di tools/ yang juga boleh dijalankan lewat run.py (pemeriksaan opsional)
+TOOLS = ("render_check",)
+
 MIN_PYTHON = (3, 11)
 
 
@@ -106,7 +109,7 @@ def main():
              f"Python {platform.python_version()} terlalu lama; ScaffolDev butuh Python 3.11 atau lebih baru.",
              "tell the user to install Python 3.11 or newer, then run the same command again")
 
-    commands = ("path", *SCRIPTS)
+    commands = ("path", *SCRIPTS, *TOOLS)
 
     if len(sys.argv) < 2 or sys.argv[1] not in commands:
         given = sys.argv[1] if len(sys.argv) > 1 else "(kosong)"
@@ -120,7 +123,8 @@ def main():
 
     prepare_dependencies()
 
-    script = Path(__file__).resolve().parent / f"{command}.py"
+    folder = paths.REPO_ROOT / "tools" if command in TOOLS else Path(__file__).resolve().parent
+    script = folder / f"{command}.py"
     sys.argv = [str(script), *args]
     runpy.run_path(str(script), run_name="__main__")
 

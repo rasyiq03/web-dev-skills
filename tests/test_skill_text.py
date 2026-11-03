@@ -46,7 +46,7 @@ def test_web_build_defines_run_shorthand_once():
 
 
 def test_every_run_shorthand_names_a_real_script():
-    valid = {"path", *run.SCRIPTS}
+    valid = {"path", *run.SCRIPTS, *run.TOOLS}
     names = []
 
     for skill in SKILL_FILES:
