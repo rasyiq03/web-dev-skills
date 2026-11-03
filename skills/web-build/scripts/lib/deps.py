@@ -273,11 +273,13 @@ def npm_ci(repo_root, npm, packages, tmp):
     return result
 
 
-def ensure_node_tools(repo_root, cache):
+def ensure_node_tools(repo_root, cache, kind="node"):
     """
     Memastikan alat Node di package.json tersedia.
 
-    I.S. : repo_root berisi package.json dan package-lock.json; cache adalah folder cache.
+    I.S. : repo_root berisi package.json dan package-lock.json; cache adalah folder cache;
+           kind membedakan folder cache (node untuk skill, render untuk render_check), agar
+           pembersihan cache satu jenis tidak menghapus jenis lain.
     F.S. : node_modules repo dikembalikan bila lengkap. Selain itu
            <cache>/node-<hash>/node_modules (dipasang dulu dengan npm ci bila belum ada)
            dikembalikan. ScriptExit kode 1 bila node/npm tidak ada atau npm ci gagal.
@@ -289,7 +291,7 @@ def ensure_node_tools(repo_root, cache):
     if node_modules_complete(local, packages):
         return local
 
-    final = Path(cache) / f"node-{file_hash(repo_root / 'package-lock.json')}"
+    final = Path(cache) / f"{kind}-{file_hash(repo_root / 'package-lock.json')}"
 
     if not final.is_dir():
         npm = shutil.which("npm")

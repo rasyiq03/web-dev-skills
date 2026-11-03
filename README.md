@@ -111,6 +111,11 @@ Changed your mind about one decision? Ask for it ("ganti paletnya jadi sun-block
 pelanggan suka warna cerah"). Only what depends on that decision is redone, and the reason
 is recorded. Ask "kenapa pakai font ini?" to get the chain of reasons.
 
+With Chrome or Chromium installed, the agent also runs `tools/render_check.py`: every page
+is opened at desktop and phone width, checked with axe-core for accessibility, for sideways
+scrolling, and for script errors, and compared with your other projects so two clients do
+not get the same site. Screenshots land in `.ScaffolDev/render/`.
+
 ## First run and the dependency cache
 
 The first build on a machine installs the Python packages and Node tools the checks need

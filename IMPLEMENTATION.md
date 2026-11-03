@@ -447,6 +447,20 @@ round reports zero errors; the restore picks the best round.
   calibrated on the eval set. Note in the report that Design Theater computed layout
   distance from screenshots with OmniParser; ours uses the DOM, so values are not directly
   comparable.
+- (2026-11-03, built) `tools/render_check.py <slug> [--browser PATH]`: Node part in
+  `tools/render/` (playwright-core 1.56.1 and axe-core 4.10.3, installed into the cache as
+  `render-<hash>`, separate from the skill's own Node tools). It serves the site over local
+  HTTP (modules and `fetch()` need it), screenshots each page at 1440 and 390 px into
+  `<work>/render/`, and adds to `report.json` (marked `source: render_check`): axe
+  violations (`category: lint`; critical and serious are errors, moderate warnings),
+  `horizontal-overflow` at 390 px, and `console-error`. Homogeneity uses the DOM, not
+  pixels: colors are sampled on a 40 px grid of the visible backgrounds plus text colors
+  weighted by length, binned in CIELab, and compared with an exact Earth Mover's Distance
+  (ΔE); layout is the Zhang-Shasha tree edit distance between the home pages' landmark
+  trees (header, nav, main, sections with their pattern, headings, lists, tables,
+  figures), normalised by the larger tree. `homogeneous-site` warns when both fall below
+  12 ΔE and 0.25 against any project in the same folder; these thresholds are provisional
+  until the eval harness calibrates them. Fingerprints are kept in `<work>/render.json`.
 - `build_cliches.py`: given generated copy from the eval harness, count 2- to 5-grams;
   keep n-grams that occur in at least 20% of outputs from at least two different models;
   write `audit/cliches-<lang>.txt`, replacing the seed lists.

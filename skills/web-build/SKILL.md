@@ -145,6 +145,10 @@ In this file `run <script> <slug>` is short for that command. Always type the fu
    `{"reviewer": "subagent", "pages": [<its objects>]}` (`"self"` if you reviewed without a
    subagent), and add `"applied": "<what you changed>"` to each finding you fixed. Without
    that file the handoff reports the review as skipped.
+   When Chrome or Chromium is installed, finish with
+   `python "${CLAUDE_PLUGIN_ROOT}/tools/render_check.py" <slug>`: it opens every page at 1440
+   and 390 px, runs axe-core, catches sideways scrolling and script errors, and warns when
+   the site looks like another project in the same folder. Fix its findings like any other.
 
 8. **Handoff.** Run `run handoff <slug>` and show its summary to the user exactly as
    printed: assumptions taken, placeholders to fill, and check scores. It also writes

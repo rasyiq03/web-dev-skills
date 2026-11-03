@@ -1,0 +1,10 @@
+{
+	"name": "scaffoldev-render-check",
+	"private": true,
+	"type": "module",
+	"description": "Browser checks for tools/render_check.py: screenshots, axe-core, and DOM fingerprints",
+	"devDependencies": {
+		"axe-core": "4.10.3",
+		"playwright-core": "1.56.1"
+	}
+}
