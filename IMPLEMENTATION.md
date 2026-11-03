@@ -499,6 +499,23 @@ round reports zero errors; the restore picks the best round.
   from the built site; compares the result with `check.py`'s `tfs_auto`.
 - Condition C3 of the evaluation: same information as C2, delivered through the ontology.
 
+- (2026-11-03, built) `python tools/export_rdf.py <slug>` (needs `requirements-dev.txt`:
+  rdflib 7.1.4, pySHACL 0.30.1) writes `<work>/rdf/model.ttl` (Requirement, Decision,
+  Rationale, Token, Constraint; basedOn, justifiedBy, realizedBy, verifiedBy), checks it
+  against `tools/shapes.ttl` (every decision has a requirement, one rationale of 10+
+  characters, and a verifying constraint), writes `facts.ttl` from the built site (token
+  values in `css/tokens.css`, every CSS declaration, patterns per page, contrast of the
+  requested pairs, transitions outside `base.css`, counts of "Anda" and "kamu"), and one
+  SHACL shape per constraint in `constraints.ttl`. pySHACL validates the facts; the
+  failing constraints and the resulting TFS are compared with `check.py`. On the four
+  dogfood sites both give 1.0, and with five constraints broken on purpose (token,
+  contrast, `var-used`, pattern, register) both fail the same five (0.58). One difference
+  by design: `check.py` reads tokens from `tokens.json`, the shapes read `css/tokens.css`
+  on the site, so a hand edit of `tokens.css` is caught only here. Exit 2 when the model is
+  not valid or the two disagree. Condition C3 of the evaluation (the agent reads this
+  ontology instead of `context` lines) is not built: it needs a `context.py` variant and
+  is only worth it once the harness runs with real models.
+
 ### 3.13 `graph.py <slug> [--impact NODE | --why NODE]`
 
 Design: `docs/superpowers/specs/2026-10-17-scaffolding-agentivism-deep-work-design.md` §2.

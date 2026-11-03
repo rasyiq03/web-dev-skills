@@ -1,0 +1,96 @@
+# ============================================================
+# File      : shapes.ttl
+# Proyek    : ScaffolDev
+# Deskripsi : Bentuk ontologi keputusan desain (IMPLEMENTATION.md §3.12).
+#             tools/export_rdf.py memvalidasi model.ttl setiap proyek
+#             terhadap shape ini; shape per batasan dibuat terpisah.
+# ============================================================
+
+@prefix sd: <https://scaffoldev.dev/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Setiap keputusan berdasar pada kebutuhan dari brief, punya satu alasan,
+# dan diperiksa oleh sedikitnya satu batasan.
+sd:DecisionShape
+	a sh:NodeShape ;
+	sh:targetClass sd:Decision ;
+	sh:property [
+		sh:path sd:axis ;
+		sh:datatype xsd:string ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+	] ;
+	sh:property [
+		sh:path sd:choice ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+	] ;
+	sh:property [
+		sh:path sd:basedOn ;
+		sh:class sd:Requirement ;
+		sh:minCount 1 ;
+		sh:message "Keputusan tanpa dasar kebutuhan dari brief." ;
+	] ;
+	sh:property [
+		sh:path sd:justifiedBy ;
+		sh:class sd:Rationale ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+		sh:message "Keputusan harus punya tepat satu alasan." ;
+	] ;
+	sh:property [
+		sh:path sd:verifiedBy ;
+		sh:class sd:Constraint ;
+		sh:minCount 1 ;
+		sh:message "Keputusan tanpa batasan yang memeriksanya." ;
+	] .
+
+sd:RationaleShape
+	a sh:NodeShape ;
+	sh:targetClass sd:Rationale ;
+	sh:property [
+		sh:path sd:text ;
+		sh:datatype xsd:string ;
+		sh:minLength 10 ;
+		sh:minCount 1 ;
+	] .
+
+sd:RequirementShape
+	a sh:NodeShape ;
+	sh:targetClass sd:Requirement ;
+	sh:property [
+		sh:path sd:path ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+	] ;
+	sh:property [
+		sh:path sd:source ;
+		sh:in ( "stated" "inferred" "form" ) ;
+		sh:minCount 1 ;
+	] .
+
+sd:TokenShape
+	a sh:NodeShape ;
+	sh:targetClass sd:Token ;
+	sh:property [
+		sh:path sd:cssVar ;
+		sh:pattern "^--pd-[a-z0-9-]+$" ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+	] ;
+	sh:property [
+		sh:path sd:value ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+	] .
+
+sd:ConstraintShape
+	a sh:NodeShape ;
+	sh:targetClass sd:Constraint ;
+	sh:property [
+		sh:path sd:kind ;
+		sh:in ( "token-equals" "contrast-min" "var-used" "pattern-present" "motion-max" "register" ) ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+	] .

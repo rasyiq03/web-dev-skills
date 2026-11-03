@@ -158,6 +158,17 @@ sittings) to compare auto, guided, and deep work.
 
 `IMPLEMENTATION.md` specifies every script.
 
+### Research tools
+
+- `python tools/eval/harness.py --out DIR --models sonnet --dry-run`: plans an evaluation of
+  conditions C0 (prompt only), C1 (frontend-design skill), and C2 (ScaffolDev) over the
+  briefs in `tools/eval/briefs.yaml`; without `--dry-run` it runs Claude Code for each and
+  writes `eval.csv` with tokens, cost, browser findings, and the design homogeneity index.
+  A full grid costs real money; start with `--only` and `--reps 1`.
+- `python tools/build_cliches.py DIR`: turns the harness runs into a cliché list.
+- `python tools/export_rdf.py <slug>`: exports a project's decisions to RDF and checks its
+  constraints with SHACL (`pip install -r requirements-dev.txt` first).
+
 ## License
 
 MIT
