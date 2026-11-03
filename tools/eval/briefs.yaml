@@ -1,0 +1,27 @@
+# Delapan prompt evaluasi (IMPLEMENTATION.md §3.11): setiap tipe situs, kota berbeda,
+# dua bahasa. Satu prompt = satu brief; harness memberikannya apa adanya ke agen.
+briefs:
+  - id: kopi-bandung
+    lang: id
+    prompt: buat company profile Kopi Senja, kedai kopi di Bandung, target mahasiswa
+  - id: klinik-surabaya
+    lang: id
+    prompt: buat company profile Klinik Gigi Senyum Sehat di Surabaya untuk keluarga muda, booking lewat WhatsApp
+  - id: keripik-kediri
+    lang: id
+    prompt: buat katalog UMKM Keripik Bu Sari di Kediri, jual keripik singkong balado, keripik tempe, dan makaroni pedas, pesan lewat WhatsApp
+  - id: batik-yogya
+    lang: id
+    prompt: buat landing page workshop batik tulis Sekar Jagad di Yogyakarta untuk wisatawan, daftar lewat WhatsApp
+  - id: ilustrator-makassar
+    lang: id
+    prompt: buat portfolio Rina Pratiwi, ilustrator lepas di Makassar, untuk penerbit buku anak
+  - id: kue-medan-dashboard
+    lang: id
+    prompt: buat dashboard penjualan Toko Kue Bunda di Medan untuk pemilik, omzet harian, jumlah pesanan, produk terlaris; datanya belum ada
+  - id: surf-bali
+    lang: en
+    prompt: make a landing page for Ombak Surf School in Canggu, Bali, for beginner travellers, booking via WhatsApp
+  - id: arsitek-jakarta
+    lang: en
+    prompt: make a company profile for Studio Ruang, a small architecture practice in Jakarta, for families building their first home

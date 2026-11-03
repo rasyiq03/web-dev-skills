@@ -468,6 +468,28 @@ round reports zero errors; the restore picks the best round.
   skill), C2 (this system) over 8 briefs × 3 models × 3 repetitions; collects check
   findings, DHI between briefs, token counts from agent logs; writes one CSV.
 
+- (2026-11-03, built) `tools/build_cliches.py RUNS... [--lang id|en] [--out FILE]` reads
+  every `meta.json` the harness writes, takes the visible text of the pages in that
+  language (placeholders removed), and keeps 2- to 5-grams that appear in at least 20% of
+  one model's outputs for at least two models. Two additions to the rule above: a phrase
+  must also appear for at least two different briefs (otherwise business names count as
+  clichés), and phrases made only of function words ("untuk anda") or almost always inside
+  a longer kept phrase are dropped. It writes `audit/cliches-<lang>.txt` by default, so run
+  it only on a real eval set and review the list before committing it.
+- (2026-11-03, built) `python tools/eval/harness.py --out DIR --models sonnet,opus
+  [--conditions C0,C1,C2] [--reps 3] [--only id,...] [--c1-plugin DIR] [--dry-run]`: eight
+  briefs in `tools/eval/briefs.yaml` (every site type, six cities, two languages). Each
+  run gets an empty folder and the prompt as is; the agent is Claude Code
+  (`claude -p … --output-format json --plugin-dir …`, user settings left out so no other
+  plugin loads, `--max-budget-usd` per run), or any command given with `--agent-command`.
+  Each site is measured with render_check's browser part (axe errors and warnings,
+  overflow, console errors), cliché hits from `audit/`, placeholders, and for C2 the
+  ScaffolDev check summary; tokens and cost come from the agent's JSON. DHI per condition
+  and model is the mean similarity between sites for different briefs, where one pair's
+  similarity is the mean of (1 − layout distance) and (1 − color distance / 50 ΔE). Runs
+  already measured are skipped, so an interrupted evaluation resumes. Not run yet with
+  real models: the full grid is 8 × 3 × 3 × 3 = 216 builds.
+
 ### 3.12 v0.4: `tools/export_rdf.py`, `tools/shapes.ttl`
 
 - Exports `brief.yaml` requirements, `decisions.yaml`, and `tokens.json` to RDF (Turtle):
